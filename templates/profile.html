@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet"
+      href="{{url_for('static',filename='css/profile.css')}}">
+{% endblock %}
+
+{% block title %}
+Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <div class="row">
+
+        <!-- PROFILE CARD -->
+
+        <div class="col-lg-3">
+
+            <div class="card profile-card shadow">
+
+                <div class="card-body text-center">
+
+                    <img
+                        src="{{ url_for('static',
+                        filename='images/profile.png') }}"
+                        class="profile-img" width="150px",height='150px'>
+
+                    <h2 class="mt-4">
+                        Suhail
+                    </h2>
+
+                    <p class="user-role">
+                        AI Fashion User
+                    </p>
+
+                    <hr>
+
+                    <p>
+                        <strong>Gender :</strong>
+                        Male
+                    </p>
+
+                    <p>
+                        <strong>Body Shape :</strong>
+                        Regular
+                    </p>
+
+                    <p>
+                        <strong>Height :</strong>
+                        174 cm
+                    </p>
+
+                    <p>
+                        <strong>Weight :</strong>
+                        47 kg
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BODY MEASUREMENTS -->
+
+        <div class="col-lg-5">
+
+            <div class="card shadow">
+
+                <div class="card-header section-title">
+
+                    Body Measurements
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-hover">
+
+                        <tr>
+                            <th>Chest</th>
+                            <td>39 in</td>
+                        </tr>
+
+                        <tr>
+                            <th>Waist</th>
+                            <td>33 in</td>
+                        </tr>
+
+                        <tr>
+                            <th>Hip</th>
+                            <td>37 in</td>
+                        </tr>
+
+                        <tr>
+                            <th>Shoulder</th>
+                            <td>18 in</td>
+                        </tr>
+
+                        <tr>
+                            <th>Arm Length</th>
+                            <td>25 in</td>
+                        </tr>
+
+                        <tr>
+                            <th>Leg Length</th>
+                            <td>40 in</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- AI RECOMMENDATION -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow">
+
+                <div class="card-header section-title">
+
+                    AI Recommendation
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="recommend-box">
+
+                        <h5>
+                            Shirt Size
+                        </h5>
+
+                        <h2>
+                            M (39)
+                        </h2>
+
+                    </div>
+
+                    <div class="recommend-box">
+
+                        <h5>
+                            Pant Size
+                        </h5>
+
+                        <h2>
+                            32
+                        </h2>
+
+                    </div>
+
+                    <div class="recommend-box">
+
+                        <h5>
+                            Fit Confidence
+                        </h5>
+
+                        <h2>
+                            92%
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- RECOMMENDED PRODUCTS -->
+
+    <div class="row mt-4">
+
+        <div class="col-12">
+
+            <div class="card shadow">
+
+                <div class="card-header section-title">
+
+                    Recommended Clothing
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-3">
+
+                            <div class="product-card">
+
+                                👔
+                                <h5>Formal Shirt</h5>
+                                <p>Size M</p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="product-card">
+
+                                👕
+                                <h5>Polo Shirt</h5>
+                                <p>Size M</p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="product-card">
+
+                                👖
+                                <h5>Jeans</h5>
+                                <p>Size 32</p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="product-card">
+
+                                🩳
+                                <h5>Chino Pant</h5>
+                                <p>Size 32</p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

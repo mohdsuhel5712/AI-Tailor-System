@@ -1,0 +1,17 @@
+# ==================================================
+# FUTURE SMPL INTEGRATION
+# ==================================================
+#
+# Step 1: Load SMPL dataset
+# Step 2: Extract beta shape parameters
+# Step 3: Map measurements -> SMPL betas
+# Step 4: Generate 3D body mesh
+# Step 5: Render virtual try-on
+#
+# Current Phase:
+# measurements -> neural network -> prediction
+#
+# Future Phase:
+# prediction -> SMPL -> 3D avatar
+# ==================================================
+

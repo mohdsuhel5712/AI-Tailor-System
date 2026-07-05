@@ -1,0 +1,150 @@
+body{
+
+    background:#f5f6fa;
+}
+
+/* HEADER */
+
+.dashboard-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.dashboard-profile{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+}
+
+/* STAT CARDS */
+
+.dashboard-card{
+
+    border:none;
+
+    border-radius:20px;
+
+    transition:.3s;
+    box-shadow: 1px 1px 1px 1px #0000006c;
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-5px);
+}
+
+.dashboard-card h1{
+
+    font-size:50px;
+
+    font-weight:700;
+}
+
+/* GENERAL CARD */
+
+.card{
+
+    border:none;
+
+    border-radius:20px;
+
+    overflow:hidden;
+}
+
+.card-header{
+
+    background:white;
+
+    font-size:22px;
+
+    font-weight:700;
+}
+
+/* CUSTOM */
+
+.custom-card{
+
+    background:#f8f9fa;
+
+    padding:30px;
+
+    text-align:center;
+
+    border-radius:15px;
+
+    transition:.3s;
+}
+
+.custom-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+.custom-card h1{
+
+    font-size:60px;
+}
+
+/* AI */
+
+.recommend-box{
+
+    background:#f8f9fa;
+
+    padding:20px;
+
+    margin-bottom:15px;
+
+    border-radius:15px;
+
+    text-align:center;
+}
+
+/* PRODUCTS */
+
+.product-card{
+
+    background:#f8f9fa;
+
+    padding:25px;
+
+    border-radius:15px;
+
+    text-align:center;
+
+    transition:.3s;
+}
+
+.product-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+.product-card h5{
+
+    margin-top:15px;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .dashboard-header{
+
+        flex-direction:column;
+    }
+
+}

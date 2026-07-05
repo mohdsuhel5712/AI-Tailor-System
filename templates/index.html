@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet"
+      href="{{url_for('static',filename='css/index.css')}}">
+{% endblock %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <!-- HERO SECTION -->
+
+    <div class="row align-items-center hero-section">
+
+        <div class="col-lg-6" card shadow-lg rounded-4 p-4>
+
+            <h1 class="display-3 fw-bold">
+
+                AI Virtual Try-On
+
+            </h1>
+
+            <p class="lead">
+
+                Predict and visualize how shirts and
+                pants look using body measurements
+                and AI prediction.
+
+            </p>
+
+            <a href="/measurement"
+               class="btn btn-primary btn-lg">
+
+                Start Measuring
+
+            </a>
+
+        </div>
+
+        <div class="col-lg-6 text-center card shadow-lg rounded-4 p-4">
+
+            <img
+            src="{{ url_for('static',
+            filename='images/hero.png') }}"
+            class="img-fluid hero-image">
+
+        </div>
+
+    </div>
+
+    <hr class="my-5">
+
+    <!-- BASIC FEATURES -->
+
+    <div class="row g-4 text-center my-5">
+
+        <div class="col-md-4">
+
+            <div class="basic-card card shadow-lg p-4 rounded">
+
+                <h3>
+
+                    Measurements
+
+                </h3>
+
+                <p>
+
+                    Save body dimensions
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="basic-card card shadow-lg p-4 rounded">
+
+                <h3>
+
+                    AI Prediction
+
+                </h3>
+
+                <p>
+
+                    Generate body shape
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="basic-card card shadow-lg p-4 rounded">
+
+                <h3>
+
+                    3D Preview
+
+                </h3>
+
+                <p>
+
+                    Visualize garments
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CUSTOMIZATION -->
+
+    <section class="features-section mt-5">
+
+        <div class="text-center mt-5 card shadow-lg rounded-4 p-4">
+
+            <h2 class="fw-bold">
+
+                What Would You Like To Stitch?
+
+            </h2>
+
+            <p>
+
+                Choose your customization option
+
+            </p>
+
+        </div>
+
+        <div class="row g-4 mt-5">
+
+            <!-- SHIRT -->
+
+            <div class="col-md-4 ">
+
+                <div class="feature-card card shadow-lg rounded-4 p-4">
+
+                    <div class="emoji">
+
+                        👔
+
+                    </div>
+
+                    <h3>
+
+                        Shirt Only
+
+                    </h3>
+
+                    <p>
+
+                        Provide shirt measurements
+                        and get AI size prediction.
+
+                    </p>
+
+                    <a href="/measurement"
+                       class="btn btn-primary">
+
+                        Select
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- PANT -->
+
+            <div class="col-md-4 ">
+
+                <div class="feature-card card shadow-lg rounded-4 p-4">
+
+                    <div class="emoji">
+
+                        👖
+
+                    </div>
+
+                    <h3>
+
+                        Pant Only
+
+                    </h3>
+
+                    <p>
+
+                        Enter pant measurements
+                        and preview your fitting.
+
+                    </p>
+
+                    <a href="/measurement"
+                       class="btn btn-primary">
+
+                        Select
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- BOTH -->
+
+            <div class="col-md-4 ">
+
+                <div class="feature-card card shadow-lg rounded-4 p-4">
+
+                    <div class="emoji">
+
+                        🧥
+
+                    </div>
+
+                    <h3>
+
+                        Complete Outfit
+
+                    </h3>
+
+                    <p>
+
+                        Shirt + Pant with AI
+                        recommendation.
+
+                    </p>
+
+                    <a href="/measurement"
+                       class="btn btn-primary">
+
+                        Select
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- AI FEATURES -->
+
+    <section class="services-section">
+
+        <div class="text-center  my-5 card shadow-lg rounded-4 p-4">
+
+            <h2 class="fw-bold">
+
+                AI Tailor System Features
+
+            </h2>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-3 ">
+
+                <div class="service-card card shadow-lg rounded-4 p-3">
+
+                    <h1>
+
+                        📏
+
+                    </h1>
+
+                    <h5>
+
+                        Measurements
+
+                    </h5>
+
+                    <p>
+
+                        Store body dimensions
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 ">
+
+                <div class="service-card card shadow-lg rounded-4 p-3">
+
+                    <h1>
+
+                        🤖
+
+                    </h1>
+
+                    <h5>
+
+                        AI Prediction
+
+                    </h5>
+
+                    <p>
+
+                        Predict body shape
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 ">
+
+                <div class="service-card card shadow-lg rounded-4 p-3">
+
+                    <h1>
+
+                        👕
+
+                    </h1>
+
+                    <h5>
+
+                        Size Recommendation
+
+                    </h5>
+
+                    <p>
+
+                        Recommend perfect fit
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 ">
+
+                <div class="service-card card shadow-lg rounded-4 p-3">
+
+                    <h1>
+
+                        🧍
+
+                    </h1>
+
+                    <h5>
+
+                        Virtual Try-On
+
+                    </h5>
+
+                    <p>
+
+                        Preview garments
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section class="workflow-section">
+
+        <div class="text-center my-5 card shadow-lg" p-4>
+
+            <h2 class="fw-bold">
+
+                How It Works
+
+            </h2>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-3 ">
+
+                <div class="step-card card shadow-lg p-2">
+
+                    <h1>
+
+                        1
+
+                    </h1>
+
+                    <h5>
+
+                        Enter Measurements
+
+                    </h5>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="step-card card shadow-lg p-2">
+
+                    <h1>
+
+                        2
+
+                    </h1>
+
+                    <h5>
+
+                        AI Prediction
+
+                    </h5>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="step-card card shadow-lg p-2">
+
+                    <h1>
+
+                        3
+
+                    </h1>
+
+                    <h5>
+
+                        Generate Size
+
+                    </h5>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="step-card card shadow-lg p-2">
+
+                    <h1>
+
+                        4
+
+                    </h1>
+
+                    <h5>
+
+                        Virtual Try-On
+
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

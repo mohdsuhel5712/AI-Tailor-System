@@ -1,0 +1,427 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet"
+      href="{{url_for('static',filename='css/dashboard.css')}}">
+{% endblock %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <!-- HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+            <h1>Welcome, Suhail 👋</h1>
+            <p>
+                AI Virtual Try-On Dashboard
+            </p>
+        </div>
+
+        <img
+            src="{{url_for('static',
+            filename='images/profile.png')}}"
+            class="dashboard-profile" width="150px" height="150px">
+
+    </div>
+
+    <!-- STATS -->
+
+    <div class="row mt-4">
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card shadow">
+
+                <div class="card-body">
+
+                    <h5>Measurements</h5>
+
+                    <h1>1</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card shadow">
+
+                <div class="card-body">
+
+                    <h5>Shirts</h5>
+
+                    <h1>20</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card shadow">
+
+                <div class="card-body">
+
+                    <h5>Pants</h5>
+
+                    <h1>10</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card shadow">
+
+                <div class="card-body">
+
+                    <h5>Try-On</h5>
+
+                    <h1>8</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CUSTOMIZATION -->
+
+    <div class="card shadow mt-4">
+
+        <div class="card-header">
+
+            What would you like to customize?
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="custom-card">
+
+                        <h1>👔</h1>
+
+                        <h4>Custom Shirt</h4>
+
+                        <p>
+                            Design your own shirt
+                        </p>
+
+                        <button
+                            class="btn btn-primary">
+
+                            Select
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="custom-card">
+
+                        <h1>👖</h1>
+
+                        <h4>Custom Pant</h4>
+
+                        <p>
+                            Design your own pant
+                        </p>
+
+                        <button
+                            class="btn btn-primary">
+
+                            Select
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="custom-card">
+
+                        <h1>🧥</h1>
+
+                        <h4>Full Outfit</h4>
+
+                        <p>
+                            Shirt + Pant
+                        </p>
+
+                        <button
+                            class="btn btn-primary">
+
+                            Select
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- BODY + AI -->
+
+    <div class="row mt-4">
+
+        <div class="col-md-6">
+
+            <div class="card shadow">
+
+                <div class="card-header">
+
+                    Body Measurements
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table">
+
+                        <tr>
+                            <th>Height</th>
+                            <td>174 cm</td>
+                        </tr>
+
+                        <tr>
+                            <th>Chest</th>
+                            <td>39</td>
+                        </tr>
+
+                        <tr>
+                            <th>Waist</th>
+                            <td>33</td>
+                        </tr>
+
+                        <tr>
+                            <th>Hip</th>
+                            <td>37</td>
+                        </tr>
+
+                        <tr>
+                            <th>Body Shape</th>
+                            <td>Regular</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card shadow">
+
+                <div class="card-header">
+
+                    AI Recommendation
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="recommend-box">
+
+                        <h6>
+                            Shirt Size
+                        </h6>
+
+                        <h2>
+                            M
+                        </h2>
+
+                    </div>
+
+                    <div class="recommend-box">
+
+                        <h6>
+                            Pant Size
+                        </h6>
+
+                        <h2>
+                            32
+                        </h2>
+
+                    </div>
+
+                    <div class="recommend-box">
+
+                        <h6>
+                            Confidence
+                        </h6>
+
+                        <h2>
+                            92%
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- RECOMMENDED PRODUCTS -->
+
+    <div class="card shadow mt-4">
+
+        <div class="card-header">
+
+            Recommended Clothing
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-3">
+
+                    <div class="product-card">
+
+                        👔
+
+                        <h5>
+                            Formal Shirt
+                        </h5>
+
+                        <p>
+                            Size M
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="product-card">
+
+                        👕
+
+                        <h5>
+                            Polo Shirt
+                        </h5>
+
+                        <p>
+                            Size M
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="product-card">
+
+                        👖
+
+                        <h5>
+                            Jeans
+                        </h5>
+
+                        <p>
+                            Size 32
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="product-card">
+
+                        🩳
+
+                        <h5>
+                            Chino Pant
+                        </h5>
+
+                        <p>
+                            Size 32
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TRY ON -->
+
+    <div class="card shadow mt-4">
+
+        <div class="card-body text-center">
+
+            <h2>
+                  <a href="/measurement">
+
+                        AI Virtual Try-On
+                  </a>
+
+            </h2>
+
+            <p>
+
+                Preview your customized outfit
+
+            </p>
+
+            <button
+                class="btn btn-success btn-lg">
+            <a href="/measurement">
+
+                  Start Try-On
+            </a>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

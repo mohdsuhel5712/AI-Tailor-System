@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet"
+      href="{{url_for('static',filename='css/measurement.css')}}">
+{% endblock %}
+
+{% block title %}
+Measurements
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <div class="measurement-container">
+
+        <h2 class="measurement-title">
+            Body Measurements
+        </h2>
+
+        <!-- Success Message -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-success">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="/api/measurements" method="POST">
+
+            <div class="row">
+
+                <!-- Left Side Image -->
+                <div class="col-md-4 text-center mb-4">
+
+                    <img
+                        src="{{ url_for('static',filename='images/body_measurement.png') }}"
+                        class="measurement-image img-fluid"
+                        alt="Body Measurement">
+
+                </div>
+
+                <!-- Right Side Form -->
+                <div class="col-md-8">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Height (cm)
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="height"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Chest
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="chest"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Waist
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="waist"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Hip
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="hip"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Shoulder
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="shoulder"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Arm Length
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="arm_length"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Leg Length
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="leg_length"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Gender
+                            </label>
+
+                            <select
+                                class="form-control"
+                                name="gender">
+
+                                <option value="Male">
+                                    Male
+                                </option>
+
+                                <option value="Female">
+                                    Female
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Body Shape
+                            </label>
+
+                            <select
+                                class="form-control"
+                                name="body_shape">
+
+                                <option value="Slim">
+                                    Slim
+                                </option>
+
+                                <option value="Regular">
+                                    Regular
+                                </option>
+
+                                <option value="Athletic">
+                                    Athletic
+                                </option>
+
+                                <option value="Broad">
+                                    Broad
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Mesh File
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="mesh_file"
+                                placeholder="mesh001.obj"
+                                required>
+                        </div>
+
+                    </div>
+
+                    <div class="text-center mt-4">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary measurement-btn">
+
+                            Save Measurements
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+        <div class="measurement-info">
+
+            <h5>
+                Measurement Tips
+            </h5>
+
+            <ul>
+                <li>Measure chest around the fullest part.</li>
+                <li>Measure waist at natural waistline.</li>
+                <li>Measure shoulder from edge to edge.</li>
+                <li>Measure arm and leg lengths accurately.</li>
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

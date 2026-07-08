@@ -28,7 +28,8 @@ Measurements
             {% endif %}
         {% endwith %}
 
-        <form action="/api/measurements" method="POST">
+        <!-- <form action="/api/measurements" method="POST"> -->
+        <form action="/predict-body" method="POST">
 
             <div class="row">
 
@@ -60,6 +61,29 @@ Measurements
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
+                                Weight (KG)
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="weight"
+                                required>
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Age
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="age"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
                                 Chest
                             </label>
                             <input
@@ -71,6 +95,17 @@ Measurements
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
+                                Neck
+                            </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="neck"
+                                required>
+                        </div>
+
+                        <!-- <div class="col-md-6 mb-3">
+                            <label class="form-label">
                                 Waist
                             </label>
                             <input
@@ -78,29 +113,7 @@ Measurements
                                 class="form-control"
                                 name="waist"
                                 required>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Hip
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="hip"
-                                required>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Shoulder
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="shoulder"
-                                required>
-                        </div>
+                        </div> -->
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">

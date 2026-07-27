@@ -32,7 +32,9 @@
 # loader.model_info(model)
 
 import os
+
 from backend.body_prediction.smpl.smpl_model import SMPLModel
+
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))
@@ -44,13 +46,21 @@ MODEL_DIR = os.path.join(
     "models"
 )
 
-print("=" * 50)
-print("MODEL DIRECTORY :", MODEL_DIR)
-print("EXISTS :", os.path.exists(MODEL_DIR))
-print("=" * 50)
 
-loader = SMPLModel(MODEL_DIR)
+def load_smpl_model(gender="neutral"):
+    """
+    Load and return the SMPL model.
+    """
 
-model = loader.load_model("neutral")
+    print("=" * 50)
+    print("MODEL DIRECTORY :", MODEL_DIR)
+    print("EXISTS :", os.path.exists(MODEL_DIR))
+    print("=" * 50)
 
-loader.model_info(model)
+    loader = SMPLModel(MODEL_DIR)
+
+    model = loader.load_model(gender)
+
+    loader.model_info(model)
+
+    return model

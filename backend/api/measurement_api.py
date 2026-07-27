@@ -1,113 +1,136 @@
-'''STEP 5 — Create Save API'''
-'''FASH_SHOP/backend/api/measurement_api.py'''
+"""
+=========================================================
+File : measurement_api.py
+
+Folder :
+backend/api/
+
+Purpose
+-------
+1. Receive measurements from HTML
+2. Validate measurements
+3. Save into PostgreSQL
+4. Predict remaining measurements
+5. Generate personalized body mesh
+6. Open body viewer
+
+Project : AI Tailor System
+=========================================================
+"""
 
 from flask import Blueprint
 from flask import request
-from flask import jsonify
-from flask import redirect
-from flask import flash
+from flask import render_template
 
-from backend.services.measurement_service import (
-    save_measurements,
-    get_measurement
-)
+from backend.validators.measurement_validator import validate_measurements
 
-from backend.validators.measurement_validator import (
-    validate_measurements
-)
+from backend.services.measurement_service import save_measurements
+from backend.services.body_generation_service import BodyGenerationService
+from backend.body_prediction.smpl.smpl_model import SMPLModel
+ 
+
+# -----------------------------------------------------
+# Blueprint
+# -----------------------------------------------------
 
 api_bp = Blueprint(
-    "measurements",
+    "measurement_bp",
     __name__
 )
 
+# -----------------------------------------------------
+# Initialize Body Generation Service
+# -----------------------------------------------------
 
-@api_bp.route("/api/measurements",methods=['POST']
-)
-def create_measurement():
-
-    try:
-
-        data = {
-
-            'height':
-                int(
-                    request.form['height']
-                ),
-
-            'chest':
-                int(
-                    request.form['chest']
-                ),
-
-            'waist':
-                int(
-                    request.form['waist']
-                ),
-
-            'hip':
-                int(
-                    request.form['hip']
-                ),
-
-            'shoulder':
-                int(
-                    request.form['shoulder']
-                ),
-
-            'arm_length':
-                int(
-                    request.form['arm_length']
-                ),
-
-            'leg_length':
-                int(
-                    request.form['leg_length']
-                ),
-
-            'gender':
-                request.form['gender'],
-
-            'body_shape':
-                request.form['body_shape'],
-
-            'mesh_file':
-                request.form['mesh_file']
-        }
-
-        validate_measurements(
-            data
-        )
-
-        save_measurements(
-            data
-        )
-        
-        flash("Measurements saved successfully!")
-        return redirect('/measurement')
-
-      #   return jsonify(
-      #       {
-      #           "success": True,
-      #           "message":
-      #           "Measurements saved successfully"
-      #       }
-      #   )
-
-    except Exception as e:
-
-        return jsonify(
-            {
-                "success": False,
-                "error": str(e)
-            }
-        )
+body_service = BodyGenerationService()
 
 
-@api_bp.route("/api/measurements",methods=['GET']
-)
-def fetch():
+# -----------------------------------------------------
+# Save Measurement Route
+# -----------------------------------------------------
 
-    return jsonify(
-        get_measurement()
+@api_bp.route("/save-measurements", methods=["POST"])
+def save_measurement():
+
+    print("\n========== STEP 1 ==========")
+    print("measurement_api.py reached")
+    print("============================")
+
+    # -----------------------------------------
+    # Read Form Data
+    # -----------------------------------------
+
+    data = {
+
+        "height": float(request.form["height"]),
+        "weight": float(request.form["weight"]),
+        "age": int(request.form["age"]),
+        "category": request.form["category"],
+        "body_shape": request.form["body_shape"],
+        "mesh_file": request.form["mesh_file"]
+    }
+    # model = smpl_model.load_model(gender)
+
+    print("\nReceived Measurements")
+    print(data)
+
+    # -----------------------------------------
+    # Validate
+    # -----------------------------------------
+
+    validate_measurements(data)
+
+    # -----------------------------------------
+    # Save + AI Prediction
+    # -----------------------------------------
+
+    prediction = save_measurements(data)
+
+    print("\nPrediction Returned")
+    print(prediction)
+
+    # -----------------------------------------
+    # Merge Original + Predicted Measurements
+    # -----------------------------------------
+
+    complete_measurements = {
+
+        **data,
+
+        **prediction
+
+    }
+
+    print("\n========== COMPLETE BODY ==========")
+
+    for key, value in complete_measurements.items():
+
+        print(f"{key:15} : {value}")
+
+    print("===================================\n")
+
+    # -----------------------------------------
+    # Generate Personalized Mesh
+    # -----------------------------------------
+
+    obj_file = body_service.generate_body(
+        complete_measurements
+    )
+
+    print("\nGenerated OBJ :", obj_file)
+
+    # -----------------------------------------
+    # Open Viewer
+    # -----------------------------------------
+
+    return render_template(
+
+        "body_viewer.html",
+
+        mesh_file=obj_file,
+
+        prediction=prediction,
+
+        measurements=complete_measurements
+
     )

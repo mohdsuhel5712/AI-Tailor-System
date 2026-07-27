@@ -1,0 +1,29 @@
+.category-card{
+    border-radius:20px;
+    transition:.35s;
+    overflow:hidden;
+}
+
+.category-card img{
+    height:200px;
+    object-fit:contain;
+    background:#f8f9fa;
+}
+
+.category-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 20px 35px rgba(0,0,0,.18)!important;
+}
+
+.category-card h3{
+    margin-top:10px;
+}
+
+.category-card p{
+    font-size:15px;
+}
+
+.btn{
+    border-radius:30px;
+    font-weight:600;
+}

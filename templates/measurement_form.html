@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<link rel="stylesheet"
-      href="{{url_for('static',filename='css/measurement.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/measurement.css')}}">
 {% endblock %}
 
 {% block title %}
@@ -15,36 +14,36 @@ Measurements
 
     <div class="measurement-container">
 
-        <h2 class="measurement-title">
-            Body Measurements
-        </h2>
+        <center>
+            <h2 class="measurement-title my-4">
+                Body Measurements System
+            </h2>
+        </center>
 
         <!-- Success Message -->
         {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="alert alert-success">
-                    {{ messages[0] }}
-                </div>
-            {% endif %}
+        {% if messages %}
+        <div class="alert alert-success">
+            {{ messages[0] }}
+        </div>
+        {% endif %}
         {% endwith %}
 
-        <!-- <form action="/api/measurements" method="POST"> -->
-        <form action="/predict-body" method="POST">
+        <form action="/save-measurements" method="POST">
+            <!-- <form action="/body-viewer" method="POST"> -->
 
-            <div class="row">
+            <div class="row my-4">
 
                 <!-- Left Side Image -->
-                <div class="col-md-4 text-center mb-4">
+                <div class="col-md-6 text-center mb-4 hint-image">
 
-                    <img
-                        src="{{ url_for('static',filename='images/body_measurement.png') }}"
-                        class="measurement-image img-fluid"
-                        alt="Body Measurement">
+                    <img src="{{ url_for('static',filename='images/body_measurement.png') }}"
+                        class="measurement-image img-fluid" alt="Body Measurement">
 
                 </div>
 
                 <!-- Right Side Form -->
-                <div class="col-md-8">
+                <div class="col-md-6 form">
 
                     <div class="row">
 
@@ -52,22 +51,14 @@ Measurements
                             <label class="form-label">
                                 Height (cm)
                             </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="height"
-                                required>
+                            <input type="number" class="form-control" name="height" required>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 Weight (KG)
                             </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="weight"
-                                required>
+                            <input type="number" class="form-control" name="weight" required>
                         </div>
 
 
@@ -75,14 +66,10 @@ Measurements
                             <label class="form-label">
                                 Age
                             </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="age"
-                                required>
+                            <input type="number" class="form-control" name="age" required>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <!-- <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 Chest
                             </label>
@@ -91,9 +78,9 @@ Measurements
                                 class="form-control"
                                 name="chest"
                                 required>
-                        </div>
+                        </div> -->
 
-                        <div class="col-md-6 mb-3">
+                        <!-- <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 Neck
                             </label>
@@ -102,7 +89,7 @@ Measurements
                                 class="form-control"
                                 name="neck"
                                 required>
-                        </div>
+                        </div> -->
 
                         <!-- <div class="col-md-6 mb-3">
                             <label class="form-label">
@@ -115,7 +102,7 @@ Measurements
                                 required>
                         </div> -->
 
-                        <div class="col-md-6 mb-3">
+                        <!-- <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 Arm Length
                             </label>
@@ -124,9 +111,9 @@ Measurements
                                 class="form-control"
                                 name="arm_length"
                                 required>
-                        </div>
+                        </div> -->
 
-                        <div class="col-md-6 mb-3">
+                        <!-- <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 Leg Length
                             </label>
@@ -135,16 +122,14 @@ Measurements
                                 class="form-control"
                                 name="leg_length"
                                 required>
-                        </div>
+                        </div> -->
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
-                                Gender
+                                Category
                             </label>
 
-                            <select
-                                class="form-control"
-                                name="gender">
+                            <select class="form-control" name="category">
 
                                 <option value="Male">
                                     Male
@@ -152,6 +137,10 @@ Measurements
 
                                 <option value="Female">
                                     Female
+                                </option>
+
+                                <option value="kid">
+                                    Kid
                                 </option>
 
                             </select>
@@ -162,9 +151,7 @@ Measurements
                                 Body Shape
                             </label>
 
-                            <select
-                                class="form-control"
-                                name="body_shape">
+                            <select class="form-control" name="body_shape">
 
                                 <option value="Slim">
                                     Slim
@@ -190,21 +177,14 @@ Measurements
                                 Mesh File
                             </label>
 
-                            <input
-                                type="text"
-                                class="form-control"
-                                name="mesh_file"
-                                placeholder="mesh001.obj"
-                                required>
+                            <input type="text" class="form-control" name="mesh_file" placeholder="mesh001.obj" required>
                         </div>
 
                     </div>
 
                     <div class="text-center mt-4">
 
-                        <button
-                            type="submit"
-                            class="btn btn-primary measurement-btn">
+                        <button type="submit" class="btn btn-primary measurement-btn">
 
                             Save Measurements
 
@@ -218,12 +198,12 @@ Measurements
 
         </form>
 
-        <div class="measurement-info">
 
-            <h5>
+
+        <div class="measurement-info mt-4">
+            <h5 class="mt-5">
                 Measurement Tips
             </h5>
-
             <ul>
                 <li>Measure chest around the fullest part.</li>
                 <li>Measure waist at natural waistline.</li>

@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/body_viewer.css')}}">
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/body_viewer.css')}}">
+{% endblock %}
+
+{% block title %}
+Personalized 3D Body
+{% endblock %}
+
+
+
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+    <div class="row">
+
+        <!-- ===================================== -->
+        <!-- LEFT SIDE : 3D VIEWER (70%) -->
+        <!-- ===================================== -->
+
+        <div class="col-lg-8 col-md-12 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h3 class="mb-0">
+                        Personalized 3D Human Body
+                    </h3>
+
+                </div>
+
+                <div class="card-body p-2">
+
+                    <div id="viewer" id="viewer-container" style="
+                            width:100%;
+                            height:600px;
+                            border-radius:10px;
+                            border:1px solid #ddd;
+                            background:#f8f9fa;
+                        ">
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <strong>OBJ File :</strong><br>
+
+                            <small class="text-muted">
+                                {{ obj_file }}
+                            </small>
+
+                        </div>
+
+                        <a href="/measurement" class="btn btn-secondary">
+
+                            ← Back
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- RIGHT SIDE : AI MEASUREMENTS (30%) -->
+        <!-- ===================================== -->
+
+        <div class="col-lg-4 col-md-12">
+
+            <div class="card shadow-lg border-0 rounded-4 sticky-top">
+
+                <div class="card-header bg-success text-white text-center py-3">
+
+                    <h4 class="mb-0">
+                        👔 Garment Customization
+                    </h4>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form method="POST">
+
+                        <!-- Shirt -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+                                Shirt Type
+                            </label>
+
+                            <select class="form-select" name="shirt">
+
+                                <option>Dress Shirt</option>
+                                <option>Oxford</option>
+                                <option>T-Shirt</option>
+                                <option>Denim Shirt</option>
+                                <option>Flannel</option>
+                                <option>Linen</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Pant -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+
+                                Pant Type
+
+                            </label>
+
+                            <select class="form-select" name="pant">
+
+                                <option>Formal</option>
+                                <option>Jeans</option>
+                                <option>Cargo</option>
+                                <option>Jogger</option>
+                                <option>Chino</option>
+                                <option>Linen</option>
+
+                            </select>
+
+                        </div>
+
+                        <hr>
+
+                        <h6 class="fw-bold my-4">
+                            🎨 Pant Colour
+                        </h6>
+
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                            <!-- Fixed colors -->
+                            <label class="color-label black-color">
+                                <input type="radio" name="pant_color" value="#000000">
+                                <span>Black</span>
+                            </label>
+
+                            <label class="color-label blue-color">
+                                <input type="radio" name="pant_color" value="#fffff">
+                                <span>White</span>
+                            </label>
+
+                           
+                            <!-- Custom color picker -->
+                            <label class="custom-color">
+                                <input type="color" id="customPantColor" value="#ff0000">
+                                <span>Custom</span>
+                            </label>
+
+                        </div>
+
+
+                        <h6 class="fw-bold my-4">
+                            🎨 Pant Colour
+                        </h6>
+
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                            <!-- Fixed colors -->
+                            <label class="color-label black-color">
+                                <input type="radio" name="pant_color" value="#000000">
+                                <span>Black</span>
+                            </label>
+
+                            <label class="color-label gray-color">
+                                <input type="radio" name="pant_color" value="#808080">
+                                <span>White</span>
+                            </label>
+
+                            <!-- Custom color picker -->
+                            <label class="custom-color">
+                                <input type="color" id="customPantColor" value="#ff0000">
+                                <span>Custom</span>
+                            </label>
+
+                        </div>
+                        <div class="row my-4">
+
+                            <div class="col-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Shirt Fabric
+
+                                </label>
+
+                                <select class="form-select">
+
+                                    <option>Cotton</option>
+
+                                    <option>Linen</option>
+
+                                    <option>Denim</option>
+
+                                    <option>Silk</option>
+
+                                    <option>Polyester</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Pant Fabric
+
+                                </label>
+
+                                <select class="form-select">
+
+                                    <option>Denim</option>
+
+                                    <option>Cotton</option>
+
+                                    <option>Linen</option>
+
+                                    <option>Polyester</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-4">
+
+                            <div class="col-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Shirt Pattern
+
+                                </label>
+
+                                <select class="form-select">
+
+                                    <option>Solid</option>
+
+                                    <option>Striped</option>
+
+                                    <option>Checked</option>
+
+                                    <option>Printed</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Pant Pattern
+
+                                </label>
+
+                                <select class="form-select">
+
+                                    <option>Solid</option>
+
+                                    <option>Pinstripe</option>
+
+                                    <option>Checked</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4">
+
+                            <label class="form-label fw-bold">
+
+                                Fit
+
+                            </label>
+
+                            <select class="form-select">
+
+                                <option>Slim Fit</option>
+
+                                <option>Regular Fit</option>
+
+                                <option>Loose Fit</option>
+
+                                <option>Relaxed Fit</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="d-grid mt-4">
+
+                            <button class="btn btn-primary btn-lg">
+
+                                👕 Apply Clothes
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+</div>
+
+<div class="container my-4">
+    <div class="row my-4">
+        <center>
+            <h2 class="my-4 p-4">AI GENERATED MEASUREMENTS</h2>
+        </center>
+        <div class="col-lg-12 col-md-12 border-radius box-shadow">
+
+            <div class="card shadow sticky-top">
+
+                <div class="card-header bg-success text-white">
+
+                    <h4 class="mb-0">
+
+                        AI Body Measurements
+
+                    </h4>
+
+                </div>
+
+                <div class="card-body p-0">
+
+                    <table class="table table-striped table-hover mb-0">
+
+                        <tbody>
+
+                            <tr>
+                                <th>Height</th>
+                                <td>{{ prediction.height }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Weight</th>
+                                <td>{{ prediction.weight }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Age</th>
+                                <td>{{ prediction.age }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>category</th>
+                                <td>{{ prediction.category }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Body Shape</th>
+                                <td>{{ prediction.body_shape }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Neck</th>
+                                <td>{{ prediction.neck }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Shoulder</th>
+                                <td>{{ prediction.shoulder }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Chest</th>
+                                <td>{{ prediction.chest }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Waist</th>
+                                <td>{{ prediction.waist }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Hip</th>
+                                <td>{{ prediction.hip }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Arm Length</th>
+                                <td>{{ prediction.arm_length }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Leg Length</th>
+                                <td>{{ prediction.leg_length }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Mesh File</th>
+                                <td class="small">
+                                    {{ prediction.mesh_file }}
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- Pass OBJ file to JavaScript -->
+        <!-- ===================================== -->
+
+        <script>
+
+            const OBJ_FILE = "{{ url_for('static', filename='generated/processed_body.obj') }}";
+            const MTL_FILE = "{{ url_for('static',filename='generated/human_body.mtl') }}"
+
+        </script>
+
+
+        <!-- ===================================== -->
+        <!-- Three.js -->
+        <!-- ===================================== -->
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+
+        <script src="{{ url_for('static', filename='js/viewer.js') }}"></script>
+
+
+        <script>
+            const colorPicker =
+    document.getElementById("customPantColor");
+
+colorPicker.addEventListener("input", function () {
+
+    const selectedColor = this.value;
+
+    changePantColor(selectedColor);
+
+});
+
+
+function changePantColor(color) {
+
+    console.log("Selected Color:", color);
+
+    pant.traverse(function (child) {
+
+        if (child.isMesh) {
+
+            child.material.color.set(color);
+
+        }
+
+    });
+
+}
+        </script>
+        {% endblock %}

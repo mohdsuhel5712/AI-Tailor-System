@@ -1,108 +1,215 @@
 """
 ===========================================================
-File: body_parameter_mapper.py
+File : body_parameter_mapper.py
 
-Purpose:
---------
-Converts user body measurements into SMPL beta parameters.
+Folder :
+backend/body_prediction/smpl/
 
-The SMPL model uses:
-    - betas : Body Shape (10 values)
-    - body_pose : Body Pose
-    - global_orient : Global Rotation
+Purpose
+-------
+Convert body measurements into SMPL Shape Betas.
 
-This file only predicts betas.
-
-Author:
+Author
+------
 AI Tailor System
 ===========================================================
-
-Maps body measurements to SMPL beta parameters.
-      
- Convert measurements into SMPL betas.
-
-        Parameters
-        ----------
-        measurements : dict
-
-        Returns
-        -------
-        numpy.ndarray
-        Shape = (1,10)
 """
-import numpy as np 
+
+import numpy as np
+
 
 class BodyParameterMapper:
-       
-    def  __init__(self):
-        """
-        Initialize mapper.
-        """
-        self.beta_count= 10
-        
+
+    def __init__(self):
+
+        self.beta_count = 10
+
     # -----------------------------------------------------
-    # Normalize measurements
+    # Normalize Measurements
     # -----------------------------------------------------
-    def normalize(self,measurements):
-        nomalized = {}
-        
-        nomalized['height'] = measurements['height']/200.0
-        nomalized['weight'] = measurements['weight']/150.0
-        nomalized['chest'] = measurements['chest']/150.0
-        nomalized['waist'] = measurements['waist']/150.0
-        nomalized['hip'] = measurements['hip']/150.0
-        nomalized['neck'] = measurements['neck']/60.0
-        nomalized['arm_length'] = measurements['arm_length']/100.0
-        nomalized['leg_length'] = measurements['leg_length']/150.0
-        
-        return nomalized
-  
+
+    def normalize(self, measurements):
+
+        normalized = {}
+
+        normalized["height"] = (measurements["height"] - 140) / 70.0
+        normalized["weight"] = (measurements["weight"] - 35) / 115.0
+
+        normalized["chest"] = (measurements["chest"] - 60) / 70.0
+        normalized["waist"] = (measurements["waist"] - 50) / 80.0
+        normalized["hip"] = (measurements["hip"] - 70) / 80.0
+
+        normalized["neck"] = (measurements["neck"] - 28) / 22.0
+
+        normalized["arm_length"] = (measurements["arm_length"] - 45) / 35.0
+        normalized["leg_length"] = (measurements["leg_length"] - 65) / 45.0
+
+        normalized["shoulder"] = (measurements["shoulder"] - 30) / 30.0
+
+        return normalized
+
     # -----------------------------------------------------
-    # Measurements → SMPL Betas
+    # Measurements -> Betas
     # -----------------------------------------------------
-    def measurements_to_betas(self,measurements):
-          
-          m = self.normalize(measurements)
-          
-          betas = np.zeros((1,self.beta_count))
-          
-          #height
-          betas[0][0] = (m['height']-0.85)*3
-          #weight
-          betas[0][1] = (m['weight']-0.45)*3
-          #chest
-          betas[0][2] = (m['chest']-0.60)*3
-          #waist
-          betas[0][3] = (m['waist']-0.55)*3
-          #hip
-          betas[0][4] = (m['hip']-0.60)*3
-          #neck
-          betas[0][5] = (m['neck']-0.55)*3
-          #arm_length
-          betas[0][6] = (m['arm_length']-0.65)*3
-          #leg_langth
-          betas[0][7] = (m['leg_length']-0.75)*3
-          
-          #reserved
-          betas[0][8] = 0.0
-          betas[0][9] = 0.0
-          return betas
-    
-    
+
+    def measurements_to_betas(self, measurements):
+
+        m = self.normalize(measurements)
+
+        betas = np.zeros((1, self.beta_count))
+
+        # -----------------------------
+        # Body Ratios
+        # -----------------------------
+
+        bmi = measurements["weight"] / (
+            (measurements["height"] / 100) ** 2
+        )
+
+        chest_waist = (
+            measurements["chest"] - measurements["waist"]
+        )
+
+        hip_waist = (
+            measurements["hip"] - measurements["waist"]
+        )
+
+        shoulder_ratio = (
+            measurements["shoulder"] / measurements["height"]
+        )
+
+        arm_ratio = (
+            measurements["arm_length"] / measurements["height"]
+        )
+
+        leg_ratio = (
+            measurements["leg_length"] / measurements["height"]
+        )
+
+        # -----------------------------
+        # Beta 0
+        # Overall Body Size
+        # -----------------------------
+
+        betas[0][0] = (
+            1.5 * m["height"] +
+            1.2 * m["weight"] - 1.0
+        )
+
+        # -----------------------------
+        # Beta 1
+        # Body Fat
+        # -----------------------------
+
+        betas[0][1] = (
+            (bmi - 22) / 6.0
+        )
+
+        # -----------------------------
+        # Beta 2
+        # Chest
+        # -----------------------------
+
+        betas[0][2] = (
+            1.8 * m["chest"] +
+            0.5 * shoulder_ratio -
+            0.5
+        )
+
+        # -----------------------------
+        # Beta 3
+        # Waist
+        # -----------------------------
+
+        betas[0][3] = (
+            2.0 * m["waist"] +
+            0.02 * chest_waist
+        )
+
+        # -----------------------------
+        # Beta 4
+        # Hip
+        # -----------------------------
+
+        betas[0][4] = (
+            2.0 * m["hip"] +
+            0.02 * hip_waist
+        )
+
+        # -----------------------------
+        # Beta 5
+        # Neck + Shoulder
+        # -----------------------------
+
+        betas[0][5] = (
+            1.2 * m["neck"] +
+            0.8 * m["shoulder"]
+        )
+
+        # -----------------------------
+        # Beta 6
+        # Arm
+        # -----------------------------
+
+        betas[0][6] = (
+            2.0 * arm_ratio +
+            0.8 * m["arm_length"]
+        )
+
+        # -----------------------------
+        # Beta 7
+        # Leg
+        # -----------------------------
+
+        betas[0][7] = (
+            2.0 * leg_ratio +
+            0.8 * m["leg_length"]
+        )
+
+        # -----------------------------
+        # Beta 8
+        # Torso Shape
+        # -----------------------------
+
+        betas[0][8] = (
+            (chest_waist + hip_waist) / 50.0
+        )
+
+        # -----------------------------
+        # Beta 9
+        # Overall Shape
+        # -----------------------------
+
+        betas[0][9] = (
+            (
+                betas[0][0] +
+                betas[0][1] +
+                betas[0][2] +
+                betas[0][3] +
+                betas[0][4]
+            ) / 5.0
+        )
+
+        # Keep Betas in SMPL Range
+
+        betas = np.clip(
+            betas,
+            -3.0,
+            3.0
+        )
+
+        return betas
+
     # -----------------------------------------------------
     # Print Betas
     # -----------------------------------------------------
-    def print_betas(self,betas):
-      print("\n generated fro csv Bteas \n")
-      for index, value in enumerate(betas[0]):
-            print(f"betas :{index} :{value:.4f}")
 
+    def print_betas(self, betas):
 
+        print("\n========== GENERATED SMPL BETAS ==========\n")
 
+        for index, value in enumerate(betas[0]):
 
-      
-          
-      
-      
-          
+            print(f"Beta {index} : {value:.4f}")
 
+        print("\n==========================================")

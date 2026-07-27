@@ -18,11 +18,11 @@ body{
 
 .navbar{
     background:#0b1320 !important;
-    padding:15px 0;
+    padding:12px 0;
 }
 
 .navbar-brand{
-    font-size:28px;
+    font-size:25px;
     font-weight:700;
     color:#ffffff !important;
 }
@@ -59,11 +59,12 @@ body{
 .card{
     border:none;
     border-radius:15px;
+    transition: all 0.5s;
 }
 
 .card:hover{
-    transform:translateY(-3px);
-    transition:.3s;
+    transform:translateY(-5px);
+    transition:.5s;
 }
 
 /* Buttons */
@@ -79,7 +80,7 @@ footer{
     margin-top:100px;
     background:#0b1320;
     color:white;
-    padding:30px;
+    padding:0px;
 }
 
 /* Mobile */
@@ -90,4 +91,109 @@ footer{
         font-size:32px;
     }
 
+}
+
+/* .................carousel slider ................ */
+/* IMPORTANT: Navbar ke baad remaining screen */
+    .hero-section {
+        width: 100%;
+        height: 530px;
+        object-fit: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        box-shadow: 1px 1px 10px 2px #2b27279e;
+    }
+    
+    .hero-section .carousel {
+        width: 100%;
+        height: 530px;
+        object-fit: cover;
+    }
+    
+    .hero-section .carousel-inner {
+        width: 100%;
+        height: 530px;
+        object-fit: cover;
+    }
+    
+    .hero-section .carousel-item {
+        width: 100%;
+        height: 530px;
+        object-fit: cover;
+        
+    }
+    
+    .hero-section .carousel-img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill !important;
+        object-position: center;
+        border-radius: 5px;
+    }
+
+
+    /*  */
+.fw-bold{
+    border: 0px solid #888282;
+    box-shadow: 1px 1px 5px 1px #7d7575b0;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.col-lg-4{
+    min-height: 180px;
+}
+
+
+/* meassurements page */
+.form{
+    border: 1px solid #5c5656;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px #0d040400;
+    padding: 20px 20px ;
+}
+.form button{
+    background: linear-gradient(45deg,rgba(255, 0, 0, 0.693),rgba(9, 9, 236, 0.71));
+}
+.form button:hover{
+    box-shadow: 1px 1px 10px 3px #0ac1b19f;
+}
+
+.btn{
+    background: linear-gradient(45deg,rgba(214, 1, 1, 0.834),rgba(5, 5, 230, 0.829));
+}
+.btn:hover{
+    box-shadow: 1px 1px 10px 3px #0ac1b19f;
+}
+
+/* img */
+.hint-image{
+    min-height: 400px !important;
+}
+.hint-image img{
+    border-radius: 10px;
+    box-shadow: 1px 1px 10px 2px #39373772;
+    height: 106%;
+}
+
+
+@media screen and (max-width:678px) {
+    .hint-image img{
+        height: 90%;
+    }
+    .form label{
+        font-size: 13px;
+    }
+    .form select{
+        font-size: 12px;
+    }
+    .form input{
+        padding: 2px;
+    }
+    .form .btn{
+        font-size: 12px;
+        padding: 5px 10px;
+    }
 }

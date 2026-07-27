@@ -50,7 +50,24 @@ Profile
 
                     <p>
                         <strong>Height :</strong>
-                        174 cm
+                        174cm
+                    </p>
+
+                    <p>
+                        <table>
+                            <!-- {% if prediction %} -->
+                           <tbody>
+                                <tr>
+                                <th>Height</th>
+                                <td>{{ prediction.height }}</td>
+                            </tr>
+                                <tr>
+                                    <td>{{ prediction.weight }}</td>
+                                </tr>
+                                <!-- {% endif %} -->
+                            </tbody>
+                        </table>
+                        
                     </p>
 
                     <p>

@@ -1,52 +1,47 @@
-'''backend/validator/measurement_validator.py '''
-'''STEP 3 — Create Validation Module'''
+"""
+=========================================================
+File : measurement_validator.py
+
+Folder :
+backend/validators/
+
+Purpose
+-------
+Validate user input before saving to database
+=========================================================
+"""
 
 
 def validate_positive(value, name):
 
     if value <= 0:
-        raise ValueError(
-            f"{name} must be positive"
-        )
+        raise ValueError(f"{name} must be positive")
+
+    return True
+
+
+def validate_gender(gender):
+
+    if gender not in ["Male", "Female"]:
+        raise ValueError("Gender must be Male or Female")
 
     return True
 
 
 def validate_measurements(data):
 
-    validate_positive(
-        data['height'],
-        'height'
-    )
+    # Required numeric fields
 
-    validate_positive(
-        data['chest'],
-        'chest'
-    )
+    validate_positive(data["height"], "Height")
 
-    validate_positive(
-        data['waist'],
-        'waist'
-    )
+    validate_positive(data["weight"], "Weight")
 
-    validate_positive(
-        data['hip'],
-        'hip'
-    )
+    validate_positive(data["age"], "Age")
 
-    validate_positive(
-        data['shoulder'],
-        'shoulder'
-    )
 
-    validate_positive(
-        data['arm_length'],
-        'arm_length'
-    )
+    # Gender
 
-    validate_positive(
-        data['leg_length'],
-        'leg_length'
-    )
+    validate_gender(data["category"])
+
 
     return True

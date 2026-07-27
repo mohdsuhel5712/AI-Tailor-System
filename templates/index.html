@@ -1,21 +1,62 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<link rel="stylesheet"
-      href="{{url_for('static',filename='css/index.css')}}">
-{% endblock %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-{% block title %}
-Home
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cards.css') }}">
+
 {% endblock %}
 
 {% block content %}
 
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="hero-section">
+                <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+                            <img src="{{ url_for('static', filename='images/slide.png') }}" class="carousel-img"
+                                alt="Kids">
+                        </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='images/slide2.png') }}" class="carousel-img"
+                                alt="Male">
+                        </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='images/slide3.png') }}" class="carousel-img"
+                                alt="Female">
+                        </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='images/hero.png') }}" class="carousel-img"
+                                alt="Female">
+                        </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='images/tech.png') }}" class="carousel-img"
+                                alt="Female">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- carousel slider  -->
 <div class="container">
 
     <!-- HERO SECTION -->
 
-    <div class="row align-items-center hero-section">
+    <!-- <div class="row align-items-center hero-section">
 
         <div class="col-lg-6" card shadow-lg rounded-4 p-4>
 
@@ -51,76 +92,141 @@ Home
 
         </div>
 
-    </div>
+    </div> -->
 
     <hr class="my-5">
 
     <!-- BASIC FEATURES -->
 
-    <div class="row g-4 text-center my-5">
 
-        <div class="col-md-4">
 
-            <div class="basic-card card shadow-lg p-4 rounded">
+    <div class="container my-5">
 
-                <h3>
+        <h1 class="text-center fw-bold my-5">
+            👤 Select Your Category
+        </h1>
 
-                    Measurements
+        <div class="row g-4">
 
-                </h3>
+            <!-- KIDS -->
+            <div class="col-lg-4 col-md-6" style="height: 200px;">
+                <div class="card category-card shadow-lg border-1 h-60">
 
-                <a href="/body_predict"><p>
+                    <img src="{{ url_for('static', filename='images/kids.png') }}" class="card-img-top p-4" alt="Kids"
+                        style="width: 250px;">
 
-                    Body Measurement prediction Model 
+                    <div class="card-body text-center">
 
-                </p></a>
+                        <h3 class="fw-bold text-primary">
+                            👦 KIDS
+                        </h3>
 
+                        <p class="text-muted">
+                            Generate a personalized 3D kid avatar from body
+                            measurements and visualize clothing.
+                        </p>
+
+                        <hr>
+
+                        <div class="text-start small">
+
+                            <!-- <p>📏 Take Body Measurements</p>
+                        <p>🤖 AI Body Prediction</p>
+                        <p>🧍 Generate 3D Mesh</p>
+                        <p>👕 Apply Clothes</p> -->
+
+                        </div>
+                        <!-- # api ka path dena hai na ki app.py  -->
+                        <!-- app.py me blueprint banake xall kkardena hai  -->
+                        <a href="/measurement?gender=kids" class="btn btn-primary w-100 mt-3">
+                            Get Started
+                        </a>
+
+                    </div>
+
+                </div>
             </div>
 
-        </div>
+            <!-- MALE -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card category-card shadow-lg border-0 h-90">
 
-        <div class="col-md-4">
+                    <img src="{{ url_for('static', filename='images/male.png') }}" class="card-img-top p-4" alt="Male"
+                        style="width: 250px;">
 
-            <div class="basic-card card shadow-lg p-4 rounded">
+                    <div class="card-body text-center">
 
-                <h3>
+                        <h3 class="fw-bold text-success">
+                            👨 MALE
+                        </h3>
 
-                    AI Prediction
+                        <p class="text-muted">
+                            Create an accurate male 3D body model from
+                            measurements and preview garments.
+                        </p>
 
-                </h3>
+                        <hr>
 
-                <p>
+                        <div class="text-start small">
 
-                    Generate body shape
+                            <!-- <p>📏 Take Body Measurements</p>
+                        <p>🤖 AI Body Prediction</p>
+                        <p>🧍 Generate 3D Mesh</p>
+                        <p>👔 Try Clothes</p> -->
 
-                </p>
+                        </div>
 
+                        <a href="/measurement?gender=male" class="btn btn-primary w-100 mt-3">
+                            Get Started
+                        </a>
+
+                    </div>
+
+                </div>
             </div>
 
-        </div>
+            <!-- FEMALE -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card category-card shadow-lg border-0 h-90">
 
-        <div class="col-md-4">
+                    <img src="{{ url_for('static', filename='images/female.png') }}" class="card-img-top p-4"
+                        alt="Female" style="width: 250px;">
 
-            <div class="basic-card card shadow-lg p-4 rounded">
+                    <div class="card-body text-center">
 
-                <h3>
+                        <h3 class="fw-bold text-danger">
+                            👩 FEMALE
+                        </h3>
 
-                    3D Preview
+                        <p class="text-muted">
+                            Generate a realistic female avatar and visualize
+                            dresses, suits and other garments.
+                        </p>
 
-                </h3>
+                        <hr>
 
-                <p>
+                        <div class="text-start small">
 
-                    Visualize garments
+                            <!-- <p>📏 Take Body Measurements</p>
+                        <p>🤖 AI Body Prediction</p>
+                        <p>🧍 Generate 3D Mesh</p>
+                        <p>👗 Apply Clothes</p> -->
 
-                </p>
+                        </div>
 
+                        <a href="/measurement?gender=female" class="btn btn-primary w-100 mt-3">
+                            Get Started
+                        </a>
+
+                    </div>
+
+                </div>
             </div>
 
         </div>
 
     </div>
-
+    <hr class="my-5">
 
     <!-- CUSTOMIZATION -->
 
@@ -165,12 +271,11 @@ Home
                     <p>
 
                         Provide shirt measurements
-                        and get AI size prediction.
+                        and get AI size.
 
                     </p>
 
-                    <a href="/measurement"
-                       class="btn btn-primary">
+                    <a href="/measurement" class="btn btn-primary">
 
                         Select
 
@@ -205,8 +310,7 @@ Home
 
                     </p>
 
-                    <a href="/measurement"
-                       class="btn btn-primary">
+                    <a href="/measurement" class="btn btn-primary">
 
                         Select
 
@@ -241,8 +345,7 @@ Home
 
                     </p>
 
-                    <a href="/measurement"
-                       class="btn btn-primary">
+                    <a href="/measurement" class="btn btn-primary">
 
                         Select
 
@@ -255,7 +358,7 @@ Home
         </div>
 
     </section>
-
+    <hr class="my-5">
 
     <!-- AI FEATURES -->
 
@@ -381,7 +484,7 @@ Home
 
     </section>
 
-
+    <hr class="my-5">
     <!-- HOW IT WORKS -->
 
     <section class="workflow-section">
@@ -484,4 +587,11 @@ Home
 
 </div>
 
+<script>
+    var myCarousel = document.getElementById('myCarousel')
+
+    myCarousel.addEventListener('slide.bs.carousel', function () {
+        // do something...
+    })
+</script>
 {% endblock %}

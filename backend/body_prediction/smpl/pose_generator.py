@@ -1,113 +1,250 @@
 """
 ===========================================================
-File: pose_generator.py
+File : pose_generator.py
 
-Purpose:
---------
-Generate SMPL pose parameters.
+Location:
+backend/body_prediction/smpl/
 
-SMPL uses:
-    - global_orient : Rotation of the whole body
-    - body_pose     : 23 joints × 3 values = 69 parameters
+Purpose
+-------
+Generate SMPL body poses.
 
-Author:
+Project:
 AI Tailor System
 ===========================================================
 """
 
+import random
 import torch
 
 
 class PoseGenerator:
-    """
-    Generates body pose parameters for the SMPL model.
-    """
 
     def __init__(self):
-        """
-        SMPL Body Pose:
-        23 joints × 3 axis-angle values = 69 values
-
-        Global Orientation:
-        3 values
-        """
 
         self.pose_size = 69
+
         self.global_size = 3
 
-    # --------------------------------------------------
-    # Neutral Standing Pose
-    # --------------------------------------------------
+        self.available_poses = [
+
+            "neutral",
+
+            "standing",
+
+            "apose",
+
+            "walking",
+
+            "running",
+
+            "fashion",
+
+            "hands_on_waist",
+
+            "cross_arm"
+
+        ]
+
+    # =====================================================
+    # MAIN POSE INTERFACE
+    # =====================================================
+
+    def generate_pose(self, pose_name="apose"):
+
+        return self.get_pose(pose_name)
+
+    # =====================================================
+    # NEUTRAL POSE
+    # =====================================================
 
     def neutral_pose(self):
-        """
-        Generate a neutral standing pose.
 
-        Returns
-        -------
-        body_pose : torch.Tensor
-            Shape = (1,69)
+        body_pose = torch.zeros(
 
-        global_orient : torch.Tensor
-            Shape = (1,3)
-        """
+            self.pose_size,
 
-        body_pose = torch.zeros((1, self.pose_size))
+            dtype=torch.float32
 
-        global_orient = torch.zeros((1, self.global_size))
+        )
+
+        global_orient = torch.zeros(
+
+            (1, 3),
+
+            dtype=torch.float32
+
+        )
 
         return body_pose, global_orient
 
-    # --------------------------------------------------
-    # Random Pose
-    # --------------------------------------------------
+    # =====================================================
+    # A-POSE
+    # =====================================================
+
+    def apose(self):
+
+        body_pose = torch.zeros(
+
+            self.pose_size,
+
+            dtype=torch.float32
+
+        )
+
+        # -------------------------------------------------
+        # SMPL body_pose is:
+        #
+        # 23 joints × 3 rotation values
+        #
+        # Each joint:
+        #
+        # [rotation_x,
+        #  rotation_y,
+        #  rotation_z]
+        #
+        # -------------------------------------------------
+
+        # LEFT SHOULDER
+        #
+        # Try rotation around Z axis
+        # to move the left arm downward.
+
+        body_pose[45 + 2] = -1.00
+
+
+        # RIGHT SHOULDER
+        #
+        # Opposite rotation around Z axis.
+
+        body_pose[48 + 2] = 1.00
+
+
+        # -------------------------------------------------
+        # ELBOW
+        #
+        # Keep elbows almost straight.
+        # -------------------------------------------------
+
+        body_pose[51 + 0] = 0.0
+        body_pose[54 + 0] = 0.0
+        global_orient = torch.zeros((1, 3),dtype=torch.float32)
+
+        print("\n========== A-POSE ==========")
+        print("Left shoulder rotation :",body_pose[45:48])
+        print("Right shoulder rotation:",body_pose[48:51])
+        print("============================\n")
+        return body_pose, global_orient
+
+    # =====================================================
+    # STANDING
+    # =====================================================
+
+    def standing_pose(self):
+
+        body_pose = torch.zeros(self.pose_size,dtype=torch.float32)
+
+        global_orient = torch.zeros((1, 3),dtype=torch.float32)
+        return body_pose, global_orient
+
+    # =====================================================
+    # WALKING
+    # =====================================================
+
+    def walking_pose(self):
+
+        body_pose = torch.zeros(self.pose_size,dtype=torch.float32)
+        body_pose[0] = 0.20
+        body_pose[3] = -0.20
+        global_orient = torch.zeros((1, 3),dtype=torch.float32)
+        return body_pose, global_orient
+
+    # =====================================================
+    # RUNNING
+    # =====================================================
+
+    def running_pose(self):
+
+        body_pose = torch.zeros(self.pose_size,dtype=torch.float32)
+        body_pose[0] = 0.50
+        body_pose[3] = -0.50
+        global_orient = torch.zeros( (1, 3),dtype=torch.float32)
+        return body_pose, global_orient
+
+    # =====================================================
+    # FASHION
+    # =====================================================
+
+    def fashion_pose(self):
+
+        body_pose = torch.zeros(self.pose_size, dtype=torch.float32)
+        body_pose[45] = -0.70
+        body_pose[48] = 0.20
+        global_orient = torch.tensor([[0.0, 0.25, 0.0]],dtype=torch.float32)
+        return body_pose, global_orient
+
+    # =====================================================
+    # HANDS ON WAIST
+    # =====================================================
+
+    def hands_on_waist(self):
+
+        body_pose = torch.zeros(self.pose_size,dtype=torch.float32 )
+
+        body_pose[45] = -1.20
+        body_pose[48] = 1.20
+        body_pose[46] = -0.50
+        body_pose[49] = 0.50
+        global_orient = torch.zeros((1, 3),dtype=torch.float32)
+
+        return body_pose, global_orient
+
+    # =====================================================
+    # CROSS ARM
+    # =====================================================
+
+    def cross_arm(self):
+
+        body_pose = torch.zeros( self.pose_size,dtype=torch.float32)
+        body_pose[45] = -1.40
+        body_pose[48] = 1.40
+        body_pose[46] = -1.00
+        body_pose[49] = 1.00
+        global_orient = torch.zeros((1, 3),dtype=torch.float32)
+        return body_pose, global_orient
+
+    # =====================================================
+    # RANDOM POSE
+    # =====================================================
 
     def random_pose(self):
-        """
-        Generate a random body pose.
+        selected_pose = random.choice(
+            self.available_poses
+        )
 
-        Useful for testing only.
-        """
+        print("\nSelected Pose:", selected_pose)
+        return self.get_pose(selected_pose
+        )
 
-        body_pose = torch.randn((1, self.pose_size)) * 0.05
+    # =====================================================
+    # SELECT POSE
+    # =====================================================
 
-        global_orient = torch.zeros((1, self.global_size))
+    def get_pose(self,pose_name):
 
-        return body_pose, global_orient
+        pose_name = pose_name.lower()
 
-    # --------------------------------------------------
-    # T-Pose
-    # --------------------------------------------------
+        pose_functions = {
 
-    def t_pose(self):
-        """
-        Generate an approximate T-Pose.
-        """
+            "neutral":self.neutral_pose, 
+            "standing":self.standing_pose,
+            "apose":self.apose,
+            "walking":self.walking_pose,
+            "running": self.running_pose,
+            "fashion":self.fashion_pose,
+            "hands_on_waist":self.hands_on_waist,
+            "cross_arm":self.cross_arm
+        }
 
-        body_pose = torch.zeros((1, self.pose_size))
-
-        # Left Shoulder
-        body_pose[0][45] = -1.57
-
-        # Right Shoulder
-        body_pose[0][48] = 1.57
-
-        global_orient = torch.zeros((1, self.global_size))
-
-        return body_pose, global_orient
-
-    # --------------------------------------------------
-    # Print Pose Information
-    # --------------------------------------------------
-
-    def print_pose_info(self, body_pose, global_orient):
-
-        print("\n========== Pose Information ==========\n")
-
-        print("Global Orientation Shape :", global_orient.shape)
-
-        print("Body Pose Shape :", body_pose.shape)
-
-        print("\nTotal Pose Parameters :", body_pose.numel())
-
-        print("\n======================================")
+        function = pose_functions.get(pose_name,self.apose)
+        return function()

@@ -1,3 +1,19 @@
+"""
+=========================================================
+File : train_model.py
+
+Purpose
+-------
+Loads the dataset,
+preprocesses the data,
+trains the neural network,
+and saves the trained model.
+
+Project : AI Tailor System
+=========================================================
+"""
+
+import os
 import torch
 import torch.nn as nn
 
@@ -6,9 +22,27 @@ from backend.body_prediction.preprocess import preprocess
 from backend.body_prediction.body_prediction_model import BodyPrecitor
 
 
-X,y = load_dataset()
+# =====================================================
+# Load Dataset
+# =====================================================
 
-X,y = preprocess(X,y)
+print("\n========== LOADING DATASET ==========\n")
+
+X, y = load_dataset()
+
+print("Dataset Loaded Successfully.")
+print("Number of Samples :", len(X))
+print()
+
+# =====================================================
+# Preprocess Dataset
+# =====================================================
+
+X, y = preprocess(X, y)
+
+# =====================================================
+# Convert to Tensor
+# =====================================================
 
 X = torch.tensor(
     X,
@@ -20,18 +54,47 @@ y = torch.tensor(
     dtype=torch.float32
 )
 
+print("Tensor Conversion Complete.\n")
+
+# =====================================================
+# Build Neural Network
+# =====================================================
+
 model = BodyPrecitor()
+
+print(model)
+
+# =====================================================
+# Loss Function
+# =====================================================
 
 criterion = nn.MSELoss()
 
+# =====================================================
+# Optimizer
+# =====================================================
+
 optimizer = torch.optim.Adam(
+
     model.parameters(),
+
     lr=0.001
+
 )
 
-epochs = 200
+# =====================================================
+# Training Settings
+# =====================================================
 
-for epoch in range(epochs):
+EPOCHS = 300
+
+print("\n========== TRAINING STARTED ==========\n")
+
+# =====================================================
+# Training Loop
+# =====================================================
+
+for epoch in range(EPOCHS):
 
     prediction = model(X)
 
@@ -46,13 +109,43 @@ for epoch in range(epochs):
 
     optimizer.step()
 
-    if epoch%10==0:
+    if (epoch + 1) % 10 == 0:
 
         print(
-            f"Epoch {epoch} Loss {loss.item()}"
+
+            f"Epoch {epoch + 1:03d} | Loss = {loss.item():.6f}"
+
         )
 
-torch.save(
-    model.state_dict(),
-    "backend/models/body_predictor.pth"
+# =====================================================
+# Save Model
+# =====================================================
+
+MODEL_DIR = os.path.join(
+    "backend",
+    "models"
 )
+
+os.makedirs(
+    MODEL_DIR,
+    exist_ok=True
+)
+
+MODEL_PATH = os.path.join(
+    MODEL_DIR,
+    "body_predictor.pth"
+)
+
+torch.save(
+
+    model.state_dict(),
+
+    MODEL_PATH
+
+)
+
+print("\n======================================")
+print("Training Completed Successfully.")
+print("Model Saved Successfully.")
+print(MODEL_PATH)
+print("======================================")

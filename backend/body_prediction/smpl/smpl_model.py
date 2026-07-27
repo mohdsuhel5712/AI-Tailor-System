@@ -44,13 +44,13 @@ AI Tailor System
 import os
 import smplx
 
-
+# this is the model used by the SMPL model loading
 class SMPLModel:
 
     def __init__(self, model_directory):
-
+        # here i am defining path (absolute apth)
         self.model_directory = os.path.abspath(model_directory)
-
+        # kon kon si files  / (diff .pkl file )
         self.supported_gender = [
             "male",
             "female",
@@ -66,6 +66,7 @@ class SMPLModel:
         gender = gender.lower()
 
         if gender not in self.supported_gender:
+            # here i learn how to raise error in python = (raise ValueError('pass message '))
             raise ValueError(f"Unsupported gender: {gender}")
 
         return gender
@@ -73,8 +74,11 @@ class SMPLModel:
     # ---------------------------------------
     # Load Model
     # ---------------------------------------
-
-    def load_model(self, gender="neutral"):
+    # here after constructor (definening variable and their values )
+    # after gender valiadator= (i am on main part)
+    # load actual smpl dataste (.PKL)
+    def load_model(self, gender="male"):
+        
 
         gender = self.validate_gender(gender)
 
@@ -94,6 +98,8 @@ class SMPLModel:
         print("isdir =", os.path.isdir(model_path))
         print("exists =", os.path.exists(model_path))
 
+
+        #function that create SMPL mesh file PTH 
         model = smplx.create(
             model_path=self.model_directory,
             model_type="smpl",

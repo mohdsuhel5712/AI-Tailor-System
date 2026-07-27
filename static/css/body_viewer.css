@@ -1,0 +1,354 @@
+body{
+    background:#334e6f;
+    font-family:Poppins,sans-serif;
+}
+
+.viewer-page{
+    width:100%;
+    margin:auto;
+    padding:30px;
+}
+
+
+.viewer-header{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.viewer-header h2{
+    font-size:34px;
+    font-weight:700;
+    color:#474141;
+
+}
+
+.viewer-container{
+
+    display:flex;
+    gap:25px;
+
+}
+
+
+/* LEFT */
+
+.viewer-left{
+    flex:7;
+}
+
+
+#viewer{
+    width:100%;
+    height:660px;
+    background:white;
+    border-radius:10%;
+    box-shadow:0 15px 40px rgba(5, 5, 5, 0.568);
+
+}
+
+
+/* RIGHT */
+
+.viewer-right{
+    flex:3;
+}
+
+
+.measurement-card{
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 15px 40px rgba(0, 0, 0, 0.681);
+    animation:floatCard 4s ease infinite;
+
+}
+
+
+@keyframes floatCard{
+
+0%{
+
+transform:translateY(0px);
+
+}
+
+50%{
+
+transform:translateY(-8px);
+
+}
+
+100%{
+
+transform:translateY(0px);
+
+}
+
+}
+
+
+.measurement-card h3{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+    color:#0d6efd;
+
+}
+
+
+table{
+
+    width:100%;
+
+}
+
+
+table tr{
+
+    border-bottom:1px solid #ddd;
+
+}
+
+
+table td{
+
+    padding:11px;
+
+}
+
+
+table td:first-child{
+
+    font-weight:600;
+
+}
+
+
+.buttons{
+
+    margin-top:25px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+
+.btn-download{
+
+    text-align:center;
+
+    padding:12px;
+
+    background:#198754;
+
+    color:white;
+
+    border-radius:10px;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+
+.btn-download:hover{
+
+    background:#157347;
+
+    transform:scale(1.05);
+
+}
+
+
+.btn-back{
+
+    text-align:center;
+
+    padding:12px;
+
+    background:#0d6efd;
+
+    color:white;
+
+    border-radius:10px;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+
+.btn-back:hover{
+
+    background:#084298;
+
+    transform:scale(1.05);
+
+}
+
+
+/* Mobile */
+
+@media(max-width:992px){
+
+.viewer-container{
+
+flex-direction:column;
+
+}
+
+#viewer{
+
+height:500px;
+
+}
+
+}
+
+
+
+
+/* carsd */
+
+/* .color-option {
+        display: inline-block;
+        margin: 10px;
+        cursor: pointer;
+        color: #fff;
+    }
+
+    .color-option .white {
+        color: #0000;
+    }
+
+    .color-option input {
+        display: none;
+    }
+
+    .color-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: block;
+        border: 2px solid #999;
+    }
+
+    .color-option input:checked+.color-circle {
+        border: 4px solid #0d6efd;
+    }
+    .card{
+
+border-radius:20px;
+
+}
+
+.form-select{
+
+border-radius:12px;
+
+padding:10px;
+
+}
+
+.color-radio{
+
+cursor:pointer;
+
+}
+
+.color-radio input{
+
+display:none;
+
+}
+
+.color-radio span{
+
+width:35px;
+
+height:35px;
+
+display:block;
+
+border-radius:50%;
+
+border:2px solid #ddd;
+
+transition:.3s;
+
+}
+
+.color-radio input:checked + span{
+
+border:4px solid #0d6efd;
+
+transform:scale(1.15);
+
+}
+
+.btn{
+
+border-radius:12px;
+
+font-weight:bold;
+
+}
+
+.card-header{
+
+font-size:22px;
+
+font-weight:600;
+
+}
+
+@media(max-width:768px){
+
+.card{
+
+margin-top:20px;
+
+}
+
+.form-select{
+
+font-size:14px;
+
+}
+
+}
+ */
+
+
+ .color-radio{
+    display:inline-block;
+    cursor:pointer;
+}
+
+.color-radio input{
+    display:none;
+}
+
+.color-radio span{
+    display:inline-block;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    border:2px solid #ccc;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);
+    cursor:pointer;
+    transition:.3s;
+}
+
+.color-radio input:checked + span{
+    transform:scale(1.2);
+    border:3px solid #0d6efd;
+}

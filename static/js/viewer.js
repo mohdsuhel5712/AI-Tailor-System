@@ -876,14 +876,19 @@
 // =====================================================
 
 
+// =====================================================
+// viewer.js
+// Task:
+// 1. Load body
+// 2. Load and fit shirt
+// 3. Load and fit pant
+// =====================================================
 
-import {BodyEngine}
-from "./virtual_tryon/bodyEngine.js";
-import {GarmentManager}
-from "./virtual_tryon/garmentManager.js";
-// =====================================================
-// GLOBAL VARIABLES
-// =====================================================
+console.log("🔥 viewer.js started");
+
+import {BodyEngine} from "./virtual_tryon/bodyEngine.js";
+import {GarmentManager} from "./virtual_tryon/garmentManager.js";
+
 let scene;
 let camera;
 let renderer;
@@ -891,355 +896,703 @@ let controls;
 let body;
 let bodyEngine;
 let garmentManager;
-// =====================================================
-// INITIALIZE VIEWER
-// =====================================================
-function initViewer() {
-    // =================================================
-    // SCENE
-    // =================================================
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf5f5f5);
-    // =================================================
-    // CAMERA
-    // =================================================
-    camera = new THREE.PerspectiveCamera(45,window.innerWidth /window.innerHeight,0.1,1000);
-    camera.position.set(0,1.2,3);
-    // =================================================
-    // RENDERER
-    // =================================================
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize( window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.shadowMap.enabled =true;
-    document.getElementById("viewer-container").appendChild(renderer.domElement);
-    // =================================================
-    // ORBIT CONTROLS
-    // =================================================
-    controls =
-        new THREE.OrbitControls(
-            camera,
-            renderer.domElement
-        );
-    controls.enableDamping =
-        true;
-    controls.target.set(
-        0,
-        1,
-        0
-    );
-    // =================================================
-    // LIGHTING
-    // =================================================
-    createLights();
-    // =================================================
-    // LOAD BODY
-    // =================================================
-    loadBody();
-    // =================================================
-    // RESIZE
-    // =================================================
-    window.addEventListener(
-        "resize",
-        onWindowResize
-    );
-    // =================================================
-    // START RENDER LOOP
-    // =================================================
-    animate();
+// new
+let allGarments=[];
+
+function initViewer(){
+console.log("✅ initViewer started");
+
+scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0b1220);
+scene.fog=new THREE.Fog(0x0b1220,4,12);
+
+camera=new THREE.PerspectiveCamera(
+45,
+1,
+0.1,
+1000
+);
+
+camera.position.set(0,1.2,3);
+
+renderer=new THREE.WebGLRenderer({
+antialias:true,
+alpha:false
+});
+
+renderer.setPixelRatio(
+Math.min(
+window.devicePixelRatio,
+2
+)
+);
+
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1;
+
+const viewerContainer=document.getElementById(
+"viewer-container"
+);
+
+if(!viewerContainer){
+console.error(
+"❌ viewer-container not found"
+);
+return;
 }
-// =====================================================
-// CREATE LIGHTS
-// =====================================================
-function createLights() {
-    // ---------------------------------------------
-    // AMBIENT LIGHT
-    // ---------------------------------------------
-    const ambientLight =
-        new THREE.AmbientLight(
-            0xffffff,
-            1.5
-        );
-    scene.add(
-        ambientLight
-    );
-    // ---------------------------------------------
-    // KEY LIGHT
-    // ---------------------------------------------
-    const directionalLight =
-        new THREE.DirectionalLight(
-            0xffffff,
-            2
-        );
-    directionalLight.position.set(
-        3,
-        5,
-        3
-    );
-    directionalLight.castShadow =
-        true;
-    scene.add(
-        directionalLight
-    );
-    // ---------------------------------------------
-    // FILL LIGHT
-    // ---------------------------------------------
-    const fillLight =
-        new THREE.DirectionalLight(
-            0xffffff,
-            1
-        );
-    fillLight.position.set(
-        -3,
-        2,
-        2
-    );
-    scene.add(
-        fillLight
-    );
+
+viewerContainer.appendChild(
+renderer.domElement
+);
+
+controls=new THREE.OrbitControls(
+camera,
+renderer.domElement
+);
+
+controls.enableDamping=true;
+controls.dampingFactor=0.06;
+controls.enablePan=false;
+controls.minDistance=1.5;
+controls.maxDistance=7;
+controls.minPolarAngle=Math.PI/3;
+controls.maxPolarAngle=(Math.PI*2)/3;
+controls.target.set(0,1,0);
+
+createLights();
+createStudioFloor();
+
+onWindowResize();
+
+loadBody();
+
+window.addEventListener(
+"resize",
+onWindowResize
+);
+
+animate();
 }
-// =====================================================
-// LOAD BODY
-// =====================================================
-function loadBody() {
-    const loader =
-        new THREE.OBJLoader();
-    loader.load(
-        // ---------------------------------------------
-        // YOUR BODY FILE
-        // ---------------------------------------------
-        "/static/generated/processed_body.obj",
-        function (loadedBody) {
-            body =
-                loadedBody;
-            body.name =
-                "Body";
-            // -----------------------------------------
-            // BODY MATERIAL
-            // -----------------------------------------
-            body.traverse(
-                function (child) {
-                    if (
-                        child.isMesh
-                    ) {
-                        child.material =
-                            new THREE.MeshStandardMaterial({
-                                color: 0xd9a07c,
-                                roughness: 0.8,
-                                metalness: 0.0,
-                                side: THREE.DoubleSide
-                            });
-                        child.castShadow =
-                            true;
-                        child.receiveShadow =
-                            true;
-                    }
-                }
-            );
-            // -----------------------------------------
-            // ADD BODY TO SCENE
-            // -----------------------------------------
-            scene.add(
-                body
-            );
-            // -----------------------------------------
-            // CREATE BODY ENGINE
-            // -----------------------------------------
-            bodyEngine =
-                new BodyEngine(
-                    body
-                );
-            // -----------------------------------------
-            // CREATE GARMENT MANAGER
-            // -----------------------------------------
-            garmentManager =
-                new GarmentManager(
-                    scene,
-                    body
-                );
-            console.log(
-                "✅ Body loaded"
-            );
-            console.log(
-                "✅ Body Engine initialized"
-            );
-            console.log(
-                "✅ Garment Manager initialized"
-            );
-            // -----------------------------------------
-            // OPTIONAL DEFAULT PANT
-            // -----------------------------------------
-            // loadDefaultPant();
-        },
-        undefined,
-        function (error) {
-            console.error(
-                "❌ Body loading failed:",
-                error
-            );
-        }
-    );
+
+function createLights(){
+
+const hemisphereLight=
+new THREE.HemisphereLight(
+0xbfd7ff,
+0x111827,
+1.5
+);
+
+scene.add(
+hemisphereLight
+);
+
+const keyLight=
+new THREE.DirectionalLight(
+0xffffff,
+2.2
+);
+
+keyLight.position.set(
+4,
+6,
+5
+);
+
+keyLight.castShadow=true;
+
+keyLight.shadow.mapSize.set(
+2048,
+2048
+);
+
+keyLight.shadow.camera.left=-5;
+keyLight.shadow.camera.right=5;
+keyLight.shadow.camera.top=5;
+keyLight.shadow.camera.bottom=-5;
+
+scene.add(
+keyLight
+);
+
+const fillLight=
+new THREE.DirectionalLight(
+0xC6865B,
+1
+);
+
+fillLight.position.set(
+-5,
+3,
+2
+);
+
+scene.add(
+fillLight
+);
+
+const rimLight=
+new THREE.DirectionalLight(
+0xC6865B,
+1.2
+);
+
+rimLight.position.set(
+3,
+4,
+-4
+);
+
+scene.add(
+rimLight
+);
 }
-// =====================================================
-// LOAD DEFAULT PANT
-// =====================================================
-function loadDefaultPant() {
-    if (
-        !garmentManager
-    ) {
-        console.warn(
-            "⚠️ Garment Manager not ready"
-        );
-        return;
-    }
-    garmentManager.loadGarment({
-        type:
-            "pants",
-        modelPath:
-            "/static/garments/pants/pant.obj",
-        materialPath:
-            null,
-        fitType:
-            "regular",
-        color:
-            0x222222
-    });
+
+function createStudioFloor(){
+
+const floorGeometry=
+new THREE.PlaneGeometry(
+20,
+20
+);
+
+const floorMaterial=
+new THREE.MeshStandardMaterial({
+color:0x111827,
+roughness:0.92,
+metalness:0.05
+});
+
+const floor=
+new THREE.Mesh(
+floorGeometry,
+floorMaterial
+);
+
+floor.rotation.x=-Math.PI/2;
+floor.position.y=-1.15;
+floor.receiveShadow=true;
+
+scene.add(
+floor
+);
 }
-// =====================================================
-// USER: LOAD PANT
-// =====================================================
-function selectPant() {
-    if (
-        !garmentManager
-    ) {
-        console.warn(
-            "⚠️ Garment Manager not ready"
-        );
-        return;
-    }
-    garmentManager.loadGarment({
-        type:
-            "pants",
-        modelPath:
-            "/static/garments/pants/pant.obj",
-        fitType:
-            "regular",
-        color:
-            0x222222
-    });
+
+function loadBody(){
+
+console.log(
+"🔄 Loading body"
+);
+
+const loader=
+new THREE.OBJLoader();
+
+loader.load(
+
+"/static/generated/processed_body.obj",
+
+async function(loadedBody){
+
+body=loadedBody;
+
+body.name="Body";
+
+body.traverse(
+(child)=>{
+
+if(!child.isMesh){
+return;
 }
-// =====================================================
-// USER: LOAD SHIRT
-// =====================================================
-function selectShirt() {
-    if (
-        !garmentManager
-    ) {
-        console.warn(
-            "⚠️ Garment Manager not ready"
-        );
-        return;
-    }
-    garmentManager.loadGarment({
-        type:
-            "shirt",
-        modelPath:
-            "/static/garments/shirts/Male_Shirt.obj",
-        materialPath:
-            "/static/garments/shirts/Male_Shirt.mtl",
-        fitType:
-            "regular",
-        color:
-            0xffffff
-    });
+
+child.castShadow=true;
+child.receiveShadow=true;
+
+child.material=
+new THREE.MeshStandardMaterial({
+color:0xC6865A,
+roughness:0.72,
+metalness:0,
+side:THREE.FrontSide
+});
+
+child.material.needsUpdate=true;
+
 }
+);
+
+scene.add(
+body
+);
+
+body.updateMatrixWorld(
+true
+);
+
+const bodyBox=
+new THREE.Box3()
+.setFromObject(
+body
+);
+
+const bodyCenter=
+bodyBox.getCenter(
+new THREE.Vector3()
+);
+
+const bodySize=
+bodyBox.getSize(
+new THREE.Vector3()
+);
+
+const maxBodySize=
+Math.max(
+bodySize.x,
+bodySize.y,
+bodySize.z
+);
+
+const cameraDistance=
+maxBodySize*1.9;
+
+camera.position.set(
+bodyCenter.x,
+bodyCenter.y,
+bodyCenter.z+
+cameraDistance
+);
+
+controls.target.copy(
+bodyCenter
+);
+
+controls.update();
+
+bodyEngine=
+new BodyEngine(
+body
+);
+
+garmentManager=
+new GarmentManager(
+scene,
+body
+);
+
+await loadGarmentsFromDatabase();
+
+console.log(
+"✅ Body loaded"
+);
+
+console.log(
+"✅ Garment Manager initialized"
+);
+
+// Default shirt load
+
+await loadDefaultShirt();
+await selectPant();
+
+},
+
+undefined,
+
+function(error){
+
+console.error(
+"❌ Body loading failed:",
+error
+);
+
+}
+
+);
+}
+
+// =====================================================
+// LOAD DEFAULT SHIRT
+// =====================================================
+
+async function loadDefaultShirt(){
+
+if(!garmentManager){
+
+console.warn(
+"⚠️ Garment Manager not ready"
+);
+
+return;
+
+}
+
+const shirt=
+await garmentManager.loadGarment({
+
+type:"shirt",
+
+modelPath:
+"/static/garments/shirts/",
+
+materialPath:
+"/static/garments/shirts/Male_Shirt.mtl",
+
+fitType:"regular",
+
+color:0xffffff
+
+});
+
+if(shirt){
+
+console.log(
+"👕 Default shirt loaded"
+);
+
+}
+
+}
+
+// =====================================================
+// SELECT SHIRT
+// =====================================================
+
+async function selectShirt(){
+
+await loadDefaultShirt();
+
+}
+
+// =====================================================
+// SELECT PANT
+// =====================================================
+
+async function selectPant(){
+
+if(!garmentManager){
+
+console.warn(
+"⚠️ Garment Manager not ready"
+);
+
+return;
+
+}
+
+console.log(
+"👖 Loading pant"
+);
+
+const pant=
+await garmentManager.loadGarment({
+
+type:"pant",
+
+modelPath:
+"/static/garments/pants/",
+
+materialPath:null,
+
+fitType:"regular",
+
+color:0x222222
+
+});
+
+if(pant){
+
+console.log(
+"👖 Pant loaded successfully"
+);
+
+}else{
+
+console.error(
+"❌ Pant was not loaded"
+);
+
+}
+
+}
+
 // =====================================================
 // CHANGE FIT
 // =====================================================
+
 function changeGarmentFit(
-    fitType
-) {
-    if (
-        !garmentManager
-    ) {
-        return;
-    }
-    garmentManager.changeFit(
-        fitType
-    );
+fitType
+){
+
+if(!garmentManager){
+return;
 }
+
+// Current manager uses
+// separate shirt/pant methods
+
+garmentManager.changeShirtFit(
+fitType
+);
+
+}
+
 // =====================================================
 // CHANGE COLOR
 // =====================================================
+
 function changeGarmentColor(
-    color
-) {
-    if (
-        !garmentManager
-    ) {
+color
+){
+
+if(!garmentManager){
+return;
+}
+
+garmentManager.changeShirtColor(
+color
+);
+
+}
+
+// =====================================================
+// RESIZE
+// =====================================================
+
+function onWindowResize(){
+
+const viewerContainer=
+document.getElementById(
+"viewer-container"
+);
+
+if(
+!viewerContainer||
+!camera||
+!renderer
+){
+return;
+}
+
+const width=
+viewerContainer.clientWidth;
+
+const height=
+viewerContainer.clientHeight;
+
+if(
+width===0||
+height===0
+){
+return;
+}
+
+camera.aspect=
+width/height;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+width,
+height
+);
+
+}
+
+// =====================================================
+// ANIMATION
+// =====================================================
+
+function animate(){
+
+requestAnimationFrame(
+animate
+);
+
+if(controls){
+controls.update();
+}
+
+if(
+renderer&&
+scene&&
+camera
+){
+
+renderer.render(
+scene,
+camera
+);
+
+}
+
+}
+
+// =====================================================
+// CONNECT HTML BUTTONS
+// =====================================================
+
+
+
+// new function for btn 
+// =====================================================
+// LOAD GARMENTS FROM DATABASE
+// =====================================================
+
+async function loadGarmentsFromDatabase(){
+    try{
+        const response = await fetch("/api/garments");
+        const data = await response.json();
+
+        if(!data.success){
+            console.log("! garment api failed");
+            return;
+        }
+
+        allGarments= data.garments;
+        console.log("database garment loaded ! ",allGarments);
+        fillGarmentDropdowns();
+    }catch(error){
+        console.log("garment api erro : ",error);
+    }
+    
+}
+
+// =====================================================
+// FILL SHIRT AND PANT DROPDOWNS
+// =====================================================
+
+
+function fillGarmentDropdowns(){
+    const shirtSelect = document.getElementById("shirtSelect");
+    const pantSelect = document.getElementById("pantSelect");
+
+    if(!shirtSelect || !pantSelect){
+        console.warn("garment dropdown not found");
         return;
     }
-    garmentManager.changeColor(
-        color
-    );
+    shirtSelect.innerHTML= `<option value="">
+    Select Shirt
+    </option>
+    `;
+    pantSelect.innerHTML = `
+    <option value="">
+    Select Pant
+    </option>
+    `;
+    allGarments.forEach((garment)=>{
+        const option = document.createElement("option");
+        option.value=garment.garment_id;
+        option.textContent = garment.garment_name;
+        if(garment.category_id==1){
+            shirtSelect.appendChild(option);
+        }
+        if(garment.category_id==2){
+            pantSelect.appendChild(option);
+        }
+
+    });
+    console.log("garment dropdown filles succesfully ! ")
 }
+
 // =====================================================
-// CHANGE TEXTURE
+// APPLY SELECTED SHIRT
 // =====================================================
-async function changeGarmentTexture(
-    texturePath
-) {
-    if (
-        !garmentManager
-    ) {
+
+async function applySelectedShirt(){
+    const shirtSelect = document.getElementById("shirtSelect");
+    if(!shirtSelect){
+        console.log("shirt drop down nor found");
+        return ;
+    }
+
+    const garmentId =Number(shirtSelect.value);
+    if(!garmentId){
+        alert("please select a shirt");
         return;
     }
-    await garmentManager.changeTexture(
-        texturePath
-    );
-}
-// =====================================================
-// CHANGE FABRIC
-// =====================================================
-function changeGarmentFabric(
-    fabricType
-) {
-    if (
-        !garmentManager
-    ) {
+    const garment = allGarments.find((item)=> item.garment_id===garmentId);
+    if(!garment){
+        console.log("seleted shirt is not found !");
         return;
     }
-    garmentManager.changeFabric(
-        fabricType
-    );
+    console.log("apply shirt !",garment);
+    const shirt = await garmentManager.loadGarment({
+        type:"shirt",
+        modelPath:"static/garments/"+garment.obj_file,
+        materialPath:null,
+        fitType:"regular",
+        color:0xffffff
+    });
+    if(shirt){
+        console.log("seledct shirt applied !");
+    }
+
 }
+
 // =====================================================
-// WINDOW RESIZE
+// APPLY SELECTED PANT
 // =====================================================
-function onWindowResize() {
-    camera.aspect =
-        window.innerWidth /
-        window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-    );
+
+async function applySelectedPant(){
+    const pantSelect = document.getElementById("pantSelect");
+    if(!pantSelect){
+        console.log("pant dropdown not found !");
+        return;
+    }
+    const garmentID = Number(pantSelect.value);
+    if(!garmentID){
+        alert("please select the pant ");
+        return;
+    }
+    const garment = allGarments.find((item)=>item.garment_id===garmentID);
+    if(!garment){
+        console.log("selected pant not found ");
+        return;
+    }
+    console.log("apply pant ",garment);
+    const pant = await garmentManager.loadGarment({
+        type:"pant",
+        modelPath:"/static/garments/"+garment.obj_file,
+        materialPath:null,
+        fitType:"regular",
+        color:0x222222
+    });
+    if(pant){
+        console.log("select pant applied ! ");
+    }
 }
-// =====================================================
-// ANIMATION LOOP
-// =====================================================
-function animate() {
-    requestAnimationFrame(
-        animate
-    );
-    controls.update();
-    renderer.render(
-        scene,
-        camera
-    );
-}
+
+// same function calling 
+document.addEventListener("DOMContentLoaded",()=>{
+    console.log("loading garment dropdown ! ");
+    loadGarmentsFromDatabase();
+});
 // =====================================================
 // START VIEWER
 // =====================================================
+window.selectShirt=selectShirt;
+
+window.selectPant=selectPant;
+
+window.applySelectedShirt=
+    applySelectedShirt;
+
+window.applySelectedPant=
+    applySelectedPant;
+
+window.changeGarmentFit=
+    changeGarmentFit;
+
+window.changeGarmentColor=
+    changeGarmentColor;
+
+// window.changeGarmentTexture=
+//     changeGarmentTexture;
+
+// window.changeGarmentFabric=
+//     changeGarmentFabric;
+
 initViewer();

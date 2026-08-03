@@ -1,8 +1,59 @@
 {% extends "base.html" %}
-<link rel="stylesheet" href="{{url_for('static', filename='css/body_viewer.css')}}">
 
 {% block head %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/body_viewer.css')}}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<!-- 
+  Inline override: increases the 3D viewer height and re-flows the lower
+  row now that "View Options" has been removed and measurements take
+  the full width. Move these rules into body_viewer.css when convenient.
+-->
+<style>
+    /*
+      base.html's outer wrapper was constraining this page's width, so
+      the whole layout sat with dead space on both sides instead of
+      spanning the viewport like container-fluid is supposed to.
+      Force this page's own container-fluid to go true full-bleed.
+    */
+    body:has(.avs-wrap) {
+        overflow-x: hidden;
+    }
+
+    .avs-wrap {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .avs-wrap>.container-fluid {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /* 3D mesh is the main attraction (measurements + virtual try-on
+       are supporting features) — give it a lot more room */
+    #viewer-container {
+        height: 780px;
+        min-height: 60vh;
+    }
+
+    .avs-viewer-card {
+        width: 100%;
+    }
+
+    .avs-lower-row .avs-measure-full {
+        width: 100%;
+    }
+
+    .avs-measure-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+</style>
 {% endblock %}
 
 {% block title %}
@@ -10,488 +61,244 @@ Personalized 3D Body
 {% endblock %}
 
 
-
-
 {% block content %}
-<div class="container-fluid mt-4">
 
-    <div class="row">
+<div class="avs-wrap">
+    <div class="container-fluid">
+        <div class="row g-3">
 
-        <!-- ===================================== -->
-        <!-- LEFT SIDE : 3D VIEWER (70%) -->
-        <!-- ===================================== -->
-
-        <div class="col-lg-8 col-md-12 mb-4">
-
-            <div class="card shadow h-100">
-
-                <div class="card-header bg-primary text-white">
-
-                    <h3 class="mb-0">
-                        Personalized 3D Human Body
-                    </h3>
-
-                </div>
-
-                <div class="card-body p-2">
-
-                    <div id="viewer" id="viewer-container" style="
-                            width:100%;
-                            height:600px;
-                            border-radius:10px;
-                            border:1px solid #ddd;
-                            background:#f8f9fa;
-                        ">
+            <!-- ===================================== -->
+            <!-- LEFT : CATEGORY / GARMENT NAV -->
+            <!-- ===================================== -->
+            <div class="col-lg-2 col-md-3 col-xl-2">
+                <div class="avs-sidebar">
+                    <h6>Categories</h6>
+                    <div class="list-group">
+                        <div class="list-group-item active"><i class="bi bi-gender-male avs-ic"></i> Male</div>
+                        <div class="list-group-item"><i class="bi bi-gender-female avs-ic"></i> Female</div>
+                        <div class="list-group-item"><i class="bi bi-emoji-smile avs-ic"></i> Kids</div>
                     </div>
-
+                    <h6>Garments</h6>
+                    <div class="list-group">
+                        <div class="list-group-item active"><i class="bi bi-vest avs-ic"></i> Shirts</div>
+                        <div class="list-group-item"><i class="bi bi-bookmark avs-ic"></i> Pants</div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="card-footer">
+            <!-- ===================================== -->
+            <!-- CENTER : 3D VIEWER + MEASUREMENTS -->
+            <!-- ===================================== -->
+            <div class="col-lg-8 col-md-9 col-xl-8 avs-center-col">
 
-                    <div class="d-flex justify-content-between align-items-center">
-
+                <div class="avs-viewer-card mb-3">
+                    <div class="avs-viewer-topbar">
                         <div>
-
-                            <strong>OBJ File :</strong><br>
-
-                            <small class="text-muted">
-                                {{ obj_file }}
-                            </small>
+                            <h5 class="mb-0"><i class="bi bi-person-bounding-box"></i> Your Personalized 3D Body</h5>
+                            <small class="text-muted">AI-predicted measurements &middot; Virtual try-on preview</small>
+                        </div>
+                        <div class="avs-viewer-tools">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnReset"
+                                title="Reset view"><i class="bi bi-arrow-clockwise"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnSnapshot"
+                                title="Snapshot"><i class="bi bi-camera"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnFullscreen"
+                                title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
 
                         </div>
-
-                        <a href="/measurement" class="btn btn-secondary">
-
-                            ← Back
-
-                        </a>
-
                     </div>
+                    <div id="viewer-container">
+                        <div class="viewer-loading"></div>
+                        <div class="avs-viewer-hint"><i class="bi bi-mouse"></i> Left: Rotate &nbsp; Right: Pan &nbsp;
+                            <i class="bi bi-arrow-down-up"></i> Scroll: Zoom
+                        </div>
+                    </div>
+                </div>
 
+                <!--
+                Lower row: "View Options" panel removed permanently.
+                "AI Generated Measurements" now takes the full width
+                that used to be split between col-md-8 / col-md-4.
+            -->
+                <div class="row g-3 avs-lower-row">
+                    <div class="col-12">
+                        <div class="avs-panel avs-measure-full">
+                            <h6><i class="bi bi-rulers"></i> AI Generated Measurements</h6>
+                            <div class="avs-measure-grid">
+                                <div class="avs-measure-item"><i class="bi bi-arrows-vertical avs-ic"></i>
+                                    <div><span class="lbl">Height</span><span class="val">{{ prediction.height }}</span>
+                                    </div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-speedometer2 avs-ic"></i>
+                                    <div><span class="lbl">Weight</span><span class="val">{{ prediction.weight }}</span>
+                                    </div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-calendar3 avs-ic"></i>
+                                    <div><span class="lbl">Age</span><span class="val">{{ prediction.age }}</span></div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-tag avs-ic"></i>
+                                    <div><span class="lbl">Category</span><span class="val">{{ prediction.category
+                                            }}</span></div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-person-lines-fill avs-ic"></i>
+                                    <div><span class="lbl">Body Shape</span><span class="val">{{ prediction.body_shape
+                                            }}</span></div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-circle avs-ic"></i>
+                                    <div><span class="lbl">Neck</span><span class="val">{{ prediction.neck }}</span>
+                                    </div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-arrows-angle-expand avs-ic"></i>
+                                    <div><span class="lbl">Shoulder</span><span class="val">{{ prediction.shoulder
+                                            }}</span></div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-square avs-ic"></i>
+                                    <div><span class="lbl">Chest</span><span class="val">{{ prediction.chest }}</span>
+                                    </div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-dash-circle avs-ic"></i>
+                                    <div><span class="lbl">Waist</span><span class="val">{{ prediction.waist }}</span>
+                                    </div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-triangle avs-ic"></i>
+                                    <div><span class="lbl">Hip</span><span class="val">{{ prediction.hip }}</span></div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-arrow-left-right avs-ic"></i>
+                                    <div><span class="lbl">Arm Length</span><span class="val">{{ prediction.arm_length
+                                            }}</span></div>
+                                </div>
+                                <div class="avs-measure-item"><i class="bi bi-arrow-down-up avs-ic"></i>
+                                    <div><span class="lbl">Leg Length</span><span class="val">{{ prediction.leg_length
+                                            }}</span></div>
+                                </div>
+                            </div>
+                            <div class="small text-muted mt-2">Mesh file: {{ prediction.mesh_file }}</div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
 
-        </div>
-
-
-
-        <!-- ===================================== -->
-        <!-- RIGHT SIDE : AI MEASUREMENTS (30%) -->
-        <!-- ===================================== -->
-
-        <div class="col-lg-4 col-md-12">
-
-            <div class="card shadow-lg border-0 rounded-4 sticky-top">
-
-                <div class="card-header bg-success text-white text-center py-3">
-
-                    <h4 class="mb-0">
-                        👔 Garment Customization
-                    </h4>
-
-                </div>
-
-                <div class="card-body p-4">
-
-                    <form method="POST">
-
-                        <!-- Shirt -->
-
-                        <div class="mb-4">
-
-                            <label class="form-label fw-bold">
-                                Shirt Type
-                            </label>
-
-                            <select class="form-select" name="shirt">
-
-                                <option>Dress Shirt</option>
-                                <option>Oxford</option>
-                                <option>T-Shirt</option>
-                                <option>Denim Shirt</option>
-                                <option>Flannel</option>
-                                <option>Linen</option>
-
-                            </select>
-
-                        </div>
-
-
-                        <!-- Pant -->
-
-                        <div class="mb-4">
-
-                            <label class="form-label fw-bold">
-
-                                Pant Type
-
-                            </label>
-
-                            <select class="form-select" name="pant">
-
-                                <option>Formal</option>
-                                <option>Jeans</option>
-                                <option>Cargo</option>
-                                <option>Jogger</option>
-                                <option>Chino</option>
-                                <option>Linen</option>
-
-                            </select>
-
-                        </div>
-
-                        <hr>
-
-                        <h6 class="fw-bold my-4">
-                            🎨 Pant Colour
-                        </h6>
-
-                        <div class="d-flex flex-wrap gap-2 align-items-center">
-
-                            <!-- Fixed colors -->
-                            <label class="color-label black-color">
-                                <input type="radio" name="pant_color" value="#000000">
-                                <span>Black</span>
-                            </label>
-
-                            <label class="color-label blue-color">
-                                <input type="radio" name="pant_color" value="#fffff">
-                                <span>White</span>
-                            </label>
-
-                           
-                            <!-- Custom color picker -->
-                            <label class="custom-color">
-                                <input type="color" id="customPantColor" value="#ff0000">
-                                <span>Custom</span>
-                            </label>
-
-                        </div>
-
-
-                        <h6 class="fw-bold my-4">
-                            🎨 Pant Colour
-                        </h6>
-
-                        <div class="d-flex flex-wrap gap-2 align-items-center">
-
-                            <!-- Fixed colors -->
-                            <label class="color-label black-color">
-                                <input type="radio" name="pant_color" value="#000000">
-                                <span>Black</span>
-                            </label>
-
-                            <label class="color-label gray-color">
-                                <input type="radio" name="pant_color" value="#808080">
-                                <span>White</span>
-                            </label>
-
-                            <!-- Custom color picker -->
-                            <label class="custom-color">
-                                <input type="color" id="customPantColor" value="#ff0000">
-                                <span>Custom</span>
-                            </label>
-
-                        </div>
-                        <div class="row my-4">
-
-                            <div class="col-6">
-
-                                <label class="form-label fw-bold">
-
-                                    Shirt Fabric
-
-                                </label>
-
-                                <select class="form-select">
-
-                                    <option>Cotton</option>
-
-                                    <option>Linen</option>
-
-                                    <option>Denim</option>
-
-                                    <option>Silk</option>
-
-                                    <option>Polyester</option>
-
-                                </select>
-
-                            </div>
-
-                            <div class="col-6">
-
-                                <label class="form-label fw-bold">
-
-                                    Pant Fabric
-
-                                </label>
-
-                                <select class="form-select">
-
-                                    <option>Denim</option>
-
-                                    <option>Cotton</option>
-
-                                    <option>Linen</option>
-
-                                    <option>Polyester</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-4">
-
-                            <div class="col-6">
-
-                                <label class="form-label fw-bold">
-
-                                    Shirt Pattern
-
-                                </label>
-
-                                <select class="form-select">
-
-                                    <option>Solid</option>
-
-                                    <option>Striped</option>
-
-                                    <option>Checked</option>
-
-                                    <option>Printed</option>
-
-                                </select>
-
-                            </div>
-
-                            <div class="col-6">
-
-                                <label class="form-label fw-bold">
-
-                                    Pant Pattern
-
-                                </label>
-
-                                <select class="form-select">
-
-                                    <option>Solid</option>
-
-                                    <option>Pinstripe</option>
-
-                                    <option>Checked</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="mt-4">
-
-                            <label class="form-label fw-bold">
-
-                                Fit
-
-                            </label>
-
-                            <select class="form-select">
-
-                                <option>Slim Fit</option>
-
-                                <option>Regular Fit</option>
-
-                                <option>Loose Fit</option>
-
-                                <option>Relaxed Fit</option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="d-grid mt-4">
-
-                            <button class="btn btn-primary btn-lg">
-
-                                👕 Apply Clothes
-
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                </div>
+            <!-- ===================================== -->
+            <!-- RIGHT : GARMENT CUSTOMIZATION -->
+            <!-- ===================================== -->
+            <!-- ================================================= -->
+            <!-- GARMENT SELECTION PANEL -->
+            <!-- ================================================= -->
+
+            <div class="card mt-3 p-3">
+                <h5 class="mb-3">
+                    Virtual Try-On
+                </h5>
+
+                <!-- SHIRT -->
+                <label for="shirtSelect">
+                    Select Shirt
+                </label>
+
+                <select id="shirtSelect" class="form-select mb-2">
+                    <option value="">
+                        Loading shirts...
+                    </option>
+                </select>
+
+                <button type="button" class="btn btn-success w-100 mb-3" style="color:aliceblue;" onclick="applySelectedShirt()">
+                    Apply Shirt
+                </button>
+
+
+                <!-- PANT -->
+                <label for="pantSelect">
+                    Select Pant
+                </label>
+
+                <select id="pantSelect" class="form-select mb-2">
+                    <option value="">
+                        Loading pants...
+                    </option>
+                </select>
+
+                <button type="button" class="btn btn-success w-100" style="color: antiquewhite;" onclick="applySelectedPant()">
+                    Apply Pant
+                </button>
 
             </div>
 
-        </div>
 
+            <!-- main cards -->
 
+            
 
-    </div>
+<!-- ===================================== -->
+<!-- Pass OBJ file to JavaScript -->
+<!-- ===================================== -->
 
-</div>
+<link rel="stylesheet" href="{{url_for('static', filename='css/body_viewer.css')}}">
+<script>
+    const OBJ_FILE = "{{ url_for('static', filename='generated/processed_body.obj') }}";
+    const MTL_FILE = "{{ url_for('static', filename='generated/human_body.mtl') }}";
+</script>
 
-<div class="container my-4">
-    <div class="row my-4">
-        <center>
-            <h2 class="my-4 p-4">AI GENERATED MEASUREMENTS</h2>
-        </center>
-        <div class="col-lg-12 col-md-12 border-radius box-shadow">
+<!-- ===================================== -->
+<!-- Three.js -->
+<!-- ===================================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script type="module" src="{{ url_for('static', filename='js/viewer.js') }}"></script>
 
-            <div class="card shadow sticky-top">
-
-                <div class="card-header bg-success text-white">
-
-                    <h4 class="mb-0">
-
-                        AI Body Measurements
-
-                    </h4>
-
-                </div>
-
-                <div class="card-body p-0">
-
-                    <table class="table table-striped table-hover mb-0">
-
-                        <tbody>
-
-                            <tr>
-                                <th>Height</th>
-                                <td>{{ prediction.height }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Weight</th>
-                                <td>{{ prediction.weight }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Age</th>
-                                <td>{{ prediction.age }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>category</th>
-                                <td>{{ prediction.category }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Body Shape</th>
-                                <td>{{ prediction.body_shape }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Neck</th>
-                                <td>{{ prediction.neck }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Shoulder</th>
-                                <td>{{ prediction.shoulder }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Chest</th>
-                                <td>{{ prediction.chest }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Waist</th>
-                                <td>{{ prediction.waist }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Hip</th>
-                                <td>{{ prediction.hip }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Arm Length</th>
-                                <td>{{ prediction.arm_length }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Leg Length</th>
-                                <td>{{ prediction.leg_length }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Mesh File</th>
-                                <td class="small">
-                                    {{ prediction.mesh_file }}
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-            </div>
-        </div>
-
-
-
-        <!-- ===================================== -->
-        <!-- Pass OBJ file to JavaScript -->
-        <!-- ===================================== -->
-
-        <script>
-
-            const OBJ_FILE = "{{ url_for('static', filename='generated/processed_body.obj') }}";
-            const MTL_FILE = "{{ url_for('static',filename='generated/human_body.mtl') }}"
-
-        </script>
-
-
-        <!-- ===================================== -->
-        <!-- Three.js -->
-        <!-- ===================================== -->
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
-
-
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
-
-        <script src="{{ url_for('static', filename='js/viewer.js') }}"></script>
-
-
-        <script>
-            const colorPicker =
-    document.getElementById("customPantColor");
-
-colorPicker.addEventListener("input", function () {
-
-    const selectedColor = this.value;
-
-    changePantColor(selectedColor);
-
-});
-
-
-function changePantColor(color) {
-
-    console.log("Selected Color:", color);
-
-    pant.traverse(function (child) {
-
-        if (child.isMesh) {
-
-            child.material.color.set(color);
-
-        }
-
+<script>
+    // ---- Custom colour pickers ----
+    const pantColorPicker = document.getElementById("customPantColor");
+    pantColorPicker.addEventListener("input", function () {
+        changePantColor(this.value);
     });
 
-}
-        </script>
-        {% endblock %}
+    const shirtColorPicker = document.getElementById("customShirtColor");
+    shirtColorPicker.addEventListener("input", function () {
+        changeShirtColor(this.value);
+    });
+
+    function changePantColor(color) {
+        console.log("Selected Pant Color:", color);
+        if (typeof pant !== "undefined") {
+            pant.traverse(function (child) {
+                if (child.isMesh) child.material.color.set(color);
+            });
+        }
+    }
+
+    function changeShirtColor(color) {
+        console.log("Selected Shirt Color:", color);
+        if (typeof shirt !== "undefined") {
+            shirt.traverse(function (child) {
+                if (child.isMesh) child.material.color.set(color);
+            });
+        }
+    }
+
+    // ---- Swatch/pattern selection highlight (visual only) ----
+    document.querySelectorAll('.avs-color-dot input[type="radio"]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            document.querySelectorAll('.avs-color-dot').forEach(function (dot) {
+                if (dot.querySelector('input') && dot.querySelector('input').name === input.name) {
+                    dot.classList.remove('checked');
+                }
+            });
+            input.closest('.avs-color-dot').classList.add('checked');
+        });
+    });
+
+    document.querySelectorAll('.avs-pattern input[type="radio"]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            document.querySelectorAll('.avs-pattern').forEach(function (p) {
+                if (p.querySelector('input').name === input.name) p.classList.remove('checked');
+            });
+            input.closest('.avs-pattern').classList.add('checked');
+        });
+    });
+</script>
+
+{% endblock %}

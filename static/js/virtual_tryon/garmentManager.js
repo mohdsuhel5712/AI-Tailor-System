@@ -1,287 +1,433 @@
 // =====================================================
 // garmentManager.js
-// Central Garment Controller
+// Shirt + Pant Runtime Controller
 // =====================================================
-// 2 FILE 
 
-import { GarmentEngine } from "./garmentEngine.js";
-import { FitEngine } from "./fitEngine.js";
-import { MaterialEngine } from "./materialEngine.js";
+import {GarmentEngine} from "./garmentEngine.js";
+import {FitEngine} from "./fitEngine.js";
+import {MaterialEngine} from "./materialEngine.js";
+
+export class GarmentManager{
+constructor(scene,body){
+this.scene=scene;
+this.body=body;
+this.garmentEngine=new GarmentEngine();
+this.fitEngine=new FitEngine(body);
+this.materialEngine=new MaterialEngine();
+
+this.shirt=null;
+this.pant=null;
+
+this.shirtData=null;
+this.pantData=null;
+
+console.log("✅ Garment Manager Initialized");
+}
+
 // =====================================================
-// GARMENT MANAGER
+// LOAD GARMENT
 // =====================================================
-export class GarmentManager {
-    constructor(scene, body) {
-        // ---------------------------------------------
-        // THREE.JS SCENE
-        // ---------------------------------------------
-        this.scene = scene;
-        // ---------------------------------------------
-        // BODY MODEL
-        // ---------------------------------------------
-        this.body = body;
-        // ---------------------------------------------
-        // GARMENT ENGINE
-        // ---------------------------------------------
-        this.garmentEngine = new GarmentEngine();
-        // ---------------------------------------------
-        // FIT ENGINE
-        // ---------------------------------------------
-        this.fitEngine = new FitEngine( body
-            );
-        // ---------------------------------------------
-        // MATERIAL ENGINE
-        // ---------------------------------------------
-        this.materialEngine =
-            new MaterialEngine();
-        // ---------------------------------------------
-        // CURRENT GARMENT
-        // ---------------------------------------------
-        this.currentGarment = null;
-        // ---------------------------------------------
-        // CURRENT GARMENT DATA
-        // ---------------------------------------------
-        this.currentGarmentData = null;
-        console.log(
-            "✅ Garment Manager Initialized"
-        );
-    }
-    // =================================================
-    // LOAD GARMENT
-    // =================================================
-    async loadGarment({
-        type = "pants",
-        modelPath,
-        materialPath = null,
-        texturePath = null,
-        fitType = "regular",
-        color = null
-    }) {
-        console.log(
-            "👕 Loading garment..."
-        );
-        // ---------------------------------------------
-        // REMOVE OLD GARMENT
-        // ---------------------------------------------
-        this.removeCurrentGarment();
-        try {
-            // =========================================
-            // 1. LOAD OBJ / GLB
-            // =========================================
-            const garment =
-                await this.garmentEngine.load(
-                    modelPath,
-                    materialPath
-                );
-                this.garmentEngine.prepareGarment(garment);
-            console.log(
-                "✅ Garment model loaded"
-            );
-            // =========================================
-            // 2. FIT GARMENT
-            // =========================================
-            this.fitEngine.fitGarment(
-                garment,
-                type,
-                fitType
-            );
-            console.log(
-                "✅ Garment fitted"
-            );
-            // =========================================
-            // 3. APPLY COLOR
-            // =========================================
-            if (
-                color
-            ) {
-                this.materialEngine.applyColor(
-                    garment,
-                    color
-                );
-            }
-            // =========================================
-            // 4. APPLY TEXTURE
-            // =========================================
-            if (
-                texturePath
-            ) {
-                await this.materialEngine.applyTexture(
-                    garment,
-                    texturePath
-                );
-            }
-            // =========================================
-            // 5. ADD TO SCENE
-            // =========================================
-            this.scene.add(
-                garment
-            );
-            // =========================================
-            // 6. SAVE CURRENT GARMENT
-            // =========================================
-            this.currentGarment =
-                garment;
-            this.currentGarmentData = {
-                type,
-                modelPath,
-                materialPath,
-                texturePath,
-                fitType,
-                color
-            };
-            console.log(
-                "🎉 Garment added to scene"
-            );
-            return garment;
-        }
-        catch (
-            error
-        ) {
-            console.error(
-                "❌ Garment loading failed:",
-                error
-            );
-            return null;
-        }
-    }
-    // =================================================
-    // REMOVE CURRENT GARMENT
-    // =================================================
-    removeCurrentGarment() {
-        if (
-            !this.currentGarment
-        ) {
-            return;
-        }
-        this.scene.remove(
-            this.currentGarment
-        );
-        // Dispose geometry/material
-        this.currentGarment.traverse(
-            function (child) {
-                if (
-                    child.isMesh
-                ) {
-                    if (
-                        child.geometry
-                    ) {
-                        child.geometry.dispose();
-                    }
-                    if (
-                        child.material
-                    ) {
-                        if (
-                            Array.isArray(
-                                child.material
-                            )
-                        ) {
-                            child.material.forEach(
-                                material =>
-                                    material.dispose()
-                            );
-                        }
-                        else {
-                            child.material.dispose();
-                        }
-                    }
-                }
-            }
-        );
-        this.currentGarment =
-            null;
-        this.currentGarmentData =
-            null;
-        console.log(
-            "🗑️ Old garment removed"
-        );
-    }
-    // =================================================
-    // CHANGE FIT
-    // =================================================
-    changeFit(
-        fitType
-    ) {
-        if (
-            !this.currentGarment
-        ) {
-            console.warn(
-                "⚠️ No garment loaded"
-            );
-            return;
-        }
-        const type =
-            this.currentGarmentData.type;
-        this.fitEngine.fitGarment(
-            this.currentGarment,
-            type,
-            fitType
-        );
-        this.currentGarmentData.fitType =
-            fitType;
-        console.log(
-            "👖 Fit changed to:",
-            fitType
-        );
-    }
-    // =================================================
-    // CHANGE COLOR
-    // =================================================
-    changeColor(
-        color
-    ) {
-        if (
-            !this.currentGarment
-        ) {
-            console.warn(
-                "⚠️ No garment loaded"
-            );
-            return;
-        }
-        this.materialEngine.applyColor(
-            this.currentGarment,
-            color
-        );
-        this.currentGarmentData.color =
-            color;
-        console.log(
-            "🎨 Color changed:",
-            color
-        );
-    }
-    // =================================================
-    // CHANGE TEXTURE
-    // =================================================
-    async changeTexture(
-        texturePath
-    ) {
-        if (
-            !this.currentGarment
-        ) {
-            console.warn(
-                "⚠️ No garment loaded"
-            );
-            return;
-        }
-        await this.materialEngine.applyTexture(
-            this.currentGarment,
-            texturePath
-        );
-        this.currentGarmentData.texturePath =
-            texturePath;
-        console.log(
-            "🧵 Texture changed"
-        );
-    }
-    // =================================================
-    // GET CURRENT GARMENT
-    // =================================================
-    getCurrentGarment() {
-        return this.currentGarment;
-    }
-    // =================================================
-    // GET GARMENT DATA
-    // =================================================
-    getCurrentGarmentData() {
-        return this.currentGarmentData;
-    }
+
+async loadGarment({
+type="shirt",
+modelPath,
+materialPath=null,
+texturePath=null,
+fitType="regular",
+color=null
+}){
+
+if(!modelPath){
+console.error("❌ Garment model path is required");
+return null;
+}
+
+console.log("👕 Loading:",type);
+
+try{
+
+// Remove only same garment type
+
+if(type==="shirt"){
+this.removeShirt();
+}
+
+if(type==="pant"){
+this.removePant();
+}
+
+// Load OBJ
+
+const garment=await this.garmentEngine.load(
+modelPath,
+materialPath
+);
+
+if(!garment){
+console.error("❌ Garment not loaded");
+return null;
+}
+
+garment.position.set(0,0,0);
+garment.rotation.set(0,0,0);
+garment.scale.set(1,1,1);
+
+garment.updateMatrixWorld(true);
+
+console.log("📦 Model loaded:",type);
+
+// Fit shirt or pant
+
+const fittedGarment=
+this.fitEngine.fitGarment(
+garment,
+type,
+fitType
+);
+
+if(!fittedGarment){
+console.error("❌ Fitting failed:",type);
+return null;
+}
+
+fittedGarment.updateMatrixWorld(true);
+
+// Apply color
+
+if(color!==null){
+
+this.materialEngine.applyColor(
+fittedGarment,
+color
+);
+
+}
+
+// Apply texture
+
+if(texturePath){
+
+await this.materialEngine.applyTexture(
+fittedGarment,
+texturePath
+);
+
+}
+
+fittedGarment.updateMatrixWorld(true);
+
+// Add to scene
+
+this.scene.add(
+fittedGarment
+);
+
+// Store separately
+
+if(type==="shirt"){
+
+this.shirt=fittedGarment;
+
+this.shirtData={
+type,
+modelPath,
+materialPath,
+texturePath,
+fitType,
+color
+};
+
+}
+
+if(type==="pant"){
+
+this.pant=fittedGarment;
+
+this.pantData={
+type,
+modelPath,
+materialPath,
+texturePath,
+fitType,
+color
+};
+
+}
+
+console.log("🎉 Added:",type);
+
+console.log(
+"📏 Scale:",
+fittedGarment.scale
+);
+
+console.log(
+"📍 Position:",
+fittedGarment.position
+);
+
+return fittedGarment;
+
+}catch(error){
+
+console.error(
+"❌ Loading failed:",
+type,
+error
+);
+
+return null;
+
+}
+
+}
+
+// =====================================================
+// LOAD SHIRT
+// =====================================================
+
+async loadShirt(
+modelPath,
+fitType="regular",
+color=null
+){
+
+return await this.loadGarment({
+
+type:"shirt",
+
+modelPath:modelPath,
+
+fitType:fitType,
+
+color:color
+
+});
+
+}
+
+// =====================================================
+// LOAD PANT
+// =====================================================
+
+async loadPant(
+modelPath,
+fitType="regular",
+color=0x222222
+){
+
+return await this.loadGarment({
+
+type:"pant",
+
+modelPath:modelPath,
+
+fitType:fitType,
+
+color:color
+
+});
+
+}
+
+// =====================================================
+// REMOVE SHIRT
+// =====================================================
+
+removeShirt(){
+
+if(!this.shirt){
+return;
+}
+
+this.garmentEngine.remove(
+this.shirt,
+this.scene
+);
+
+this.shirt=null;
+
+this.shirtData=null;
+
+console.log("🗑️ Shirt removed");
+
+}
+
+// =====================================================
+// REMOVE PANT
+// =====================================================
+
+removePant(){
+
+if(!this.pant){
+return;
+}
+
+this.garmentEngine.remove(
+this.pant,
+this.scene
+);
+
+this.pant=null;
+
+this.pantData=null;
+
+console.log("🗑️ Pant removed");
+
+}
+
+// =====================================================
+// REMOVE ALL
+// =====================================================
+
+removeAllGarments(){
+
+this.removeShirt();
+
+this.removePant();
+
+console.log(
+"🗑️ All garments removed"
+);
+
+}
+
+// =====================================================
+// CHANGE SHIRT FIT
+// =====================================================
+
+changeShirtFit(fitType){
+
+if(!this.shirt){
+console.warn(
+"⚠️ Shirt not loaded"
+);
+return null;
+}
+
+this.shirt.position.set(
+0,0,0
+);
+
+this.shirt.rotation.set(
+0,0,0
+);
+
+this.shirt.scale.set(
+1,1,1
+);
+
+const fitted=
+this.fitEngine.fitGarment(
+this.shirt,
+"shirt",
+fitType
+);
+
+this.shirt=fitted;
+
+this.shirtData.fitType=
+fitType;
+
+return fitted;
+
+}
+
+// =====================================================
+// CHANGE PANT FIT
+// =====================================================
+
+changePantFit(fitType){
+
+if(!this.pant){
+console.warn(
+"⚠️ Pant not loaded"
+);
+return null;
+}
+
+this.pant.position.set(
+0,0,0
+);
+
+this.pant.rotation.set(
+0,0,0
+);
+
+this.pant.scale.set(
+1,1,1
+);
+
+const fitted=
+this.fitEngine.fitGarment(
+this.pant,
+"pant",
+fitType
+);
+
+this.pant=fitted;
+
+this.pantData.fitType=
+fitType;
+
+return fitted;
+
+}
+
+// =====================================================
+// CHANGE SHIRT COLOR
+// =====================================================
+
+changeShirtColor(color){
+
+if(!this.shirt){
+return;
+}
+
+this.materialEngine.applyColor(
+this.shirt,
+color
+);
+
+this.shirtData.color=
+color;
+
+}
+
+// =====================================================
+// CHANGE PANT COLOR
+// =====================================================
+
+changePantColor(color){
+
+if(!this.pant){
+return;
+}
+
+this.materialEngine.applyColor(
+this.pant,
+color
+);
+
+this.pantData.color=
+color;
+
+}
+
+// =====================================================
+// GET SHIRT
+// =====================================================
+
+getShirt(){
+return this.shirt;
+}
+
+// =====================================================
+// GET PANT
+// =====================================================
+
+getPant(){
+return this.pant;
+}
+
 }

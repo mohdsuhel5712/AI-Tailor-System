@@ -7,6 +7,8 @@ from backend.api.measurement_api import api_bp
 from backend.api.body_prediction_api import body_prediction_bp
 # for texture 
 from backend.api.texture_api import texture_bp
+from backend.api.garment_api import garment_bp
+
 
 
 app = Flask(
@@ -19,6 +21,7 @@ app.secret_key = "fashshop"
 app.register_blueprint(api_bp)
 app.register_blueprint(body_prediction_bp)
 app.register_blueprint(texture_bp)
+app.register_blueprint(garment_bp)
 
 
 

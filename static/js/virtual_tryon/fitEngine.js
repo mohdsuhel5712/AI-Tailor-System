@@ -1,377 +1,395 @@
 // =====================================================
 // fitEngine.js
-// Professional Garment Fitting Engine
+// Shirt Upper-Body Fit + Pant Waist-to-Ankle Fit
 // =====================================================
-// 4 FILE 
-
 
 import {getBoundingBox,getObjectSize,getObjectCenter} from "./helper.js";
+
+export class FitEngine{
+
+constructor(body){
+this.body=body;
+this.updateBodyData();
+console.log("✅ Fit Engine Initialized");
+}
+
 // =====================================================
-// FIT ENGINE
+// UPDATE BODY DATA
 // =====================================================
-export class FitEngine {
-    constructor(body) {
-        this.body = body;
-        this.bodyBox = getBoundingBox(body);
-        this.bodySize = getObjectSize(body);
-        this.bodyCenter = getObjectCenter(body);
-    }
-    // =================================================
-    // MAIN FIT FUNCTION
-    // =================================================
-    fitGarment(
-        garment,
-        garmentType = "pants",
-        fitType = "regular"
-    ) {
-        console.log(
-            "👕 Fitting garment:", garmentType
-        );
-        console.log(
-            "📏 Fit type:",fitType
-        );
-        // ---------------------------------------------
-        // 1. RESET TRANSFORM
-        // ---------------------------------------------
-        garment.position.set(0,0,0
-        );
-        garment.rotation.set(0,0,0
-        );
-        garment.scale.set(1, 1,1
-        );
-        // ---------------------------------------------
-        // 2. GARMENT BOX
-        // ---------------------------------------------
-        let garmentBox =getBoundingBox(garment);
-        let garmentSize =getObjectSize(garment);
-        // ---------------------------------------------
-        // 3. CALCULATE SCALE
-        // ---------------------------------------------
-        const scale =
-            this.calculateScale(
-                garmentSize,
-                garmentType
-            );
-        // ---------------------------------------------
-        // 4. APPLY FIT TYPE
-        // ---------------------------------------------
-        const fitScale =
-            this.getFitScale(
-                fitType,
-                garmentType
-            );
-        garment.scale.set(
-            scale.x * fitScale.x,
-            scale.y * fitScale.y,
-            scale.z * fitScale.z
-        );
-        // Update world matrix
-        garment.updateMatrixWorld(
-            true
-        );
-        // ---------------------------------------------
-        // 5. X ALIGNMENT
-        // ---------------------------------------------
-        this.alignX(
-            garment,
-            garmentType
-        );
-        // ---------------------------------------------
-        // 6. Y ALIGNMENT
-        // ---------------------------------------------
-        this.alignY(
-            garment,
-            garmentType
-        );
-        // ---------------------------------------------
-        // 7. Z ALIGNMENT
-        // ---------------------------------------------
-        this.alignZ(
-            garment,
-            garmentType
-        );
-        // ---------------------------------------------
-        // 8. ROTATION
-        // ---------------------------------------------
-        this.applyRotation(
-            garment,
-            garmentType
-        );
-        // ---------------------------------------------
-        // 9. COLLISION CHECK
-        // ---------------------------------------------
-        this.checkCollision(
-            garment
-        );
-        // ---------------------------------------------
-        // 10. UPDATE FINAL DATA
-        // ---------------------------------------------
-        garment.updateMatrixWorld(
-            true
-        );
-        console.log(
-            "✅ Garment fitted successfully"
-        );
-        return garment;
-    }
-    // =================================================
-    // SCALE CALCULATION
-    // =================================================
-    calculateScale(
-        garmentSize,
-        garmentType
-    ) {
-        // ---------------------------------------------
-        // PANTS
-        // ---------------------------------------------
-        if (
-            garmentType === "pants"
-        ) {
-            const desiredHeight =
-                this.bodySize.y * 0.48;
-            const uniformScale =
-                desiredHeight /
-                garmentSize.y;
-            return {
-                x: uniformScale,
-                y: uniformScale,
-                z: uniformScale
-            };
-        }
-        // ---------------------------------------------
-        // SHIRT
-        // ---------------------------------------------
-        if (
-            garmentType === "shirt"
-        ) {
-            const desiredHeight =
-                this.bodySize.y * 0.42;
-            const uniformScale =
-                desiredHeight /
-                garmentSize.y;
-            return {
-                x: uniformScale,
-                y: uniformScale,
-                z: uniformScale
-            };
-        }
-        // ---------------------------------------------
-        // DEFAULT
-        // ---------------------------------------------
-        return {
-            x: 1,
-            y: 1,
-            z: 1
-        };
-    }
-    // =================================================
-    // FIT TYPE
-    // =================================================
-    getFitScale(
-        fitType,
-        garmentType
-    ) {
-        // =============================================
-        // PANTS
-        // =============================================
-        if (
-            garmentType === "pants"
-        ) {
-            if (
-                fitType === "slim"
-            ) {
-                return {
-                    x: 1.18,
-                    y: 1.0,
-                    z: 1.18
-                };
-            }
-            if (
-                fitType === "loose"
-            ) {
-                return {
-                    x: 1.35,
-                    y: 1.0,
-                    z: 1.35
-                };
-            }
-            // REGULAR FIT
-            return {
-                x: 1.28,
-                y: 1.0,
-                z: 1.28
-            };
-        }
-        // =============================================
-        // SHIRT
-        // =============================================
-        if (
-            garmentType === "shirt"
-        ) {
-            if (
-                fitType === "slim"
-            ) {
-                return {
-                    x: 1.05,
-                    y: 1.0,
-                    z: 1.05
-                };
-            }
-            if (
-                fitType === "loose"
-            ) {
-                return {
-                    x: 1.25,
-                    y: 1.0,
-                    z: 1.25
-                };
-            }
-            return {
-                x: 1.15,
-                y: 1.0,
-                z: 1.15
-            };
-        }
-        return {
-            x: 1,
-            y: 1,
-            z: 1
-        };
-    }
-    // =================================================
-    // X ALIGNMENT
-    // =================================================
-    alignX(
-        garment,
-        garmentType
-    ) {
-        const garmentCenter =
-            getObjectCenter(
-                garment
-            );
-        const difference =
-            this.bodyCenter.x -
-            garmentCenter.x;
-        garment.position.x +=
-            difference;
-        console.log(
-            "↔ X aligned"
-        );
-    }
-    // =================================================
-    // Y ALIGNMENT
-    // =================================================
-    alignY(
-        garment,
-        garmentType
-    ) {
-        const garmentBox =
-            getBoundingBox(
-                garment
-            );
-        let targetY;
-        // ---------------------------------------------
-        // PANTS
-        // ---------------------------------------------
-        if (
-            garmentType === "pants"
-        ) {
-            targetY =
-                this.bodyBox.min.y +
-                (
-                    this.bodySize.y *
-                    0.56
-                );
-        }
-        // ---------------------------------------------
-        // SHIRT
-        // ---------------------------------------------
-        else if (
-            garmentType === "shirt"
-        ) {
-            targetY =
-                this.bodyBox.max.y -
-                (
-                    this.bodySize.y *
-                    0.22
-                );
-        }
-        else {
-            targetY =
-                this.bodyCenter.y;
-        }
-        const difference =
-            targetY -
-            garmentBox.max.y;
-        garment.position.y +=
-            difference;
-        console.log(
-            "↕ Y aligned"
-        );
-    }
-    // =================================================
-    // Z ALIGNMENT
-    // =================================================
-    alignZ(
-        garment,
-        garmentType
-    ) {
-        const garmentCenter =
-            getObjectCenter(
-                garment
-            );
-        const difference =
-            this.bodyCenter.z -
-            garmentCenter.z;
-        garment.position.z +=
-            difference;
-        console.log(
-            "↔ Z aligned"
-        );
-    }
-    // =================================================
-    // ROTATION
-    // =================================================
-    applyRotation(
-        garment,
-        garmentType
-    ) {
-        // Default garment orientation
-        garment.rotation.set(
-            0,
-            0,
-            0
-        );
-        console.log(
-            "🔄 Rotation applied"
-        );
-    }
-    // =================================================
-    // COLLISION CHECK
-    // =================================================
-    checkCollision(
-        garment
-    ) {
-        const garmentBox =
-            getBoundingBox(
-                garment
-            );
-        const intersects =
-            garmentBox.intersectsBox(
-                this.bodyBox
-            );
-        if (
-            intersects
-        ) {
-            console.log(
-                "⚠️ Garment intersects body"
-            );
-        }
-        else {
-            console.log(
-                "✅ No major collision"
-            );
-        }
-        return intersects;
-    }
+
+updateBodyData(){
+
+if(!this.body){
+console.error("❌ Body is not available");
+return;
+}
+
+this.body.updateMatrixWorld(true);
+
+this.bodyBox=getBoundingBox(this.body);
+this.bodySize=getObjectSize(this.body);
+this.bodyCenter=getObjectCenter(this.body);
+
+console.log("📏 Body Size:",this.bodySize);
+
+}
+
+// =====================================================
+// MAIN FITTING
+// =====================================================
+
+fitGarment(garment,garmentType="shirt",fitType="regular"){
+
+if(!garment){
+console.error("❌ Garment is required");
+return null;
+}
+
+this.updateBodyData();
+
+garment.position.set(0,0,0);
+garment.rotation.set(0,0,0);
+garment.scale.set(1,1,1);
+
+garment.updateMatrixWorld(true);
+
+console.log("👕 Fitting:",garmentType);
+console.log("📏 Fit Type:",fitType);
+
+if(garmentType==="shirt"){
+return this.fitShirt(
+garment,
+fitType
+);
+}
+
+if(
+garmentType==="pant"||
+garmentType==="pants"
+){
+return this.fitPant(
+garment,
+fitType
+);
+}
+
+console.error(
+"❌ Unknown garment type:",
+garmentType
+);
+
+return null;
+
+}
+
+// =====================================================
+// SHIRT FIT
+// =====================================================
+
+fitShirt(garment,fitType){
+
+const garmentSize=
+getObjectSize(garment);
+
+if(
+garmentSize.x<=0||
+garmentSize.y<=0||
+garmentSize.z<=0
+){
+console.error("❌ Invalid shirt size");
+return null;
+}
+
+// Upper body size
+
+const targetWidth=
+this.bodySize.x*0.94;
+
+const targetHeight=
+this.bodySize.y*0.43;
+
+const targetDepth=
+this.bodySize.z*1.03;
+
+// Scale
+
+let scaleX=
+targetWidth/garmentSize.x;
+
+let scaleY=
+targetHeight/garmentSize.y;
+
+let scaleZ=
+targetDepth/garmentSize.z;
+
+// Fit type
+
+if(fitType==="slim"){
+scaleX*=0.95;
+scaleZ*=0.96;
+}
+
+if(fitType==="loose"){
+scaleX*=1.08;
+scaleZ*=1.10;
+scaleY*=1.03;
+}
+
+garment.scale.set(
+scaleX,
+scaleY,
+scaleZ
+);
+
+garment.updateMatrixWorld(true);
+
+// Center X
+
+let shirtBox=
+getBoundingBox(garment);
+
+const shirtCenterX=
+(
+shirtBox.min.x+
+shirtBox.max.x
+)/2;
+
+garment.position.x+=
+this.bodyCenter.x-
+shirtCenterX;
+
+garment.updateMatrixWorld(true);
+
+// Neck position
+
+shirtBox=
+getBoundingBox(garment);
+
+const shirtTop=
+shirtBox.max.y;
+
+const targetTop=
+this.bodyBox.max.y-
+this.bodySize.y*0.07;
+
+garment.position.y+=
+targetTop-
+shirtTop;
+
+garment.updateMatrixWorld(true);
+
+// Center Z
+
+shirtBox=
+getBoundingBox(garment);
+
+const shirtCenterZ=
+(
+shirtBox.min.z+
+shirtBox.max.z
+)/2;
+
+garment.position.z+=
+this.bodyCenter.z-
+shirtCenterZ;
+
+// Small outside offset
+
+garment.position.z+=
+this.bodySize.z*0.015;
+
+garment.updateMatrixWorld(true);
+
+console.log(
+"👕 Shirt fitted to upper body"
+);
+
+console.log(
+"📏 Shirt Scale:",
+garment.scale
+);
+
+console.log(
+"📍 Shirt Position:",
+garment.position
+);
+
+return garment;
+
+}
+
+// =====================================================
+// PANT FIT
+// =====================================================
+
+fitPant(garment,fitType){
+
+const garmentSize=
+getObjectSize(garment);
+
+if(
+garmentSize.x<=0||
+garmentSize.y<=0||
+garmentSize.z<=0
+){
+console.error("❌ Invalid pant size");
+return null;
+}
+
+// Body levels
+
+const ankleLevel=
+this.bodyBox.min.y+
+this.bodySize.y*0.02;
+
+const waistLevel=
+this.bodyBox.min.y+
+this.bodySize.y*0.58;
+
+const targetPantHeight=
+waistLevel-
+ankleLevel;
+
+// Pant size based on hips
+
+const targetPantWidth=
+this.bodySize.x*0.88;
+
+const targetPantDepth=
+this.bodySize.z*1.05;
+
+// Scale pant
+
+let scaleX=
+targetPantWidth/
+garmentSize.x;
+
+let scaleY=
+targetPantHeight/
+garmentSize.y;
+
+let scaleZ=
+targetPantDepth/
+garmentSize.z;
+
+// Fit type
+
+if(fitType==="slim"){
+scaleX*=0.90;
+scaleZ*=0.90;
+}
+
+if(fitType==="loose"){
+scaleX*=1.02;
+scaleZ*=1.04;
+}
+
+garment.scale.set(
+scaleX,
+scaleY,
+scaleZ
+);
+
+garment.updateMatrixWorld(true);
+
+// Center pant on body X
+
+let pantBox=
+getBoundingBox(garment);
+
+const pantCenterX=
+(
+pantBox.min.x+
+pantBox.max.x
+)/2;
+
+garment.position.x+=
+this.bodyCenter.x-
+pantCenterX;
+
+garment.updateMatrixWorld(true);
+
+// Pant top to waist
+
+pantBox=
+getBoundingBox(garment);
+
+garment.position.y+=
+waistLevel-
+pantBox.max.y;
+
+garment.updateMatrixWorld(true);
+
+// Center Z
+
+pantBox=
+getBoundingBox(garment);
+
+const pantCenterZ=
+(
+pantBox.min.z+
+pantBox.max.z
+)/2;
+
+const bodyFrontZ=
+this.bodyBox.max.z;
+
+const pantFrontZ=
+pantBox.max.z;
+
+garment.position.z+=
+bodyFrontZ-
+pantFrontZ;
+
+garment.position.z+=
+this.bodySize.z*0.03;
+
+garment.updateMatrixWorld(true);
+
+console.log(
+"👖 Pant fitted from waist to ankle"
+);
+
+console.log(
+"📏 Pant Scale:",
+garment.scale
+);
+
+console.log(
+"📍 Pant Position:",
+garment.position
+);
+
+return garment;
+
+}
+
+// =====================================================
+// COLLISION CHECK
+// =====================================================
+
+checkCollision(garment){
+
+const garmentBox=
+getBoundingBox(garment);
+
+const intersects=
+garmentBox.intersectsBox(
+this.bodyBox
+);
+
+if(intersects){
+console.log(
+"⚠️ Garment overlaps body"
+);
+}else{
+console.log(
+"✅ Garment is outside body"
+);
+}
+
+return intersects;
+
+}
+
 }

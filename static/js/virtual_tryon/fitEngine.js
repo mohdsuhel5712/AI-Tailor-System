@@ -393,3 +393,48 @@ return intersects;
 }
 
 }
+
+
+// ===============
+// apply fit garment
+// ==============
+class updatedFiting{
+
+    applyFit(garment, fitType) {
+
+        if (!garment) {
+            return;
+        }
+
+        let width = 1.0;
+
+        switch (fitType) {
+
+            case "slim":
+                width = 0.92;
+                break;
+
+            case "regular":
+                width = 1.0;
+                break;
+
+            case "loose":
+                width = 1.10;
+                break;
+        }
+
+        garment.scale.x = width;
+        garment.scale.z = width;
+
+        garment.updateMatrixWorld(true);
+
+        console.log(
+            "Fit Updated:",
+            fitType,
+            "Scale:",
+            width
+        );
+    }
+}
+
+window.updatedFiting = new updatedFiting();

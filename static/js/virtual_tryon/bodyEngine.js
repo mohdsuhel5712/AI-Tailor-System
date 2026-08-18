@@ -1,6 +1,8 @@
 // static/js/virtual_tryon/bodyEngine.js
 // 1 FILE
 import {getBoundingBox,getObjectSize,getObjectCenter} from "./helper.js";
+
+
 export class BodyEngine {
     constructor(body) { this.body = body;}
     getBoundingBox() {return getBoundingBox( this.body);

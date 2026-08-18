@@ -53,6 +53,20 @@
     .avs-measure-grid {
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     }
+
+    #shirtSelect,
+#pantSelect {
+    display: block !important;
+    width: 100%;
+    min-height: 48px;
+
+    color: #ffffff !important;
+    font-size: 16px;
+    font-weight: 600;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 </style>
 {% endblock %}
 
@@ -192,25 +206,16 @@ Personalized 3D Body
                 </h5>
 
                 <!-- SHIRT -->
-                <label for="shirtSelect">
-                    Select Shirt
-                </label>
-
-                <select id="shirtSelect" class="form-select mb-2">
-                    <option value="">
-                        Loading shirts...
-                    </option>
+                <label for="shirtSelect">Select Shirt</label>
+                <select id="shirtSelect" class="form-select mb-2"><option value=""> Loading shirts... </option>
                 </select>
-
                 <button type="button" class="btn btn-success w-100 mb-3" style="color:aliceblue;" onclick="applySelectedShirt()">
                     Apply Shirt
                 </button>
 
 
                 <!-- PANT -->
-                <label for="pantSelect">
-                    Select Pant
-                </label>
+                <label for="pantSelect">Select Pant</label>
 
                 <select id="pantSelect" class="form-select mb-2">
                     <option value="">
@@ -222,9 +227,50 @@ Personalized 3D Body
                     Apply Pant
                 </button>
 
-            </div>
+                <label for="customizeTarget">Customize</label>
+                <select id="customizeTarget" class="form-select mb-3">
+                    <option value="shirt">shirt</option>
+                    <option value="pant">pant</option>
+                </select>
 
+                
+                <!-- color -->
+                <label for="garmentColor">Garment Color</label>
+                <input type="color" id="garmentColor" value="#ffffff" class="form-control form-control-color" onclick="changeGarmentColor(this.value)">
+           
 
+            <!-- febrics -->
+             <label for="fabricSelect">Fabric</label>
+             <select name="" id="fabricSelect" class="form-select mb-3" onchange="changeGarmentFabric(this.value)">
+                <option value="">select fabric</option>
+                <option value="cotton">cotton</option>
+                <option value="denim">denim</option>
+                <option value="silk">silk</option>
+                <option value="wool">wool</option>
+                <option value="linen">linen</option>
+             </select>
+
+             <!-- pattern  -->
+              <label for="patternSelect">Pattern</label>
+              <select name="" id="patternSelect" class="form-select mb-3" onchange="changeGarmentPattern(this.value)">
+                <option value="plain">plain</option>
+                <option value="stripes">stripes</option>
+                <option value="checks">checks</option>
+                <option value="floral">floral</option>
+                <option value="dots">dots</option>
+              </select>
+
+              <label for="fitType" class="mt-3">
+                Fit Type
+              </label>
+              <select name="" id="fitType" class="form-select mb-3">
+                <option value="slim">Slim</option>
+                <option value="regular">Regular</option>
+                <option value="loose">Loose</option>
+              </select>
+              <button class="btn btn-primary w-1000" onclick="applyFit()">Apply fit </button>
+
+               </div>
             <!-- main cards -->
 
             
@@ -247,16 +293,25 @@ Personalized 3D Body
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script type="module" src="{{ url_for('static', filename='js/viewer.js') }}"></script>
 
-<script>
+
+<script type="module" src="{{ url_for('static', filename='js/viewer.js') }}"></script>
+<!-- <script type="module" src="{{ url_for('static',filename='js/virtual_tryon/garmentManager.js')}}"></script> -->
+<!-- <script src="{{ url_for('static', filename='js/virtual_tryon/materialEngine.js') }}"></script>  -->
+
+VIRTUAL TRY-ON FILES new  added for the btn click 
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/bodyEngine.js') }}"></script> 
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/fitEngine.js') }}"></script>  
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/garmentEngine.js') }}"></script>  
+<!-- <script type="module" src="{{ url_for('static', filename='js/virtual_tryon/garmentManager.js') }}"></script>   -->
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/materialEngine.js') }}"></script>  <script>
     // ---- Custom colour pickers ----
-    const pantColorPicker = document.getElementById("customPantColor");
+    const pantColorPicker = document.getElementById("garmentColor");
     pantColorPicker.addEventListener("input", function () {
         changePantColor(this.value);
     });
 
-    const shirtColorPicker = document.getElementById("customShirtColor");
+    const shirtColorPicker = document.getElementById("garmentColor");
     shirtColorPicker.addEventListener("input", function () {
         changeShirtColor(this.value);
     });

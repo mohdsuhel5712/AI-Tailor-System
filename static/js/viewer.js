@@ -888,6 +888,8 @@ console.log("🔥 viewer.js started");
 
 import {BodyEngine} from "./virtual_tryon/bodyEngine.js";
 import {GarmentManager} from "./virtual_tryon/garmentManager.js";
+// import {clearGarmentTexture} from "/static/js/virtual_tryon/materialEngine.js";
+
 
 let scene;
 let camera;
@@ -905,6 +907,9 @@ console.log("✅ initViewer started");
 scene=new THREE.Scene();
 scene.background=new THREE.Color(0x0b1220);
 scene.fog=new THREE.Fog(0x0b1220,4,12);
+
+const garmentManager  = new GarmentManager(scene);
+window.garmentManager = garmentManager;
 
 camera=new THREE.PerspectiveCamera(
 45,
@@ -1176,12 +1181,10 @@ new BodyEngine(
 body
 );
 
-garmentManager=
-new GarmentManager(
-scene,
-body
-);
+garmentManager=new GarmentManager(scene,body);
 
+window.garmentManager = garmentManager;
+console.log("globle garment manager connected ! ",window.GarmentManager);
 await loadGarmentsFromDatabase();
 
 console.log(
@@ -1194,8 +1197,9 @@ console.log(
 
 // Default shirt load
 
-await loadDefaultShirt();
-await selectPant();
+// await loadDefaultShirt();
+// await applySelectedPant();
+// await selectPant();
 
 },
 
@@ -1229,22 +1233,23 @@ return;
 
 }
 
-const shirt=
-await garmentManager.loadGarment({
+const shirt=await garmentManager.loadGarment({
 
 type:"shirt",
 
 modelPath:
-"/static/garments/shirts/",
+"/static/garments/shirts/Male_shirt.obj",
 
 materialPath:
-"/static/garments/shirts/Male_Shirt.mtl",
+"/static/garments/shirts/Male_shirt.mtl",
 
 fitType:"regular",
 
 color:0xffffff
 
 });
+
+console.log(window.garmentManager.shirt);
 
 if(shirt){
 
@@ -1292,7 +1297,7 @@ await garmentManager.loadGarment({
 type:"pant",
 
 modelPath:
-"/static/garments/pants/",
+"/static/garments/pants/pant.obj",
 
 materialPath:null,
 
@@ -1502,36 +1507,42 @@ function fillGarmentDropdowns(){
 // =====================================================
 
 async function applySelectedShirt(){
-    const shirtSelect = document.getElementById("shirtSelect");
+    const shirtSelect=document.getElementById("shirtSelect");
     if(!shirtSelect){
-        console.log("shirt drop down nor found");
-        return ;
+        console.log("shirt dropdown not found");
+        return;
     }
-
-    const garmentId =Number(shirtSelect.value);
+    const garmentId=Number(shirtSelect.value);
     if(!garmentId){
-        alert("please select a shirt");
+        alert("Please select a shirt");
         return;
     }
-    const garment = allGarments.find((item)=> item.garment_id===garmentId);
+    const garment=allGarments.find((item)=>item.garment_id===garmentId);
     if(!garment){
-        console.log("seleted shirt is not found !");
+        console.log("Selected shirt is not found!");
         return;
     }
-    console.log("apply shirt !",garment);
-    const shirt = await garmentManager.loadGarment({
+    console.log("Apply shirt!",garment);
+    const modelPath=garment.glb_file
+        ? "static/garments/"+garment.glb_file
+        : garment.obj_file
+        ? "static/garments/"+garment.obj_file
+        : null;
+    if(!modelPath){
+        console.log("No GLB or OBJ file found for selected shirt!");
+        return;
+    }
+    const shirt=await garmentManager.loadGarment({
         type:"shirt",
-        modelPath:"static/garments/"+garment.obj_file,
+        modelPath:modelPath,
         materialPath:null,
         fitType:"regular",
         color:0xffffff
     });
     if(shirt){
-        console.log("seledct shirt applied !");
+        console.log("Selected shirt applied!",modelPath);
     }
-
 }
-
 // =====================================================
 // APPLY SELECTED PANT
 // =====================================================
@@ -1570,6 +1581,182 @@ document.addEventListener("DOMContentLoaded",()=>{
     console.log("loading garment dropdown ! ");
     loadGarmentsFromDatabase();
 });
+
+
+
+
+// =====================================================
+// GET CUSTOMIZATION TARGET
+// =====================================================
+
+function getCustomizationTarget(){
+    const targetSelect = document.getElementById("customizeTarget");
+    if(!targetSelect){
+        return "shirt";
+    }
+    return targetSelect.value;
+}
+
+// =====================================================
+// CHANGE COLOR
+// =====================================================
+// function changeGarmentColor(color){
+//     const target = getCustomizationTarget();
+//     applySelectedPant(target,color);
+// }
+
+// =====================================================
+// CHANGE FABRIC
+// =====================================================
+// =====================================================
+// CHANGE GARMENT FABRIC
+// File: static/js/viewer.js
+// =====================================================
+
+function changeGarmentFabric(
+    fabric
+) {
+
+    const target =getCustomizationTarget();
+
+    console.log("Selected fabric:",fabric);
+
+    console.log("Customization target:", target);
+
+
+    // Empty option selected
+    if (!fabric) {
+
+        console.warn( "⚠️ Please select a fabric");
+        return;
+    }
+
+
+    const fabricPaths = {
+        cotton: "/static/textures/fabrics/cotton.jpg",
+
+        denim: "/static/textures/fabrics/denim.jpg",
+
+        silk:"/static/textures/fabrics/silk.jpg",
+
+        wool:"/static/textures/fabrics/wool.jpg",
+
+        linen: "/static/textures/fabrics/linen.jpg"
+    };
+
+
+    const texturePath =
+        fabricPaths[fabric];
+
+
+    // Only show this warning if path does not exist
+    if (!texturePath) {
+
+        console.error(
+            "❌ Fabric path not found for:",
+            fabric
+        );
+
+        return;
+    }
+
+
+    console.log(
+        "✅ Applying fabric:",
+        texturePath,
+        "to:",
+        target
+    );
+
+
+    if (
+        typeof applyGarmentFabric
+        !== "function"
+    ) {
+
+        console.error(
+            "❌ applyGarmentFabric() is not available"
+        );
+
+        return;
+    }
+
+
+    applyGarmentFabric(
+        target,
+        texturePath
+    );
+}
+
+
+// =====================================================
+// CHANGE PATTERN
+// =====================================================
+
+function changeGarmentPattern(pattern){
+    const target = getCustomizationTarget();
+    if(pattern =='plain'){
+        clearGarmentTexture(target);
+        return;
+    }
+
+    const patternPaths = {
+        stripes:'/static/textures/patterns/stripes.png',
+        checks:'/static/textures/patterns/checks.png',
+        floral:'/static/textures/patterns/floral.png',
+        dots:'/static/textures/patterns/dots.png',
+        plan:'/static/textures/patterns/plan.png'
+    };
+
+    const pattenPth = patternPaths[pattern];
+    if(!pattenPth){
+        console.warn("pattern not found ",pattern);
+        return ;
+    }
+    console.log("applying pattern ",pattenPth,"to:",target);
+    applyGarmentPattern(target,pattenPth);
+}
+
+
+// =======================
+// apply fit  button
+// ========================
+
+function applyFit() {
+
+    const target = getCustomizationTarget();
+
+    const fitType =
+        document.getElementById("fitType").value;
+
+    console.log(
+        "Applying Fit:",
+        target,
+        fitType
+    );
+
+    if (!window.garmentManager) {
+        console.error("garmentManager is not available");
+        return;
+    }
+
+    if (typeof window.garmentManager.updateGarmentFit !== "function") {
+        console.error(
+            "updateGarmentFit() is missing from garmentManager",
+            window.garmentManager
+        );
+        return;
+    }
+
+    window.garmentManager.updateGarmentFit(
+        target,
+        fitType
+    );
+}
+
+window.applyFit = applyFit;
+
+
 // =====================================================
 // START VIEWER
 // =====================================================
@@ -1589,10 +1776,12 @@ window.changeGarmentFit=
 window.changeGarmentColor=
     changeGarmentColor;
 
+window.changeGarmentPattern =
+    changeGarmentPattern;
+    
 // window.changeGarmentTexture=
 //     changeGarmentTexture;
 
-// window.changeGarmentFabric=
-//     changeGarmentFabric;
+window.changeGarmentFabric=changeGarmentFabric;
 
 initViewer();

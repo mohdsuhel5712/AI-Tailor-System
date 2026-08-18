@@ -34,6 +34,7 @@ measurements -> neural network -> prediction
 
 Future Phase:
 prediction -> SMPL -> 3D avatar
+
 ==================================================
 
 PHASE :3

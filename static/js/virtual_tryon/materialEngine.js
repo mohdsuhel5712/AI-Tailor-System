@@ -278,3 +278,296 @@ export class MaterialEngine {
         });
     }
 }
+
+
+
+// ====================== HERE I GET STRTED TO WORK ON TEXTUTE ON CLICK ON BTN =================
+// =====================================================
+// materialEngine.js
+// Runtime Color, Fabric Texture and Pattern System
+// =====================================================
+
+// =====================================================
+// TEXTURE LOADER
+// =====================================================
+
+const textureLoader = new THREE.TextureLoader();
+// =====================================================
+// GET SELECTED GARMENT
+// =====================================================
+
+function getSelectedGarment(target) {
+
+    const manager = window.garmentManager;
+
+    if (!manager) {
+        console.error(
+            "❌ Garment manager is not available"
+        );
+
+        return null;
+    }
+
+    console.log(
+        "✅ Garment manager found:",
+        manager
+    );
+
+
+    if (target === "shirt") {
+
+        return (
+            manager.shirt ||
+            manager.currentShirt ||
+            manager.shirtGarment ||
+            null
+        );
+    }
+
+
+    if (target === "pant") {
+
+        return (
+            manager.pant ||
+            manager.currentPant ||
+            manager.pantGarment ||
+            null
+        );
+    }
+
+
+    console.error(
+        "❌ Invalid target:",
+        target
+    );
+
+    return null;
+    console.log(window.garmentManager);
+console.log(window.garmentManager.shirt);
+}
+
+// // =====================================================
+// APPLY COLOR
+// =====================================================
+
+function applyGarmentColor(target,color){
+    console.log("Color Target:", target);
+    console.log("Color garment:", garment);
+
+    const garment = getSelectedGarment(target);
+    console.log("Selected Garment:", garment);
+    if(!garment){
+        console.warn(`${target} is not loaded`);
+        return;
+    }
+    garment.traverse((child)=>{
+        if(child.isMesh && child.material){
+            child.material.color.set(color);
+            child.material.needsUpdate= true;
+        }
+    });
+
+    console.log(`${target} color updated`,color);
+}
+
+
+// =====================================================
+// APPLY FABRIC TEXTURE
+// =====================================================
+
+function applyGarmentFabric(
+    target,
+    texturePath
+) {
+
+    const garment =
+        getSelectedGarment(
+            target
+        );
+
+    if (!garment) {
+
+        console.warn(
+            `${target} is not loaded`
+        );
+
+        return;
+    }
+
+    const loader =
+        new THREE.TextureLoader();
+
+    loader.load(
+
+        texturePath,
+
+        function(texture) {
+
+            texture.wrapS =
+                THREE.RepeatWrapping;
+
+            texture.wrapT =
+                THREE.RepeatWrapping;
+
+            texture.repeat.set(
+                4,
+                4
+            );
+
+            garment.traverse(
+                function(child) {
+
+                    if (
+                        child.isMesh &&
+                        child.material
+                    ) {
+
+                        child.material.map =
+                            texture;
+
+                        child.material.color.set(
+                            0xffffff
+                        );
+
+                        child.material.needsUpdate =
+                            true;
+                    }
+                }
+            );
+
+            console.log(
+                "Fabric applied:",
+                texturePath
+            );
+        },
+
+        undefined,
+
+        function(error) {
+
+            console.error(
+                "Fabric loading failed:",
+                texturePath,
+                error
+            );
+        }
+    );
+}
+
+
+
+// =====================================================
+// APPLY PATTERN
+// =====================================================
+function applyGarmentPattern(
+    target,
+    texturePath
+) {
+
+    const garment =
+        getSelectedGarment(
+            target
+        );
+
+    if (!garment) {
+
+        console.warn(
+            `${target} is not loaded`
+        );
+
+        return;
+    }
+
+    const loader =
+        new THREE.TextureLoader();
+
+    loader.load(
+
+        texturePath,
+
+        function(texture) {
+
+            texture.wrapS =
+                THREE.RepeatWrapping;
+
+            texture.wrapT =
+                THREE.RepeatWrapping;
+
+            texture.repeat.set(
+                5,
+                5
+            );
+
+            garment.traverse(
+                function(child) {
+
+                    if (
+                        child.isMesh &&
+                        child.material
+                    ) {
+
+                        child.material.map =
+                            texture;
+
+                        child.material.color.set(
+                            0xffffff
+                        );
+
+                        child.material.needsUpdate =
+                            true;
+                    }
+                }
+            );
+
+            console.log(
+                "Pattern applied:",
+                texturePath
+            );
+        },
+
+        undefined,
+
+        function(error) {
+
+            console.error(
+                "Pattern loading failed:",
+                texturePath,
+                error
+            );
+        }
+    );
+}
+
+// =====================================================
+// REMOVE TEXTURE / PATTERN
+// =====================================================
+
+function clearGarmentTexture(target){
+    const garment = getSelectedGarment(target);
+    if(!garment){
+        return;
+    }
+
+    garment.traverse((child)=>{
+        if(child.isMesh && child.material){
+            child.material.map = null;
+            child.material.needsUpdate =true;
+        }
+    });
+
+    console.log(`${target} texture cleared`)
+}
+
+
+// apply globle avaialabel 
+window.applyGarmentFabric =
+    applyGarmentFabric;
+
+window.applyGarmentPattern =
+    applyGarmentPattern;
+
+window.clearGarmentTexture =
+    clearGarmentTexture;
+
+window.applyGarmentColor =
+    applyGarmentColor;

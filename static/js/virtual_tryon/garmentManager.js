@@ -8,6 +8,7 @@ import {FitEngine} from "./fitEngine.js";
 import {MaterialEngine} from "./materialEngine.js";
 
 export class GarmentManager{
+
 constructor(scene,body){
 this.scene=scene;
 this.body=body;
@@ -177,31 +178,27 @@ error
 );
 
 return null;
+console.log("Shirt:", this.shirt);
+console.log("Pant:", this.pant);
+console.log("Same Instance:", this === window.garmentManager);
 
 }
 
 }
+
+
+
 
 // =====================================================
 // LOAD SHIRT
 // =====================================================
 
-async loadShirt(
-modelPath,
-fitType="regular",
-color=null
-){
-
+async loadShirt(modelPath,fitType="regular",){
 return await this.loadGarment({
-
 type:"shirt",
-
 modelPath:modelPath,
-
 fitType:fitType,
-
 color:color
-
 });
 
 }
@@ -210,24 +207,13 @@ color:color
 // LOAD PANT
 // =====================================================
 
-async loadPant(
-modelPath,
-fitType="regular",
-color=0x222222
-){
-
+async loadPant(modelPath,fitType="regular",color=0x222222){
 return await this.loadGarment({
-
 type:"pant",
-
 modelPath:modelPath,
-
 fitType:fitType,
-
 color:color
-
 });
-
 }
 
 // =====================================================
@@ -431,3 +417,58 @@ return this.pant;
 }
 
 }
+
+
+
+// ===============
+// update the garment fitting 
+// ===============
+class updatedGarment{
+
+    constructor(fitEngine) {
+
+        this.fitEngine = fitEngine;
+
+        this.shirt = null;
+        this.pant = null;
+    }
+
+
+    // =====================================
+    // UPDATE GARMENT FIT
+    // =====================================
+
+    updateGarmentFit(type, fitType) {
+
+        let garment = null;
+
+        if (type === "shirt") {
+            garment = this.shirt;
+        }
+
+        if (type === "pant") {
+            garment = this.pant;
+        }
+
+        if (!garment) {
+            console.warn(type + " not loaded");
+            return;
+        }
+
+        if (!this.fitEngine) {
+            console.error("FitEngine not available");
+            return;
+        }
+
+        this.fitEngine.applyFit(
+            garment,
+            fitType
+        );
+    }
+}
+
+// const updatedGarment = new updatedGarment(
+//     fitEngine
+// );
+
+window.updatedGarment =new  updatedGarment(window.updatedFiting);

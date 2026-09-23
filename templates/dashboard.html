@@ -1,427 +1,1312 @@
 {% extends 'base.html' %}
-
+{% block title %}AI AlterFit | Dashboard{% endblock %}
 {% block head %}
-<link rel="stylesheet"
-      href="{{url_for('static',filename='css/dashboard.css')}}">
-{% endblock %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap"
+    rel="stylesheet">
+<style>
+    :root {
+        --dash-bg: #f3f4f6;
+        --dash-surface: #ffffff;
+        --dash-border: #e5e7eb;
+        --dash-text: #181a20;
+        --dash-muted: #737780;
+        --dash-light: #a7aab1;
+        --dash-primary: #5b5bd6;
+        --dash-primary-dark: #4747b8;
+        --dash-success: #198754;
+        --dash-warning: #b7791f;
+        --dash-danger: #dc3545;
+        --dash-radius: 18px;
+        --dash-shadow: 0 8px 30px rgba(20, 22, 30, 0.06);
+        --dash-shadow-hover: 0 16px 40px rgba(20, 22, 30, 0.11);
+    }
 
-{% block title %}
-Dashboard
-{% endblock %}
+    .dashboard-page {
+        max-width: 1240px;
+        margin: 34px auto 70px;
+        padding: 0 22px;
+        animation: pageFade 0.55s ease both;
+    }
 
+    @keyframes pageFade {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ================= HEADER ================= */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .dashboard-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--dash-primary);
+        margin-bottom: 8px;
+    }
+
+    .dashboard-eyebrow::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--dash-primary);
+        box-shadow: 0 0 0 5px rgba(91, 91, 214, 0.10);
+    }
+
+    .dashboard-title {
+        margin: 0;
+        color: var(--dash-text);
+        font-size: clamp(27px, 4vw, 38px);
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1.12;
+    }
+
+    .dashboard-subtitle {
+        margin: 9px 0 0;
+        color: var(--dash-muted);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .dashboard-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid var(--dash-border);
+        border-radius: 11px;
+        background: #fff;
+        color: var(--dash-text);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+
+    .dashboard-action:hover {
+        color: var(--dash-text);
+        border-color: #cfd1d8;
+        transform: translateY(-2px);
+        box-shadow: var(--dash-shadow);
+    }
+
+    .dashboard-action.primary {
+        background: var(--dash-text);
+        color: #fff;
+        border-color: var(--dash-text);
+    }
+
+    .dashboard-action.primary:hover {
+        background: #000;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: var(--dash-shadow-hover);
+    }
+
+    /* ================= QUICK LINKS ================= */
+    .quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-bottom: 20px;
+    }
+
+    .quick-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 14px;
+        border: 1px solid var(--dash-border);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--dash-text);
+        text-decoration: none;
+        font-size: 12.5px;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+
+    .quick-link:hover {
+        color: var(--dash-primary);
+        border-color: rgba(91, 91, 214, 0.25);
+        background: rgba(91, 91, 214, 0.04);
+        transform: translateY(-2px);
+    }
+
+    /* ================= MAIN PANEL ================= */
+    .dashboard-panel {
+        background: var(--dash-surface);
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius);
+        box-shadow: var(--dash-shadow);
+        overflow: hidden;
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding: 24px 26px 20px;
+        border-bottom: 1px solid var(--dash-border);
+    }
+
+    .panel-heading {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .panel-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(91, 91, 214, 0.09);
+        color: var(--dash-primary);
+        font-size: 18px;
+    }
+
+    .panel-title {
+        margin: 0;
+        color: var(--dash-text);
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .panel-description {
+        margin: 3px 0 0;
+        color: var(--dash-muted);
+        font-size: 12.5px;
+    }
+
+    /* ================= TOOLBAR ================= */
+    .dashboard-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 20px 26px;
+        background: #fafafb;
+        border-bottom: 1px solid var(--dash-border);
+    }
+
+    .request-selector {
+        position: relative;
+        flex: 1 1 360px;
+        min-width: 240px;
+    }
+
+    .request-selector-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dash-light);
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .request-select {
+        width: 100%;
+        height: 44px;
+        appearance: none;
+        border: 1px solid var(--dash-border);
+        border-radius: 11px;
+        padding: 0 42px 0 42px;
+        background: #fff;
+        color: var(--dash-text);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .request-select:hover {
+        border-color: #cfd1d8;
+    }
+
+    .request-select:focus {
+        outline: none;
+        border-color: var(--dash-primary);
+        box-shadow: 0 0 0 4px rgba(91, 91, 214, 0.10);
+    }
+
+    .request-selector-caret {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dash-light);
+        pointer-events: none;
+    }
+
+    .toolbar-btn {
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 15px;
+        border: 1px solid var(--dash-border);
+        border-radius: 11px;
+        background: #fff;
+        color: var(--dash-text);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .toolbar-btn:hover {
+        border-color: #cfd1d8;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 16px rgba(20, 22, 30, 0.06);
+    }
+
+    /* ================= ALERT ================= */
+    .dashboard-error {
+        display: none;
+        margin: 18px 26px 0;
+        padding: 13px 16px;
+        border: 1px solid #f0cccc;
+        border-radius: 11px;
+        background: #fff5f5;
+        color: #9c3333;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    /* ================= LOADING ================= */
+    .dashboard-loading,
+    .dashboard-empty {
+        text-align: center;
+        padding: 70px 20px;
+        color: var(--dash-muted);
+        font-size: 13.5px;
+    }
+
+    .dashboard-spinner {
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 13px;
+        border: 2.5px solid #e8e9ed;
+        border-top-color: var(--dash-primary);
+        border-radius: 50%;
+        animation: dashboardSpin 0.8s linear infinite;
+    }
+
+    @keyframes dashboardSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .empty-icon {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 13px;
+        border-radius: 16px;
+        background: #f2f3f5;
+        font-size: 25px;
+    }
+
+    .empty-title {
+        color: var(--dash-text);
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    /* ================= REQUEST CONTENT ================= */
+    .request-content {
+        display: none;
+        padding: 26px;
+    }
+
+    .request-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 22px;
+        border-radius: 16px;
+        background:
+            radial-gradient(circle at 90% 20%, rgba(91, 91, 214, 0.13), transparent 30%),
+            linear-gradient(135deg, #f8f8fc, #ffffff);
+        border: 1px solid var(--dash-border);
+        margin-bottom: 20px;
+    }
+
+    .request-identity {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+    }
+
+    .request-avatar {
+        width: 50px;
+        height: 50px;
+        flex: 0 0 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #5b5bd6, #8b7cf6);
+        color: #fff;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 8px 20px rgba(91, 91, 214, 0.20);
+    }
+
+    .request-customer {
+        color: var(--dash-text);
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .request-number {
+        color: var(--dash-muted);
+        font-size: 12px;
+    }
+
+    .request-status-area {
+        text-align: right;
+    }
+
+    .status-label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--dash-muted);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #fff5df;
+        color: #91621c;
+        border: 1px solid #f1dfb7;
+        font-size: 11.5px;
+        font-weight: 700;
+    }
+
+    .status-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 0 4px rgba(145, 98, 28, 0.08);
+    }
+
+    /* ================= DATA GRID ================= */
+    .request-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .request-item {
+        padding: 17px 18px;
+        border: 1px solid var(--dash-border);
+        border-radius: 13px;
+        background: #fff;
+        transition: all 0.25s ease;
+    }
+
+    .request-item:hover {
+        transform: translateY(-2px);
+        border-color: #d3d5dc;
+        box-shadow: 0 9px 24px rgba(20, 22, 30, 0.06);
+    }
+
+    .request-label {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--dash-light);
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+    }
+
+    .request-value {
+        color: var(--dash-text);
+        font-size: 14px;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+    /* ================= ACTION ================= */
+    .request-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--dash-border);
+    }
+
+    .request-hint {
+        color: var(--dash-muted);
+        font-size: 12px;
+    }
+
+    .view-details-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 43px;
+        padding: 0 19px;
+        border-radius: 11px;
+        background: var(--dash-text);
+        color: #fff;
+        text-decoration: none;
+        font-size: 12.5px;
+        font-weight: 700;
+        transition: all 0.25s ease;
+    }
+
+    .view-details-btn:hover {
+        color: #fff;
+        background: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(20, 22, 30, 0.15);
+    }
+
+    .view-details-btn i {
+        transition: transform 0.25s ease;
+    }
+
+    .view-details-btn:hover i {
+        transform: translateX(3px);
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 900px) {
+        .dashboard-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .dashboard-actions {
+            width: 100%;
+        }
+
+        .dashboard-action {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .dashboard-page {
+            margin-top: 22px;
+            padding: 0 15px;
+        }
+
+        .dashboard-toolbar {
+            padding: 17px;
+        }
+
+        .request-content {
+            padding: 17px;
+        }
+
+        .panel-header {
+            padding: 20px 17px;
+        }
+
+        .request-hero {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .request-status-area {
+            text-align: left;
+        }
+
+        .request-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .request-footer {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .view-details-btn {
+            width: 100%;
+        }
+
+        .request-hint {
+            line-height: 1.5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-title {
+            font-size: 27px;
+        }
+
+        .dashboard-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-action {
+            width: 100%;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .quick-link {
+            justify-content: center;
+        }
+
+        .dashboard-toolbar {
+            display: block;
+        }
+
+        .request-selector {
+            width: 100%;
+            margin-bottom: 9px;
+        }
+
+        .toolbar-btn {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .request-identity {
+            align-items: flex-start;
+        }
+
+        .request-avatar {
+            width: 44px;
+            height: 44px;
+            flex-basis: 44px;
+        }
+
+        .request-customer {
+            font-size: 15px;
+        }
+    }
+</style>
+{% endblock %}
 {% block content %}
-
-<div class="container mt-5 mb-5">
-
-    <!-- HEADER -->
-
-    <div class="dashboard-header">
-
+<div class="dashboard-page">
+    <!-- ================= HEADER ================= -->
+    <section class="dashboard-header">
         <div>
-            <h1>Welcome, Suhail 👋</h1>
-            <p>
-                AI Virtual Try-On Dashboard
+            <div class="dashboard-eyebrow">
+                AI ALTERFIT
+            </div>
+            <h1 class="dashboard-title">
+                Smart Alteration Dashboard
+            </h1>
+            <p class="dashboard-subtitle">
+                Select an alteration request to view customer,
+                garment and service information.
             </p>
         </div>
-
-        <img
-            src="{{url_for('static',
-            filename='images/profile.png')}}"
-            class="dashboard-profile" width="150px" height="150px">
-
-    </div>
-
-    <!-- STATS -->
-
-    <div class="row mt-4">
-
-        <div class="col-md-3">
-
-            <div class="card dashboard-card shadow">
-
-                <div class="card-body">
-
-                    <h5>Measurements</h5>
-
-                    <h1>1</h1>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card dashboard-card shadow">
-
-                <div class="card-body">
-
-                    <h5>Shirts</h5>
-
-                    <h1>20</h1>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card dashboard-card shadow">
-
-                <div class="card-body">
-
-                    <h5>Pants</h5>
-
-                    <h1>10</h1>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card dashboard-card shadow">
-
-                <div class="card-body">
-
-                    <h5>Try-On</h5>
-
-                    <h1>8</h1>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- CUSTOMIZATION -->
-
-    <div class="card shadow mt-4">
-
-        <div class="card-header">
-
-            What would you like to customize?
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="row">
-
-                <div class="col-md-4">
-
-                    <div class="custom-card">
-
-                        <h1>👔</h1>
-
-                        <h4>Custom Shirt</h4>
-
-                        <p>
-                            Design your own shirt
-                        </p>
-
-                        <button
-                            class="btn btn-primary">
-
-                            Select
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="custom-card">
-
-                        <h1>👖</h1>
-
-                        <h4>Custom Pant</h4>
-
-                        <p>
-                            Design your own pant
-                        </p>
-
-                        <button
-                            class="btn btn-primary">
-
-                            Select
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="custom-card">
-
-                        <h1>🧥</h1>
-
-                        <h4>Full Outfit</h4>
-
-                        <p>
-                            Shirt + Pant
-                        </p>
-
-                        <button
-                            class="btn btn-primary">
-
-                            Select
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- BODY + AI -->
-
-    <div class="row mt-4">
-
-        <div class="col-md-6">
-
-            <div class="card shadow">
-
-                <div class="card-header">
-
-                    Body Measurements
-
-                </div>
-
-                <div class="card-body">
-
-                    <table class="table">
-
-                        <tr>
-                            <th>Height</th>
-                            <td>174 cm</td>
-                        </tr>
-
-                        <tr>
-                            <th>Chest</th>
-                            <td>39</td>
-                        </tr>
-
-                        <tr>
-                            <th>Waist</th>
-                            <td>33</td>
-                        </tr>
-
-                        <tr>
-                            <th>Hip</th>
-                            <td>37</td>
-                        </tr>
-
-                        <tr>
-                            <th>Body Shape</th>
-                            <td>Regular</td>
-                        </tr>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-6">
-
-            <div class="card shadow">
-
-                <div class="card-header">
-
-                    AI Recommendation
-
-                </div>
-
-                <div class="card-body">
-
-                    <div class="recommend-box">
-
-                        <h6>
-                            Shirt Size
-                        </h6>
-
-                        <h2>
-                            M
-                        </h2>
-
-                    </div>
-
-                    <div class="recommend-box">
-
-                        <h6>
-                            Pant Size
-                        </h6>
-
-                        <h2>
-                            32
-                        </h2>
-
-                    </div>
-
-                    <div class="recommend-box">
-
-                        <h6>
-                            Confidence
-                        </h6>
-
-                        <h2>
-                            92%
-                        </h2>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- RECOMMENDED PRODUCTS -->
-
-    <div class="card shadow mt-4">
-
-        <div class="card-header">
-
-            Recommended Clothing
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="row">
-
-                <div class="col-md-3">
-
-                    <div class="product-card">
-
-                        👔
-
-                        <h5>
-                            Formal Shirt
-                        </h5>
-
-                        <p>
-                            Size M
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="product-card">
-
-                        👕
-
-                        <h5>
-                            Polo Shirt
-                        </h5>
-
-                        <p>
-                            Size M
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="product-card">
-
-                        👖
-
-                        <h5>
-                            Jeans
-                        </h5>
-
-                        <p>
-                            Size 32
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="product-card">
-
-                        🩳
-
-                        <h5>
-                            Chino Pant
-                        </h5>
-
-                        <p>
-                            Size 32
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- TRY ON -->
-
-    <div class="card shadow mt-4">
-
-        <div class="card-body text-center">
-
-            <h2>
-                  <a href="/measurement">
-
-                        AI Virtual Try-On
-                  </a>
-
-            </h2>
-
-            <p>
-
-                Preview your customized outfit
-
-            </p>
-
-            <button
-                class="btn btn-success btn-lg">
-            <a href="/measurement">
-
-                  Start Try-On
+        <div class="dashboard-actions">
+            <a href="/alteration_request" class="dashboard-action primary">
+                <i class="bi bi-plus-lg"></i>
+                New Request
             </a>
-
-            </button>
-
+            <a href="/customer-tracking" class="dashboard-action">
+                <i class="bi bi-search"></i>
+                Track Request
+            </a>
         </div>
-
+    </section>
+    <!-- ================= QUICK LINKS ================= -->
+    <div class="quick-links">
+        <a href="/tailor_dashboard" class="quick-link">
+            <i class="bi bi-scissors"></i>
+            Tailor Dashboard
+        </a>
+        <a href="/customer-tracking" class="quick-link">
+            <i class="bi bi-person-check"></i>
+            Customer Tracking
+        </a>
+        <a href="/delivery-management" class="quick-link">
+            <i class="bi bi-truck"></i>
+            Delivery Management
+        </a>
+        <a href="/request-detail?id=9" class="quick-link">
+            <i class="bi bi-file-earmark-text"></i>
+            Request Details
+        </a>
     </div>
-
+    <!-- ================= MAIN PANEL ================= -->
+    <section class="dashboard-panel">
+        <div class="panel-header">
+            <div class="panel-heading">
+                <div class="panel-icon">
+                    <i class="bi bi-grid-1x2"></i>
+                </div>
+                <div>
+                    <h2 class="panel-title">
+                        Alteration Requests
+                    </h2>
+                    <p class="panel-description">
+                        Manage and inspect existing customer requests.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- ================= TOOLBAR ================= -->
+        <div class="dashboard-toolbar">
+            <div class="request-selector">
+                <i class="bi bi-search request-selector-icon"></i>
+                <select id="requestSelector" class="request-select">
+                    <option value="">
+                        Select Request ID
+                    </option>
+                </select>
+                <i class="bi bi-chevron-down request-selector-caret"></i>
+            </div>
+            <button type="button" id="refreshButton" class="toolbar-btn">
+                <i class="bi bi-arrow-clockwise"></i>
+                Refresh
+            </button>
+            <button type="button" id="clearButton" class="toolbar-btn">
+                <i class="bi bi-x-lg"></i>
+                Clear
+            </button>
+        </div>
+        <!-- ================= ERROR ================= -->
+        <div id="errorMessage" class="dashboard-error">
+        </div>
+        <!-- ================= LOADING ================= -->
+        <div id="loadingMessage" class="dashboard-loading">
+            <div class="dashboard-spinner"></div>
+            Loading alteration requests...
+        </div>
+        <!-- ================= EMPTY ================= -->
+        <div id="emptyMessage" class="dashboard-empty" style="display:none;">
+            <div class="empty-icon">
+                <i class="bi bi-inbox"></i>
+            </div>
+            <div class="empty-title">
+                No requests found
+            </div>
+            <div>
+                There are currently no alteration requests in the system.
+            </div>
+        </div>
+        <!-- ================= REQUEST DATA ================= -->
+        <div id="requestContent" class="request-content">
+            <!-- REQUEST HERO -->
+            <div class="request-hero">
+                <div class="request-identity">
+                    <div id="requestAvatar" class="request-avatar">
+                        AF
+                    </div>
+                    <div>
+                        <div id="customerNameHero" class="request-customer">
+                            --
+                        </div>
+                        <div class="request-number">
+                            Alteration Request
+                            <strong>#<span id="requestId">--</span></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="request-status-area">
+                    <span class="status-label">
+                        Current Status
+                    </span>
+                    <span id="requestStatus" class="status-badge">
+                        REQUESTED
+                    </span>
+                </div>
+            </div>
+            <!-- REQUEST INFORMATION -->
+            <div class="request-grid">
+                <div class="request-item">
+                    <span class="request-label">
+                        Customer Name
+                    </span>
+                    <div id="customerName" class="request-value">
+                        --
+                    </div>
+                </div>
+                <div class="request-item">
+                    <span class="request-label">
+                        Phone
+                    </span>
+                    <div id="phone" class="request-value">
+                        --
+                    </div>
+                </div>
+                <div class="request-item">
+                    <span class="request-label">
+                        Garment Type
+                    </span>
+                    <div id="garmentType" class="request-value">
+                        --
+                    </div>
+                </div>
+                <div class="request-item">
+                    <span class="request-label">
+                        Service Type
+                    </span>
+                    <div id="serviceType" class="request-value">
+                        --
+                    </div>
+                </div>
+                <div class="request-item">
+                    <span class="request-label">
+                        Alteration Type
+                    </span>
+                    <div id="alterationType" class="request-value">
+                        Not specified
+                    </div>
+                </div>
+                <div class="request-item">
+                    <span class="request-label">
+                        Assigned Tailor
+                    </span>
+                    <div id="tailorName" class="request-value">
+                        Not assigned
+                    </div>
+                </div>
+                <div class="request-item">
+                    <span class="request-label">
+                        Created At
+                    </span>
+                    <div id="createdAt" class="request-value">
+                        --
+                    </div>
+                </div>
+                <div class="request-item">
+                    <span class="request-label">
+                        Request ID
+                    </span>
+                    <div id="requestIdValue" class="request-value">
+                        --
+                    </div>
+                </div>
+            </div>
+            <!-- REQUEST FOOTER -->
+            <div class="request-footer">
+                <div class="request-hint">
+                    View the complete request to see pickup,
+                    delivery, notes and additional information.
+                </div>
+                <a id="viewDetailsButton" class="view-details-btn" href="#">
+                    View Full Request
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
 </div>
-
+{% endblock %}
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", loadDashboard);
+    /* =========================================================
+       DASHBOARD INITIALIZATION
+    ========================================================= */
+    async function loadDashboard() {
+        try {
+            await loadAllRequests();
+            const params =
+                new URLSearchParams(window.location.search);
+            const requestId =
+                params.get("id");
+            const selector =
+                document.getElementById("requestSelector");
+            if (requestId && selector) {
+                selector.value = requestId;
+                await loadAlterationRequest(requestId);
+            }
+        } catch (error) {
+            console.error(
+                "Dashboard Load Error:",
+                error
+            );
+            showError(
+                error.message ||
+                "Unable to load dashboard."
+            );
+        }
+    }
+    /* =========================================================
+       LOAD ALL REQUESTS
+    ========================================================= */
+    async function loadAllRequests() {
+        const loading =
+            document.getElementById("loadingMessage");
+        const empty =
+            document.getElementById("emptyMessage");
+        try {
+            loading.style.display = "block";
+            empty.style.display = "none";
+            const response =
+                await fetch("/api/alteration-requests");
+            const result =
+                await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.message ||
+                    "Failed to load requests."
+                );
+            }
+            const requests =
+                result.data || [];
+            const selector =
+                document.getElementById("requestSelector");
+            selector.innerHTML = "";
+            const defaultOption =
+                document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent =
+                "Select Request ID";
+            selector.appendChild(
+                defaultOption
+            );
+            /* ================= EMPTY ================= */
+            if (requests.length === 0) {
+                loading.style.display = "none";
+                empty.style.display = "block";
+                return;
+            }
+            /* ================= ADD REQUESTS ================= */
+            requests.forEach(function (request) {
+                const option =
+                    document.createElement("option");
+                option.value =
+                    request.request_id;
+                option.textContent =
+                    `Request #${request.request_id} | ` +
+                    `${request.customer_name || "Customer"} | ` +
+                    `${request.garment_type || "Garment"} | ` +
+                    `${request.service_type || "Service"}`;
+                selector.appendChild(
+                    option
+                );
+            });
+            loading.style.display = "none";
+            /* ================= SELECT EVENT ================= */
+            selector.onchange = function () {
+                const requestId =
+                    this.value;
+                if (requestId) {
+                    loadAlterationRequest(
+                        requestId
+                    );
+                } else {
+                    hideRequestData();
+                }
+            };
+        } catch (error) {
+            console.error(
+                "Load All Requests Error:",
+                error
+            );
+            throw error;
+        }
+    }
+    /* =========================================================
+       LOAD SINGLE REQUEST
+    ========================================================= */
+    async function loadAlterationRequest(requestId) {
+        if (!requestId) {
+            showError(
+                "Please select a Request ID."
+            );
+            return;
+        }
+        const loading =
+            document.getElementById(
+                "loadingMessage"
+            );
+        const content =
+            document.getElementById(
+                "requestContent"
+            );
+        try {
+            hideError();
+            content.style.display = "none";
+            loading.style.display = "block";
+            const response =
+                await fetch(
+                    `/api/alteration-request/${requestId}`
+                );
+            const result =
+                await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.message ||
+                    "Failed to load alteration request."
+                );
+            }
+            const data =
+                result.data;
+            /* ================= DISPLAY ================= */
+            setText(
+                "requestId",
+                data.request_id
+            );
+            setText(
+                "requestIdValue",
+                `#${data.request_id}`
+            );
+            setText(
+                "customerName",
+                data.customer_name
+            );
+            setText(
+                "customerNameHero",
+                data.customer_name ||
+                "Customer"
+            );
+            setText(
+                "phone",
+                data.phone
+            );
+            setText(
+                "garmentType",
+                data.garment_type
+            );
+            setText(
+                "serviceType",
+                data.service_type
+            );
+            setText(
+                "alterationType",
+                data.alteration_type ||
+                "Not specified"
+            );
+            setText(
+                "tailorName",
+                data.tailor_name ||
+                "Not assigned"
+            );
+            setText(
+                "requestStatus",
+                data.status ||
+                "REQUESTED"
+            );
+            setText(
+                "createdAt",
+                formatDate(data.created_at)
+            );
+            /* ================= AVATAR ================= */
+            const avatar =
+                document.getElementById(
+                    "requestAvatar"
+                );
+            if (avatar) {
+                avatar.textContent =
+                    getInitials(
+                        data.customer_name
+                    );
+            }
+            /* ================= STATUS ================= */
+            updateStatusStyle(
+                data.status
+            );
+            /* ================= DETAIL LINK ================= */
+            const viewButton =
+                document.getElementById(
+                    "viewDetailsButton"
+                );
+            if (viewButton) {
+                viewButton.href =
+                    `/request-detail?id=${data.request_id}`;
+            }
+            /* ================= SHOW ================= */
+            loading.style.display = "none";
+            content.style.display = "block";
+        } catch (error) {
+            console.error(
+                "Dashboard Error:",
+                error
+            );
+            loading.style.display = "none";
+            showError(
+                error.message ||
+                "Unable to load request."
+            );
+        }
+    }
+    /* =========================================================
+       STATUS STYLE
+    ========================================================= */
+    function updateStatusStyle(status) {
+        const badge =
+            document.getElementById(
+                "requestStatus"
+            );
+        if (!badge) {
+            return;
+        }
+        badge.className =
+            "status-badge";
+        const normalized =
+            String(status || "")
+                .toUpperCase();
+        const styles = {
+            COMPLETED: {
+                background: "#eaf7ef",
+                color: "#187344",
+                border: "#ccebd8"
+            },
+            CANCELLED: {
+                background: "#fff0f0",
+                color: "#b33a3a",
+                border: "#f1cccc"
+            },
+            PICKED_UP: {
+                background: "#eef4ff",
+                color: "#3564a8",
+                border: "#d4e1f7"
+            },
+            TAILOR_ASSIGNED: {
+                background: "#f2edff",
+                color: "#6545a5",
+                border: "#ded3f5"
+            },
+            ALTERATION_IN_PROGRESS: {
+                background: "#fff5df",
+                color: "#91621c",
+                border: "#f1dfb7"
+            },
+            QUALITY_CHECK: {
+                background: "#eef8f7",
+                color: "#237b75",
+                border: "#cfe9e6"
+            },
+            OUT_FOR_DELIVERY: {
+                background: "#edf5ff",
+                color: "#2865a5",
+                border: "#d3e3f7"
+            }
+        };
+        const style =
+            styles[normalized];
+        if (style) {
+            badge.style.background =
+                style.background;
+            badge.style.color =
+                style.color;
+            badge.style.borderColor =
+                style.border;
+        } else {
+            badge.style.background =
+                "#fff5df";
+            badge.style.color =
+                "#91621c";
+            badge.style.borderColor =
+                "#f1dfb7";
+        }
+    }
+    /* =========================================================
+       GET INITIALS
+    ========================================================= */
+    function getInitials(name) {
+        if (!name) {
+            return "AF";
+        }
+        const parts =
+            String(name)
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+        if (parts.length === 1) {
+            return parts[0]
+                .substring(0, 2)
+                .toUpperCase();
+        }
+        return (
+            parts[0][0] +
+            parts[parts.length - 1][0]
+        ).toUpperCase();
+    }
+    /* =========================================================
+       SET TEXT
+    ========================================================= */
+    function setText(elementId, value) {
+        const element =
+            document.getElementById(
+                elementId
+            );
+        if (!element) {
+            return;
+        }
+        element.textContent =
+            value ?? "--";
+    }
+    /* =========================================================
+       FORMAT DATE
+    ========================================================= */
+    function formatDate(dateValue) {
+        if (!dateValue) {
+            return "--";
+        }
+        try {
+            const date =
+                new Date(dateValue);
+            if (isNaN(date.getTime())) {
+                return dateValue;
+            }
+            return date.toLocaleString(
+                undefined,
+                {
+                    dateStyle: "medium",
+                    timeStyle: "short"
+                }
+            );
+        } catch (error) {
+            return dateValue;
+        }
+    }
+    /* =========================================================
+       HIDE REQUEST
+    ========================================================= */
+    function hideRequestData() {
+        document.getElementById(
+            "requestContent"
+        ).style.display = "none";
+        document.getElementById(
+            "welcomeMessage"
+        )?.textContent;
+        hideError();
+    }
+    /* =========================================================
+       ERROR
+    ========================================================= */
+    function showError(message) {
+        const errorElement =
+            document.getElementById(
+                "errorMessage"
+            );
+        if (errorElement) {
+            errorElement.textContent =
+                message;
+            errorElement.style.display =
+                "block";
+        }
+        const loading =
+            document.getElementById(
+                "loadingMessage"
+            );
+        if (loading) {
+            loading.style.display =
+                "none";
+        }
+    }
+    function hideError() {
+        const errorElement =
+            document.getElementById(
+                "errorMessage"
+            );
+        if (errorElement) {
+            errorElement.style.display =
+                "none";
+        }
+    }
+    /* =========================================================
+       REFRESH
+    ========================================================= */
+    document
+        .getElementById("refreshButton")
+        ?.addEventListener(
+            "click",
+            async function () {
+                const icon =
+                    this.querySelector("i");
+                icon?.classList.add(
+                    "spin-animation"
+                );
+                try {
+                    await loadAllRequests();
+                } finally {
+                    setTimeout(
+                        function () {
+                            icon?.classList.remove(
+                                "spin-animation"
+                            );
+                        },
+                        350
+                    );
+                }
+            }
+        );
+    /* =========================================================
+       CLEAR
+    ========================================================= */
+    document
+        .getElementById("clearButton")
+        ?.addEventListener(
+            "click",
+            function () {
+                const selector =
+                    document.getElementById(
+                        "requestSelector"
+                    );
+                selector.value = "";
+                hideRequestData();
+            }
+        );
+</script>
+<style>
+    .spin-animation {
+        animation: dashboardSpin 0.6s linear infinite;
+    }
+</style>
 {% endblock %}

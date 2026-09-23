@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        AI AlterFit - Request
+    </title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+            margin: 0;
+            padding: 30px;
+        }
+        .print-container {
+            max-width: 900px;
+            margin: auto;
+            background: #ffffff;
+            padding: 40px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #222;
+            padding-bottom: 18px;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+        .header p {
+            margin: 7px 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .request-id {
+            font-size: 21px;
+            font-weight: bold;
+        }
+        .status {
+            display: inline-block;
+            padding: 7px 14px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 17px;
+            font-weight: bold;
+            background: #f1f1f1;
+            padding: 11px 13px;
+            border-left: 4px solid #222;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            border: 1px solid #dcdcdc;
+            padding: 10px;
+            vertical-align: top;
+            font-size: 14px;
+        }
+        td:first-child {
+            width: 30%;
+            font-weight: bold;
+            background: #fafafa;
+        }
+        .description {
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+        }
+        .print-button-container {
+            max-width: 900px;
+            margin: 0 auto 15px auto;
+            text-align: right;
+        }
+        .print-button {
+            border: none;
+            background: #222;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .print-button:hover {
+            background: #444;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 16px;
+        }
+        .error {
+            max-width: 700px;
+            margin: 50px auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 30px;
+            text-align: center;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .print-container {
+                max-width: 100%;
+                box-shadow: none;
+                padding: 20px;
+            }
+            .print-button-container {
+                display: none;
+            }
+            .section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PRINT BUTTON -->
+    <div class="print-button-container">
+        <button
+            class="print-button" onclick="window.print()">
+            🖨 Print / Save PDF
+        </button>
+    </div>
+    <!-- PRINT DOCUMENT -->
+    <div id="printContainer" class="print-container">
+        <div class="loading">
+            Loading request details...
+        </div>
+    </div>
+<script>
+/* =========================================================
+   GET REQUEST ID FROM URL
+========================================================= */
+const urlParams = new URLSearchParams(window.location.search);
+const requestId = urlParams.get("id");
+/* =========================================================
+   LOAD REQUEST
+========================================================= */
+function loadRequest() {
+
+    const params = new URLSearchParams(window.location.search);
+    const requestId = params.get("id");
+
+    console.log("Request ID:", requestId);
+
+    if (!requestId) {
+        showError("Request ID is missing.");
+        return;
+    }
+
+    fetch(`/api/alteration-request/${requestId}`).then(response => {
+            console.log("API Status:", response.status);
+            return response.json();
+        }).then(result => {
+            console.log("API Result:", result);
+            if (!result.success) {
+                showError(result.message || "Request not found.");
+                return;
+            }
+            displayRequest(result.data);
+        }).catch(error => {
+            console.error("API ERROR:", error);
+            showError("Unable to load request details." );
+        });
+}
+/* =========================================================
+   DISPLAY REQUEST
+========================================================= */
+function displayRequest(request) {
+    document.title = `AI AlterFit - Request #${request.request_id}`;
+    const html = `
+        <div class="header">
+            <h1>
+                AI AlterFit
+            </h1>
+            <p>
+                Smart Garment Alteration & Tailoring Service
+            </p>
+        </div>
+        <div class="request-header">
+            <div class="request-id">
+                Alteration Request  # ${safePDF(request.request_id)}
+            </div>
+            <div class="status">${safePDF(request.status)}</div>
+        </div>
+        <!-- CUSTOMER INFORMATION -->
+        <div class="section">
+            <div class="section-title">
+                Customer Information
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        Customer Name
+                    </td>
+                    <td>
+                        ${safePDF(request.customer_name)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Phone
+                    </td>
+                    <td>
+                        ${safePDF(request.phone)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Category
+                    </td>
+                    <td>
+                        ${safePDF(request.category)}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- GARMENT & SERVICE -->
+        <div class="section">
+            <div class="section-title">
+                Garment & Service Details
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        Garment Type
+                    </td>
+                    <td>
+                        ${safePDF(request.garment_type)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Service Type
+                    </td>
+                    <td>
+                        ${safePDF(request.service_type)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Alteration Type
+                    </td>
+                    <td>
+                        ${safePDF(request.alteration_type)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Customer Requirement
+                    </td>
+                    <td class="description">
+                        ${safePDF(request.description)}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- PICKUP INFORMATION -->
+        <div class="section">
+            <div class="section-title">
+                Pickup Information
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        Pickup Address
+                    </td>
+                    <td>
+                        ${safePDF(request.pickup_address)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Preferred Pickup Date
+                    </td>
+                    <td>
+                        ${formatPDFDate(
+                            request.preferred_pickup_date
+                        )}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Preferred Pickup Time
+                    </td>
+                    <td>
+                        ${formatPDFTime(
+                            request.preferred_pickup_time
+                        )}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- TAILOR INFORMATION -->
+        <div class="section">
+            <div class="section-title">
+                Tailor & Work Information
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        Assigned Tailor
+                    </td>
+                    <td>
+                        ${safePDF(request.tailor_name)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Work Status
+                    </td>
+                    <td>
+                        ${safePDF(request.status)}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Work Notes
+                    </td>
+                    <td class="description">
+                        ${safePDF(request.admin_notes)}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- REQUEST INFORMATION -->
+        <div class="section">
+            <div class="section-title">
+                Request Information
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        Request Created
+                    </td>
+                    <td>
+                        ${formatPDFDateTime(
+                            request.created_at
+                        )}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Last Updated
+                    </td>
+                    <td>
+                        ${formatPDFDateTime(
+                            request.updated_at
+                        )}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="footer">
+            AI AlterFit — Smart Garment Alteration & Virtual Fitting Platform
+            <br>
+            Generated on
+            ${new Date().toLocaleString()}
+        </div>
+    `;
+    document.getElementById("printContainer").innerHTML = html;
+}
+/* =========================================================
+   SAFE VALUE
+========================================================= */
+function safePDF(value) {
+    if (value === null || value === undefined ||  value === "") {
+        return "-";
+    }
+    return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"
+        );
+}
+/* =========================================================
+   FORMAT DATE
+========================================================= */
+function formatPDFDate(value) {
+    if (!value) {
+        return "-";
+    }
+    const date =
+        new Date(value);
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+        return value;
+    }
+    return date.toLocaleDateString();
+}
+/* =========================================================
+   FORMAT TIME
+========================================================= */
+function formatPDFTime(value) {
+    if (!value) {
+        return "-";
+    }
+    if (
+        typeof value === "string"
+    ) {
+        return value.substring(
+            0,
+            5
+        );
+    }
+    return value;
+}
+/* =========================================================
+   FORMAT DATE + TIME
+========================================================= */
+function formatPDFDateTime(value) {
+    if (!value) {
+        return "-";
+    }
+    const date =
+        new Date(value);
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+        return value;
+    }
+    return date.toLocaleString();
+}
+/* =========================================================
+   ERROR
+========================================================= */
+function showError(message) {
+    document.getElementById( "printContainer").innerHTML = `
+        <div class="error">
+            <h3>
+                Unable to Load Request
+            </h3>
+            <p>
+                ${safePDF(message)}
+            </p>
+        </div>
+    `;
+}
+/* =========================================================
+   START
+========================================================= */
+loadRequest();
+</script>
+</body>
+</html>
+

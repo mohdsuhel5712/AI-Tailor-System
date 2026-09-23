@@ -438,3 +438,47 @@ class updatedFiting{
 }
 
 window.updatedFiting = new updatedFiting();
+
+
+//// AUTO FIT APPLY 
+function fitGarmentToBody(garment, measurements, type) {
+
+    const box = new THREE.Box3().setFromObject(garment);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+
+    box.getSize(size);
+    box.getCenter(center);
+
+    let targetWidth;
+    let targetHeight;
+
+    if (type === "pant" || type === "shorts") {
+
+        targetWidth = measurements.hip / 100;
+        targetHeight = measurements.leg_length / 100;
+
+    } else if (type === "shirt" || type === "tshirt") {
+
+        targetWidth = measurements.chest / 100;
+        targetHeight = measurements.shirt_length / 100;
+    }
+
+    const widthScale = targetWidth / size.x;
+    const heightScale = targetHeight / size.y;
+
+    garment.scale.x *= widthScale;
+    garment.scale.y *= heightScale;
+
+    // Body ke center ke according
+    garment.position.x -= center.x;
+    garment.position.y -= center.y;
+
+    // Small gap
+    garment.scale.multiplyScalar(1.03);
+
+    return garment;
+}
+
+// IMPORTANT
+window.fitGarmentToBody = fitGarmentToBody;

@@ -1,0 +1,637 @@
+{% extends "base.html" %}
+{% block head %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI AlterFit | Tailor Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+      body {
+            background: #f5f7fb;
+      }
+
+      .dashboard-header {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.532);
+            margin-bottom: 10px;
+      }
+
+      .request-card {
+            border: 1px solid #0000 !important;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.493);
+            transition: 0.2s;
+      }
+
+      .request-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.09);
+      }
+
+      .request-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+      }
+
+      .request-body {
+            padding: 20px;
+      }
+
+      .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+      }
+
+      .info-value {
+            font-weight: 500;
+            margin-top: 3px;
+      }
+
+      .work-panel {
+            background: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 18px;
+      }
+
+      .status-badge {
+            font-size: 12px;
+            padding: 7px 11px;
+            border-radius: 20px;
+      }
+
+      .empty-state {
+            background: white;
+            border-radius: 14px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      }
+
+      .loading-state {
+            background: white;
+            border-radius: 14px;
+            padding: 50px;
+            text-align: center;
+      }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+      <!-- =====================================================
+         DASHBOARD HEADER
+    ====================================================== -->
+      <div class="dashboard-header mb-4">
+            <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    flex-wrap
+                    gap-3">
+                  <div>
+                        <h2 class="fw-bold mb-1">
+                              Tailor Dashboard
+                        </h2>
+                        <p class="text-muted mb-0">
+                              Manage assigned alteration and repair work
+                        </p>
+                  </div>
+                  <div>
+                        <a href="/dashboard" class="btn btn-outline-dark text-light">
+                              Admin Dashboard
+                        </a>
+                  </div>
+            </div>
+      </div>
+      <!-- =====================================================
+         TAILOR SELECTION
+    ====================================================== -->
+      <div class="card border-0 shadow-md mb-4">
+            <div class="card-body p-4">
+                  <div class="row align-items-end">
+                        <div class="col-md-8">
+                              <label for="tailorSelect" class="form-label fw-semibold">
+                                    Select Tailor
+                              </label>
+                              <select id="tailorSelect" class="form-select">
+                                    <option value="">
+                                          Select Tailor
+                                    </option>
+                                    <option value="Rahul">
+                                          Rahul
+                                    </option>
+                                    <option value="Taj Bhai">
+                                          Taj Bhai
+                                    </option>
+                                    <option value="Imran">
+                                          Imran
+                                    </option>
+                                    <option value="Arif">
+                                          Arif
+                                    </option>
+                                    <option value="Sameer">
+                                          Sameer
+                                    </option>
+                              </select>
+                        </div>
+                        <div class="col-md-4 mt-3 mt-md-0">
+                              <div class="text-muted small">
+                                    Select a tailor to view their
+                                    assigned requests.
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+      <!-- =====================================================
+         REQUEST CONTAINER
+    ====================================================== -->
+      <div id="requestsContainer">
+            <div class="empty-state">
+                  <h5 class="fw-bold">
+                        No Tailor Selected
+                  </h5>
+                  <p class="text-muted mb-0">
+                        Select a tailor above to view assigned work.
+                  </p>
+            </div>
+      </div>
+</div>
+<script>
+      // =========================================================
+      // LOAD TAILOR REQUESTS
+      // =========================================================
+      async function loadTailorRequests(tailorName) {
+            const container =
+                  document.getElementById(
+                        "requestsContainer"
+                  );
+            if (!tailorName) {
+                  container.innerHTML = `
+                <div class="empty-state">
+                    <h5 class="fw-bold">
+                        No Tailor Selected
+                    </h5>
+                    <p class="text-muted mb-0">
+                        Select a tailor above to view assigned work.
+                    </p>
+                </div>
+            `;
+                  return;
+            }
+            container.innerHTML = `
+            <div class="loading-state">
+                <div
+                    class="spinner-border mb-3"
+                    role="status">
+                </div>
+                <p class="text-muted mb-0">
+                    Loading assigned requests...
+                </p>
+            </div>
+        `;
+            try {
+                  const response = await fetch(
+                        `/api/tailor_requests/${encodeURIComponent(tailorName)}`
+                  );
+                  const result =
+                        await response.json();
+                  if (!response.ok ||
+                        !result.success) {
+                        throw new Error(
+                              result.message ||
+                              "Failed to load tailor requests"
+                        );
+                  }
+                  displayRequests(result.data);
+            } catch (error) {
+                  console.error(
+                        "LOAD TAILOR REQUESTS ERROR:",
+                        error
+                  );
+                  container.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>
+                        Unable to load requests.
+                    </strong>
+                    <br>
+                    Please check the server and try again.
+                </div>
+            `;
+            }
+      }
+      // =========================================================
+      // DISPLAY REQUESTS
+      // =========================================================
+      function displayRequests(requests) {
+            const container =
+                  document.getElementById(
+                        "requestsContainer"
+                  );
+            if (!requests ||
+                  requests.length === 0) {
+                  container.innerHTML = `
+                <div class="empty-state">
+                    <h5 class="fw-bold">
+                        No Assigned Requests
+                    </h5>
+                    <p class="text-muted mb-0">
+                        This tailor currently has
+                        no assigned alteration requests.
+                    </p>
+                </div>
+            `;
+                  return;
+            }
+            let html = "";
+            requests.forEach(request => {
+                  const requestId = request.request_id;
+                  const currentStatus = request.status || "";
+                  let statusClass = "bg-primary";
+                  if (currentStatus === "COMPLETED") {
+                        statusClass = "bg-success";
+                  } else if (
+                        currentStatus === "QUALITY_CHECK"
+                  ) {
+                        statusClass = "bg-warning text-dark";
+                  } else if (
+                        currentStatus === "ALTERATION_IN_PROGRESS"
+                  ) {
+                        statusClass = "bg-info text-dark";
+                  } else if (
+                        currentStatus === "OUT_FOR_DELIVERY"
+                  ) {
+                        statusClass = "bg-dark";
+                  } else if (
+                        currentStatus === "CANCELLED"
+                  ) {
+                        statusClass = "bg-danger";
+                  }
+                  html += `
+                <!-- =========================================
+                     REQUEST CARD
+                ========================================== -->
+                <div class="request-card card mb-5 shadow-lg p-3">
+                    <!-- REQUEST HEADER -->
+                    <div class="request-header">
+                        <div class="d-flex
+                                    justify-content-between
+                                    align-items-start
+                                    flex-wrap
+                                    gap-3">
+                            <div>
+                                <div class="small
+                                            text-muted
+                                            mb-1">
+                                    ALTERATION REQUEST
+                                </div>
+                                <h4 class="fw-bold mb-1">
+                                    Request #${requestId}
+                                </h4>
+                                <div class="text-muted">
+                                    Customer:
+                                    <strong>
+                                        ${request.customer_name || "-"}
+                                    </strong>
+                                </div>
+                            </div>
+                            <span
+                                class="badge status-badge ${statusClass}">
+                                ${currentStatus || "-"}
+                            </span>
+                        </div>
+                    </div>
+                    <!-- REQUEST BODY -->
+                    <div class="request-body">
+                        <!-- =================================
+                             BASIC INFORMATION
+                        ================================== -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-3">
+                                <div class="info-label">
+                                    Garment
+                                </div>
+                                <div class="info-value">
+                                    ${request.garment_type || "-"}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-label">
+                                    Service
+                                </div>
+                                <div class="info-value">
+                                    ${request.service_type || "-"}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-label">
+                                    Alteration
+                                </div>
+                                <div class="info-value">
+                                    ${request.alteration_type || "-"}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-label">
+                                    Phone
+                                </div>
+                                <div class="info-value">
+                                    ${request.phone || "-"}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- =================================
+                             PICKUP INFORMATION
+                        ================================== -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="info-label">
+                                    Pickup Date
+                                </div>
+                                <div class="info-value">
+                                    ${request.preferred_pickup_date
+                        || "-"
+                        }
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-label">
+                                    Pickup Time
+                                </div>
+                                <div class="info-value">
+                                    ${request.preferred_pickup_time
+                        || "-"
+                        }
+                                </div>
+                            </div>
+                        </div>
+                        <!-- =================================
+                             CUSTOMER DESCRIPTION
+                        ================================== -->
+                        <div class="mb-4">
+                            <div class="info-label mb-2">
+                                Customer Requirement
+                            </div>
+                            <div class="border
+                                        rounded
+                                        p-3
+                                        bg-light">
+                                ${request.description
+                        || "No description provided."
+                        }
+                            </div>
+                        </div>
+                        <!-- =================================
+                             TAILOR WORK PANEL
+                        ================================== -->
+                        <div class="work-panel">
+                            <h5 class="fw-bold mb-3">
+                                Tailor Work Update
+                            </h5>
+                            <!-- WORK NOTES -->
+                            <div class="mb-3">
+                                <label
+                                    for="notes-${requestId}"
+                                    class="form-label fw-semibold">
+                                    Work Notes
+                                </label>
+                                <textarea
+                                    id="notes-${requestId}"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Describe the alteration or repair work completed...">${request.admin_notes || ""}</textarea>
+                                <div class="form-text">
+                                    Example:
+                                    Sleeve adjusted by 2 cm
+                                    and fitting checked.
+                                </div>
+                            </div>
+                            <!-- STATUS -->
+                            <div class="row g-3">
+                                <div class="col-md-7">
+                                    <label
+                                        for="status-${requestId}"
+                                        class="form-label fw-semibold">
+                                        Work Status
+                                    </label>
+                                    <select
+                                        id="status-${requestId}"
+                                        class="form-select">
+                                        <option
+                                            value="PICKED_UP"
+                                            ${currentStatus ===
+                              "PICKED_UP"
+                              ? "selected"
+                              : ""
+                        }>
+                                            Picked Up
+                                        </option>
+                                        <option
+                                            value="TAILOR_ASSIGNED"
+                                            ${currentStatus ===
+                              "TAILOR_ASSIGNED"
+                              ? "selected"
+                              : ""
+                        }>
+                                            Tailor Assigned
+                                        </option>
+                                        <option
+                                            value="ALTERATION_IN_PROGRESS"
+                                            ${currentStatus ===
+                              "ALTERATION_IN_PROGRESS"
+                              ? "selected"
+                              : ""
+                        }>
+                                            Alteration In Progress
+                                        </option>
+                                        <option
+                                            value="QUALITY_CHECK"
+                                            ${currentStatus ===
+                              "QUALITY_CHECK"
+                              ? "selected"
+                              : ""
+                        }>
+                                            Quality Check
+                                        </option>
+                                        <option
+                                            value="OUT_FOR_DELIVERY"
+                                            ${currentStatus ===
+                              "OUT_FOR_DELIVERY"
+                              ? "selected"
+                              : ""
+                        }>
+                                            Out For Delivery
+                                        </option>
+                                        <option
+                                            value="COMPLETED"
+                                            ${currentStatus ===
+                              "COMPLETED"
+                              ? "selected"
+                              : ""
+                        }>
+                                            Completed
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5
+                                            d-flex
+                                            align-items-end">
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary w-100"
+                                        onclick="updateTailorStatus(${requestId})">
+                                        Update Work
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- =================================
+                             ACTIONS
+                        ================================== -->
+                        <div class="mt-4 d-flex gap-2 flex-wrap">
+                            <a href="/request-detail?id=${requestId}"  class="btn btn-dark">  View Full Request</a>
+
+                            <!-- quality check -->
+                              <a href="/quality_check/${requestId}" class="btn btn-success">  Quality Check</a>
+
+                              <!-- button = print.save the pdf -->
+                              <button type="button" class="btn btn-outline-dark btn-sm print-btn text-light"
+                     data-request-id="${requestId}">  🖨 Print / Save PDF
+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            });
+            container.innerHTML = html;
+      }
+      document.addEventListener("click", function (event) {
+            const button = event.target.closest(".print-btn");
+            if (!button) {
+                  return;
+            }
+            const requestId = button.dataset.requestId;
+            console.log("Printing Request:", requestId);
+            window.open(
+                  `/print-request?id=${requestId}`,
+                  "_blank"
+            );
+      });
+      // =========================================================
+      // UPDATE TAILOR STATUS + NOTES
+      // =========================================================
+      async function updateTailorStatus(requestId) {
+            const statusElement = document.getElementById(`status-${requestId}`);
+            const notesElement = document.getElementById(`notes-${requestId}`);
+            if (!statusElement) {
+                  alert(
+                        "Status field not found."
+                  );
+                  return;
+            }
+            const status = statusElement.value;
+            const adminNotes = notesElement
+                  ? notesElement.value.trim()
+                  : "";
+            const tailorName = document.getElementById("tailorSelect").value;
+            if (!tailorName) {
+                  alert(
+                        "Please select a tailor first."
+                  );
+                  return;
+            }
+            // ================================================
+            // REQUIRE NOTES FOR WORK PROGRESS
+            // ================================================
+            if (
+                  status === "ALTERATION_IN_PROGRESS" ||
+                  status === "QUALITY_CHECK" ||
+                  status === "COMPLETED"
+            ) {
+                  if (!adminNotes) {
+                        alert(
+                              "Please enter work notes before updating this status."
+                        );
+                        if (notesElement) {
+                              notesElement.focus();
+                        }
+                        return;
+                  }
+            }
+            try {
+                  const response = await fetch(
+                        `/api/alteration-request/${requestId}/status`,
+                        {
+                              method: "PUT",
+                              headers: {
+                                    "Content-Type":
+                                          "application/json"
+                              },
+                              body: JSON.stringify({
+                                    status: status,
+                                    tailor_name:
+                                          tailorName,
+                                    admin_notes:
+                                          adminNotes
+                              })
+                        }
+                  );
+                  const result =
+                        await response.json();
+                  if (
+                        !response.ok ||
+                        !result.success
+                  ) {
+                        throw new Error(
+                              result.message ||
+                              "Failed to update work"
+                        );
+                  }
+                  alert(
+                        `Request #${requestId} updated successfully.`
+                  );
+                  // ============================================
+                  // RELOAD REQUESTS
+                  // ============================================
+                  await loadTailorRequests(
+                        tailorName
+                  );
+            } catch (error) {
+                  console.error(
+                        "TAILOR WORK UPDATE ERROR:",
+                        error
+                  );
+                  alert(
+                        error.message ||
+                        "Failed to update tailor work."
+                  );
+            }
+      }
+      // =========================================================
+      // TAILOR SELECT CHANGE
+      // =========================================================
+      document
+            .getElementById("tailorSelect")
+            .addEventListener(
+                  "change",
+                  function () {
+                        loadTailorRequests(
+                              this.value
+                        );
+                  }
+            );
+      /* function to save the pdf /print -->*/
+      function printRequestPDF(requestID) {
+            if (!requestID) {
+                  alert("invalid request id ");
+                  return;
+            }
+            window.open(`/print-request?id=${requestID}`);
+      }
+</script>
+{% endblock %}

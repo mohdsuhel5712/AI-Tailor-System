@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<title>AI AlterFit | Delivery Management</title>
+
+<style>
+    .delivery-page {
+        background: #f5f7fb;
+        min-height: 100vh;
+    }
+
+    .page-header {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+    }
+
+    .delivery-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+        transition: 0.2s ease;
+    }
+
+    .delivery-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09);
+    }
+
+    .delivery-card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .delivery-card-body {
+        padding: 24px;
+    }
+
+    .info-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .delivery-address {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+    }
+
+    .status-badge {
+        border-radius: 30px;
+        padding: 8px 13px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .delivery-action {
+        background: #f8f9fa;
+        border-radius: 14px;
+        padding: 18px;
+        border: 1px solid #e9ecef;
+    }
+
+    .empty-state {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 70px 20px;
+        text-align: center;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 20px;
+        }
+
+        .delivery-card-body {
+            padding: 18px;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page">
+<div class="container py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header mb-4">
+
+        <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    flex-wrap
+                    gap-3">
+
+            <div>
+
+                <div class="text-muted small mb-1">
+                    AI ALTERFIT
+                </div>
+
+                <h2 class="fw-bold mb-1">
+                    Delivery Management
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Manage alteration orders that are ready
+                    for customer delivery.
+                </p>
+
+            </div>
+
+            <a
+                href="/tailor_dashboard"
+                class="btn btn-outline-dark">
+
+                ← Tailor Dashboard
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="alert alert-{{ category }}">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- DELIVERY REQUESTS -->
+    {% if delivery_requests %}
+
+        <div class="row g-4">
+
+            {% for request in delivery_requests %}
+
+                <div class="col-12">
+
+                    <div class="delivery-card">
+
+                        <!-- CARD HEADER -->
+                        <div class="delivery-card-header">
+
+                            <div class="d-flex
+                                        justify-content-between
+                                        align-items-start
+                                        flex-wrap
+                                        gap-3">
+
+                                <div>
+
+                                    <div class="text-muted small">
+                                        ALTERATION REQUEST
+                                    </div>
+
+                                    <h4 class="fw-bold mb-1">
+                                        Request #{{ request.request_id }}
+                                    </h4>
+
+                                    <div class="text-muted">
+                                        Customer:
+                                        <strong>
+                                            {{ request.customer_name }}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                                <span class="badge bg-dark status-badge">
+                                    OUT FOR DELIVERY
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CARD BODY -->
+                        <div class="delivery-card-body">
+
+                            <div class="row g-4">
+
+                                <!-- CUSTOMER -->
+                                <div class="col-md-4">
+
+                                    <div class="info-label">
+                                        Customer
+                                    </div>
+
+                                    <div class="info-value">
+                                        {{ request.customer_name or "-" }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PHONE -->
+                                <div class="col-md-4">
+
+                                    <div class="info-label">
+                                        Contact
+                                    </div>
+
+                                    <div class="info-value">
+                                        {{ request.phone or "-" }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- GARMENT -->
+                                <div class="col-md-4">
+
+                                    <div class="info-label">
+                                        Garment
+                                    </div>
+
+                                    <div class="info-value">
+                                        {{ request.garment_type or "-" }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- SERVICE -->
+                                <div class="col-md-4">
+
+                                    <div class="info-label">
+                                        Service
+                                    </div>
+
+                                    <div class="info-value">
+                                        {{ request.service_type or "-" }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- ALTERATION -->
+                                <div class="col-md-4">
+
+                                    <div class="info-label">
+                                        Alteration
+                                    </div>
+
+                                    <div class="info-value">
+                                        {{ request.alteration_type or "-" }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- TAILOR -->
+                                <div class="col-md-4">
+
+                                    <div class="info-label">
+                                        Tailor
+                                    </div>
+
+                                    <div class="info-value">
+                                        {{ request.tailor_name or "-" }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- DELIVERY ADDRESS -->
+                                <div class="col-12">
+
+                                    <div class="info-label">
+                                        Delivery Address
+                                    </div>
+
+                                    <div class="delivery-address">
+                                        {{ request.pickup_address or
+                                           "Customer address not available." }}
+                                    </div>
+
+                                </div>
+
+
+                                <!-- WORK NOTES -->
+                                <div class="col-12">
+
+                                    <div class="info-label">
+                                        Tailor / Quality Notes
+                                    </div>
+
+                                    <div class="delivery-address">
+                                        {{ request.admin_notes or
+                                           "No additional notes available." }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DELIVERY ACTION -->
+                            <div class="delivery-action mt-4">
+
+                                <div class="row
+                                            align-items-center
+                                            g-3">
+
+                                    <div class="col-lg-8">
+
+                                        <h5 class="fw-bold mb-1">
+                                            Ready for Delivery
+                                        </h5>
+
+                                        <p class="text-muted mb-0">
+                                            Confirm that the garment
+                                            has been delivered to
+                                            the customer.
+                                        </p>
+
+                                    </div>
+
+
+                                    <div class="col-lg-4">
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'complete_delivery',
+                                                request_id=request.request_id
+                                            ) }}">
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success w-100">
+
+                                                ✓ Mark as Delivered
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <!-- EMPTY STATE -->
+        <div class="empty-state">
+
+            <div class="display-5 mb-3">
+                ✓
+            </div>
+
+            <h4 class="fw-bold">
+                No Deliveries Pending
+            </h4>
+
+            <p class="text-muted mb-0">
+                There are currently no alteration requests
+                waiting for delivery.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+</div>
+
+{% endblock %}

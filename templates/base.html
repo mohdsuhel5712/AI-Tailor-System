@@ -1,115 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
       <title>
             {% block title %}
-            AI Virtual Try-On
+            AI AlterFit
             {% endblock %}
       </title>
-
       <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/profile.png') }}">
-
       <!-- Bootstrap -->
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
       <!-- Bootstrap Icons -->
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-      <!-- Custom CSS -->
-      <link rel="stylesheet" href="{{ url_for('static',
-    filename='css/style.css') }}">
-
+      <!-- Google Font -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
+            rel="stylesheet">
+      <!-- Global CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+      {% block head %}{% endblock %}
 </head>
-
-<body class="bg-light">
-
-      <!-- NAVBAR -->
-
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-            <div class="container">
-
-                  <a class="navbar-brand fw-bold" href="/">
-                        FASHION SHOP
+<body>
+      <!-- =========================================================
+     NAVBAR
+========================================================= -->
+      <nav class="navbar navbar-expand-lg alterfit-navbar">
+            <div class="container-fluid px-lg-5">
+                  <!-- BRAND -->
+                  <a class="navbar-brand alterfit-brand" href="/">
+                        <span class="brand-icon">
+                              <i class="bi bi-scissors"></i>
+                        </span>
+                        <span>
+                              <strong>AI</strong> AlterFit
+                        </span>
                   </a>
-
-                  <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
-
-                        <span class="navbar-toggler-icon"></span>
-
+                  <!-- MOBILE BUTTON -->
+                  <button class="navbar-toggler alterfit-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
                   </button>
-
-                  <div class="collapse navbar-collapse" id="nav">
-
-                        <ul class="navbar-nav ms-auto">
-
+                  <!-- NAVIGATION -->
+                  <div class="collapse navbar-collapse" id="mainNavigation">
+                        <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
+                              <!-- HOME -->
                               <li class="nav-item">
-                                    <a class="nav-link" href="/">
+                                    <a class="nav-link alterfit-nav-link" href="/">
+                                          <i class="bi bi-house-door"></i>
                                           Home
                                     </a>
                               </li>
-
+                              <!-- CUSTOMER -->
+                              <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle alterfit-nav-link" href="#" role="button"
+                                          data-bs-toggle="dropdown">
+                                          <i class="bi bi-person"></i>
+                                          Customer
+                                    </a>
+                                    <ul class="dropdown-menu alterfit-dropdown">
+                                          <li>
+                                                <a class="dropdown-item" href="/alteration_request">
+                                                      <i class="bi bi-plus-circle"></i>
+                                                      New Alteration Request
+                                                </a>
+                                          </li>
+                                          <li>
+                                                <a class="dropdown-item" href="/dashboard?id=11">
+                                                      <i class="bi bi-grid-1x2"></i>
+                                                      Customer Dashboard
+                                                </a>
+                                          </li>
+                                          <li>
+                                                <a class="dropdown-item" href="/customer-tracking">
+                                                      <i class="bi bi-geo-alt"></i>
+                                                      Track Request
+                                                </a>
+                                          </li>
+                                    </ul>
+                              </li>
+                              <!-- AI TOOLS -->
+                              <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle alterfit-nav-link" href="#" role="button"
+                                          data-bs-toggle="dropdown">
+                                          <i class="bi bi-cpu"></i>
+                                          AI & Fitting
+                                    </a>
+                                    <ul class="dropdown-menu alterfit-dropdown">
+                                          <li>
+                                                <a class="dropdown-item" href="/measurement">
+                                                      <i class="bi bi-rulers"></i>
+                                                      Measurements
+                                                </a>
+                                          </li>
+                                          <li>
+                                                <a class="dropdown-item" href="/body-viewer">
+                                                      <i class="bi bi-person-bounding-box"></i>
+                                                      3D Body
+                                                </a>
+                                          </li>
+                                          <li>
+                                                <a class="dropdown-item" href="/virtual-try-on">
+                                                      <i class="bi bi-person-standing-dress"></i>
+                                                      Virtual Fitting
+                                                </a>
+                                          </li>
+                                    </ul>
+                              </li>
+                              <!-- OPERATIONS -->
+                              <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle alterfit-nav-link" href="#" role="button"
+                                          data-bs-toggle="dropdown">
+                                          <i class="bi bi-kanban"></i>
+                                          Operations
+                                    </a>
+                                    <ul class="dropdown-menu alterfit-dropdown">
+                                          <li>
+                                                <a class="dropdown-item" href="/admin-dashboard">
+                                                      <i class="bi bi-speedometer2"></i>
+                                                      Admin Dashboard
+                                                </a>
+                                          </li>
+                                          <li>
+                                                <a class="dropdown-item" href="/alteration-requests">
+                                                      <i class="bi bi-list-check"></i>
+                                                      All Requests
+                                                </a>
+                                          </li>
+                                          <li>
+                                                <a class="dropdown-item" href="/tailor_dashboard">
+                                                      <i class="bi bi-person-workspace"></i>
+                                                      Tailor Dashboard
+                                                </a>
+                                          </li>
+                                          <li>
+                                                <a class="dropdown-item" href="/delivery-management">
+                                                      <i class="bi bi-truck"></i>
+                                                      Delivery
+                                                </a>
+                                          </li>
+                                    </ul>
+                              </li>
+                              <!-- GARMENTS -->
                               <li class="nav-item">
-                                    <a class="nav-link" href="/dashboard">
-                                          Dashboard
+                                    <a class="nav-link alterfit-nav-link" href="/garments">
+                                          <i class="bi bi-bag"></i>
+                                          Garments
                                     </a>
                               </li>
-
-                              <li class="nav-item">
-                                    <a class="nav-link" href="/measurement">
-                                          Measurements
-                                    </a>
-                              </li>
-
-                              <li class="nav-item">
-                                    <a class="nav-link" href="/profile">
-                                          Profile
-                                    </a>
-                              </li>
-
                         </ul>
-
+                        <!-- RIGHT SIDE -->
+                        <div class="navbar-actions">
+                              <a href="/customer-tracking" class="nav-track-btn">
+                                    <i class="bi bi-search"></i>
+                                    Track Order
+                              </a>
+                              <a href="/alteration_request" class="nav-request-btn">
+                                    <i class="bi bi-plus-lg"></i>
+                                    New Request
+                              </a>
+                        </div>
                   </div>
-
             </div>
-
       </nav>
-
-
-      <div class="container mt-4">
-
-            {% block content %}
-
-            {% endblock %}
-
-      </div>
-
-
-      <footer class="bg-dark text-white mt-5 p-4">
-
-            <div class="container text-center">
-
-                  <h5>AI Virtual Try-On System</h5>
-
-                  <p>
-                        Tailored Shirts & Pants Visualization
-                  </p>
-
-                  <small>
-                        © 2026 FASHION SHOP
-                  </small>
-
+      <!-- =========================================================
+     PAGE WRAPPER
+========================================================= -->
+      <main class="alterfit-main">
+            <div class="page-container">
+                  {% block content %}
+                  {% endblock %}
             </div>
-
+      </main>
+      <!-- =========================================================
+     FOOTER
+========================================================= -->
+      <footer class="alterfit-footer">
+            <div class="container-fluid px-lg-5">
+                  <div class="row g-4">
+                        <!-- BRAND -->
+                        <div class="col-lg-4">
+                              <div class="footer-brand">
+                                    <span class="footer-brand-icon">
+                                          <i class="bi bi-scissors"></i>
+                                    </span>
+                                    <span>
+                                          AI AlterFit
+                                    </span>
+                              </div>
+                              <p class="footer-description">
+                                    AI-powered garment alteration, intelligent
+                                    measurements and virtual fitting technology
+                                    designed to make clothing alterations smarter.
+                              </p>
+                        </div>
+                        <!-- CUSTOMER -->
+                        <div class="col-6 col-lg-2">
+                              <h6 class="footer-title">
+                                    Customer
+                              </h6>
+                              <a href="/alteration_request">
+                                    New Request
+                              </a>
+                              <a href="/dashboard?id=11">
+                                    Dashboard
+                              </a>
+                              <a href="/customer-tracking">
+                                    Track Request
+                              </a>
+                        </div>
+                        <!-- AI -->
+                        <div class="col-6 col-lg-2">
+                              <h6 class="footer-title">
+                                    AI & Fitting
+                              </h6>
+                              <a href="/measurement">
+                                    Measurements
+                              </a>
+                              <a href="/body-viewer">
+                                    3D Body
+                              </a>
+                              <a href="/virtual-try-on">
+                                    Virtual Fitting
+                              </a>
+                        </div>
+                        <!-- OPERATIONS -->
+                        <div class="col-6 col-lg-2">
+                              <h6 class="footer-title">
+                                    Operations
+                              </h6>
+                              <a href="/admin-dashboard">
+                                    Dashboard
+                              </a>
+                              <a href="/tailor_dashboard">
+                                    Tailor
+                              </a>
+                              <a href="/delivery-management">
+                                    Delivery
+                              </a>
+                        </div>
+                        <!-- SYSTEM -->
+                        <div class="col-6 col-lg-2">
+                              <h6 class="footer-title">
+                                    System
+                              </h6>
+                              <a href="/profile">
+                                    Profile
+                              </a>
+                              <a href="/garments">
+                                    Garments
+                              </a>
+                              <a href="/customer-tracking">
+                                    Track Order
+                              </a>
+                        </div>
+                  </div>
+                  <div class="footer-bottom">
+                        <span>
+                              © 2026 AI AlterFit
+                        </span>
+                        <span>
+                              AI Smart Alteration & Virtual Fitting Platform
+                        </span>
+                  </div>
+            </div>
       </footer>
-
+      <!-- =========================================================
+     GLOBAL PAGE LOADER
+========================================================= -->
+      <div id="pageLoader">
+            <div class="loader-content">
+                  <div class="loader-spinner"></div>
+                  <span>
+                        AI AlterFit
+                  </span>
+            </div>
+      </div>
+      <!-- Bootstrap JS -->
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-
+      <!-- GLOBAL UI SCRIPT -->
+      <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                  const loader = document.getElementById("pageLoader");
+                  if (loader) {
+                        setTimeout(function () {
+                              loader.classList.add("loader-hidden");
+                        }, 250);
+                  }
+                  /*
+                     Add active navigation state
+                  */
+                  const currentPath = window.location.pathname;
+                  document.querySelectorAll(".alterfit-nav-link").forEach(function (link) {
+                        const href = link.getAttribute("href");
+                        if (href && href !== "#" && currentPath === href) {
+                              link.classList.add("active");
+                        }
+                  });
+                  /*
+                     Smooth page transitions
+                  */
+                  document.querySelectorAll("a").forEach(function (link) {
+                        const href = link.getAttribute("href");
+                        if (!href ||
+                              href.startsWith("#") ||
+                              href.startsWith("javascript") ||
+                              link.target === "_blank") {
+                              return;
+                        }
+                        link.addEventListener("click", function (event) {
+                              const destination = link.href;
+                              if (!destination ||
+                                    destination.startsWith("mailto:") ||
+                                    destination.startsWith("tel:")) {
+                                    return;
+                              }
+                              event.preventDefault();
+                              document.body.classList.add("page-leaving");
+                              setTimeout(function () {
+                                    window.location.href = destination;
+                              }, 120);
+                        });
+                  });
+            });
+      </script>
+      {% block scripts %}{% endblock %}
 </body>
-
 </html>

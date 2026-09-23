@@ -1506,75 +1506,134 @@ function fillGarmentDropdowns(){
 // APPLY SELECTED SHIRT
 // =====================================================
 
-async function applySelectedShirt(){
-    const shirtSelect=document.getElementById("shirtSelect");
-    if(!shirtSelect){
+async function applySelectedShirt() {
+
+    const shirtSelect = document.getElementById("shirtSelect");
+
+    if (!shirtSelect) {
         console.log("shirt dropdown not found");
         return;
     }
-    const garmentId=Number(shirtSelect.value);
-    if(!garmentId){
+
+    const garmentId = Number(shirtSelect.value);
+
+    if (!garmentId) {
         alert("Please select a shirt");
         return;
     }
-    const garment=allGarments.find((item)=>item.garment_id===garmentId);
-    if(!garment){
+
+    const garment = allGarments.find(
+        (item) => item.garment_id === garmentId
+    );
+
+    if (!garment) {
         console.log("Selected shirt is not found!");
         return;
     }
-    console.log("Apply shirt!",garment);
-    const modelPath=garment.glb_file
-        ? "static/garments/"+garment.glb_file
-        : garment.obj_file
-        ? "static/garments/"+garment.obj_file
-        : null;
-    if(!modelPath){
-        console.log("No GLB or OBJ file found for selected shirt!");
-        return;
-    }
-    const shirt=await garmentManager.loadGarment({
-        type:"shirt",
-        modelPath:modelPath,
-        materialPath:null,
-        fitType:"regular",
-        color:0xffffff
-    });
-    if(shirt){
-        console.log("Selected shirt applied!",modelPath);
-    }
-}
-// =====================================================
-// APPLY SELECTED PANT
-// =====================================================
 
-async function applySelectedPant(){
-    const pantSelect = document.getElementById("pantSelect");
-    if(!pantSelect){
-        console.log("pant dropdown not found !");
+    console.log("Apply shirt!", garment);
+
+    const modelPath = garment.glb_file
+        ? "static/garments/" + garment.glb_file
+        : garment.obj_file
+        ? "static/garments/" + garment.obj_file
+        : null;
+
+    if (!modelPath) {
+        console.log("No GLB or OBJ file found!");
         return;
     }
-    const garmentID = Number(pantSelect.value);
-    if(!garmentID){
-        alert("please select the pant ");
-        return;
-    }
-    const garment = allGarments.find((item)=>item.garment_id===garmentID);
-    if(!garment){
-        console.log("selected pant not found ");
-        return;
-    }
-    console.log("apply pant ",garment);
-    const pant = await garmentManager.loadGarment({
-        type:"pant",
-        modelPath:"/static/garments/"+garment.obj_file,
-        materialPath:null,
-        fitType:"regular",
-        color:0x222222
+
+    const shirt = await garmentManager.loadGarment({
+        type: "shirt",
+        modelPath: modelPath,
+        materialPath: null,
+        fitType: "regular",
+        color: 0xffffff
     });
-    if(pant){
-        console.log("select pant applied ! ");
+
+    // ============================
+    // AUTO FIT SHIRT
+    // ============================
+    if (shirt) {
+
+        const measurements = {
+            chest: 87.23,          // AI chest
+            shoulder: 36.08,       // AI shoulder
+            shirt_length: 70       // temporary
+        };
+
+        window.fitGarmentToBody(
+            shirt,
+            measurements,
+            "shirt"
+        );
+
+        console.log("✅ Shirt automatically fitted!");
     }
 }
+// ===============
+// apply pant 
+// ============
+async function applySelectedPant() {
+
+    const pantSelect = document.getElementById("pantSelect");
+
+    if (!pantSelect) {
+        console.log("pant dropdown not found!");
+        return;
+    }
+
+    const garmentID = Number(pantSelect.value);
+
+    if (!garmentID) {
+        alert("Please select the pant");
+        return;
+    }
+
+    const garment = allGarments.find(
+        (item) => item.garment_id === garmentID
+    );
+
+    if (!garment) {
+        console.log("Selected pant not found!");
+        return;
+    }
+
+    console.log("Apply pant!", garment);
+
+    const pant = await garmentManager.loadGarment({
+        type: "pant",
+        modelPath: "/static/garments/" + garment.obj_file,
+        materialPath: null,
+        fitType: "regular",
+        color: 0x222222
+    });
+
+    // ============================
+    // AUTO FIT PANT
+    // ============================
+    if (pant) {
+
+        const measurements = {
+            hip: 66.22,        // AI hip
+            leg_length: 86.16  // AI leg length
+        };
+
+        window.fitGarmentToBody(
+            pant,
+            measurements,
+            "pant"
+        );
+
+        console.log("✅ Pant automatically fitted!");
+    }
+}
+// auto fit 
+
+
+// auto fit 
+
 
 // same function calling 
 document.addEventListener("DOMContentLoaded",()=>{
@@ -1785,3 +1844,22 @@ window.changeGarmentPattern =
 window.changeGarmentFabric=changeGarmentFabric;
 
 initViewer();
+
+
+
+// auto fit apply 
+const measurements = {
+    height: 167,
+    waist: 56.17,
+    hip: 66.22,
+    thigh: 55,
+    leg_length: 86.16
+};
+
+fitGarmentToBody(
+    pant,
+    measurements,
+    "pant"
+);
+
+scene.add(pant);

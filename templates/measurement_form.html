@@ -1,220 +1,413 @@
 {% extends 'base.html' %}
-
 {% block head %}
-<link rel="stylesheet" href="{{url_for('static',filename='css/measurement.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/measurement.css') }}">
+<style>
+    .measurement-page {
+        padding: 45px 0 65px;
+    }
+    .measurement-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 90% 10%, rgba(139, 124, 246, 0.25), transparent 32%),
+            linear-gradient(135deg, #10131a, #1b1f2b);
+        border-radius: 24px;
+        padding: 38px 42px;
+        color: #fff;
+        margin-bottom: 28px;
+        box-shadow: 0 18px 45px rgba(16, 19, 26, 0.16);
+    }
+    .measurement-hero::before {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        background: rgba(139, 124, 246, 0.12);
+        right: -55px;
+        top: -65px;
+    }
+    .measurement-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    .measurement-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 13px;
+        border-radius: 50px;
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #ddd9ff;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    .measurement-hero h1 {
+        font-size: 2rem;
+        font-weight: 750;
+        margin-bottom: 8px;
+        letter-spacing: -0.4px;
+    }
+    .measurement-hero p {
+        color: rgba(255, 255, 255, 0.72);
+        max-width: 650px;
+        margin: 0;
+        line-height: 1.65;
+    }
+    .measurement-container {
+        background: #fff;
+        border: 1px solid #e7e9ed;
+        border-radius: 22px;
+        padding: 30px;
+        box-shadow: 0 12px 35px rgba(16, 19, 26, 0.07);
+    }
+    .measurement-section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .measurement-section-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(91, 91, 214, 0.10);
+        color: #5b5bd6;
+        font-size: 1.15rem;
+    }
+    .measurement-section-title h2 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin: 0;
+        color: #171a21;
+    }
+    .measurement-section-title p {
+        margin: 2px 0 0;
+        color: #707783;
+        font-size: 0.88rem;
+    }
+    .measurement-main {
+        align-items: stretch;
+    }
+    .measurement-image-card {
+        height: 100%;
+        min-height: 430px;
+        border-radius: 18px;
+        background: linear-gradient(145deg, #f7f7fb, #eef0f7);
+        border: 1px solid #e6e8ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+        position: relative;
+        overflow: hidden;
+    }
+    .measurement-image-card::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(91, 91, 214, 0.06);
+        bottom: -100px;
+        right: -80px;
+    }
+    .measurement-image {
+        max-height: 400px;
+        width: auto;
+        object-fit: contain;
+        position: relative;
+        z-index: 1;
+        transition: transform 0.35s ease;
+    }
+    .measurement-image-card:hover .measurement-image {
+        transform: scale(1.025);
+    }
+    .measurement-form-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid #e7e9ed;
+        border-radius: 18px;
+        padding: 25px;
+    }
+    .form-label {
+        font-size: 0.88rem;
+        font-weight: 650;
+        color: #343841;
+        margin-bottom: 8px;
+    }
+    .form-control,
+    .form-select {
+        min-height: 46px;
+        border: 1px solid #dfe2e8;
+        border-radius: 10px;
+        padding: 10px 13px;
+        color: #20232a;
+        background-color: #fff;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #7777df;
+        box-shadow: 0 0 0 4px rgba(91, 91, 214, 0.10);
+    }
+    .measurement-field {
+        margin-bottom: 4px;
+    }
+    .measurement-btn {
+        border: none;
+        min-height: 48px;
+        padding: 11px 25px;
+        border-radius: 11px;
+        font-weight: 650;
+        background: linear-gradient(135deg, #5b5bd6, #4545b8);
+        box-shadow: 0 8px 20px rgba(91, 91, 214, 0.22);
+        transition: all 0.25s ease;
+    }
+    .measurement-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(91, 91, 214, 0.30);
+    }
+    .measurement-info {
+        margin-top: 28px !important;
+        padding: 22px 24px;
+        border-radius: 16px;
+        background: #f7f8fb;
+        border: 1px solid #e7e9ed;
+    }
+    .measurement-info-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .measurement-info-header i {
+        color: #5b5bd6;
+        font-size: 1.15rem;
+    }
+    .measurement-info h5 {
+        margin: 0 !important;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #20232a;
+    }
+    .measurement-info ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #686f7a;
+    }
+    .measurement-info li {
+        margin-bottom: 7px;
+        font-size: 0.9rem;
+    }
+    .measurement-info li:last-child {
+        margin-bottom: 0;
+    }
+    .measurement-alert {
+        border: none;
+        border-radius: 12px;
+        padding: 13px 16px;
+        margin-bottom: 22px;
+    }
+    @media (max-width: 991px) {
+        .measurement-hero {
+            padding: 32px;
+        }
+        .measurement-image-card {
+            min-height: 360px;
+        }
+    }
+    @media (max-width: 767px) {
+        .measurement-page {
+            padding: 25px 0 45px;
+        }
+        .measurement-hero {
+            padding: 28px 23px;
+            border-radius: 18px;
+        }
+        .measurement-hero h1 {
+            font-size: 1.65rem;
+        }
+        .measurement-container {
+            padding: 18px;
+            border-radius: 18px;
+        }
+        .measurement-form-card {
+            padding: 20px;
+        }
+        .measurement-image-card {
+            min-height: 300px;
+            padding: 20px;
+        }
+        .measurement-image {
+            max-height: 280px;
+        }
+        .measurement-section-title h2 {
+            font-size: 1.15rem;
+        }
+    }
+</style>
 {% endblock %}
-
 {% block title %}
-Measurements
+Measurements | AI AlterFit
 {% endblock %}
-
 {% block content %}
-
-<div class="container mt-5 mb-5">
-
+<div class="container measurement-page">
+    <!-- Hero -->
+    <div class="measurement-hero">
+        <div class="measurement-hero-content">
+            <div class="measurement-badge">
+                <i class="bi bi-rulers"></i>
+                AI Body Measurement
+            </div>
+            <h1>Body Measurements System</h1>
+            <p>
+                Enter your basic body information to generate the data
+                required for AI-based body prediction and virtual fitting.
+            </p>
+        </div>
+    </div>
+    <!-- Main Card -->
     <div class="measurement-container">
-
-        <center>
-            <h2 class="measurement-title my-4">
-                Body Measurements System
-            </h2>
-        </center>
-
+        <div class="measurement-section-title">
+            <div class="measurement-section-icon">
+                <i class="bi bi-person-bounding-box"></i>
+            </div>
+            <div>
+                <h2>Enter Your Measurements</h2>
+                <p>
+                    Provide accurate information for better body fitting results.
+                </p>
+            </div>
+        </div>
         <!-- Success Message -->
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <div class="alert alert-success">
+        <div class="alert alert-success measurement-alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
             {{ messages[0] }}
         </div>
         {% endif %}
         {% endwith %}
-
         <form action="/save-measurements" method="POST">
-            <!-- <form action="/body-viewer" method="POST"> -->
-
-            <div class="row my-4">
-
+            <div class="row g-4 measurement-main">
                 <!-- Left Side Image -->
-                <div class="col-md-6 text-center mb-4 hint-image">
-
-                    <img src="{{ url_for('static',filename='images/body_measurement.png') }}"
-                        class="measurement-image img-fluid" alt="Body Measurement">
-
+                <div class="col-lg-6">
+                    <div class="measurement-image-card">
+                        <img src="{{ url_for('static', filename='images/body_measurement.png') }}"
+                            class="measurement-image img-fluid" alt="Body Measurement">
+                    </div>
                 </div>
-
                 <!-- Right Side Form -->
-                <div class="col-md-6 form">
-
-                    <div class="row">
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Height (cm)
-                            </label>
-                            <input type="number" class="form-control" name="height" required>
+                <div class="col-lg-6">
+                    <div class="measurement-form-card">
+                        <div class="row g-3">
+                            <!-- Height -->
+                            <div class="col-md-6 measurement-field">
+                                <label class="form-label">
+                                    Height (cm)
+                                </label>
+                                <input type="number" class="form-control" name="height" required>
+                            </div>
+                            <!-- Weight -->
+                            <div class="col-md-6 measurement-field">
+                                <label class="form-label">
+                                    Weight (KG)
+                                </label>
+                                <input type="number" class="form-control" name="weight" required>
+                            </div>
+                            <!-- Age -->
+                            <div class="col-md-6 measurement-field">
+                                <label class="form-label">
+                                    Age
+                                </label>
+                                <input type="number" class="form-control" name="age" required>
+                            </div>
+                            <!-- Category -->
+                            <div class="col-md-6 measurement-field">
+                                <label class="form-label">
+                                    Category
+                                </label>
+                                <select class="form-control" name="category">
+                                    <option value="Male">
+                                        Male
+                                    </option>
+                                    <option value="Female">
+                                        Female
+                                    </option>
+                                    <option value="kid">
+                                        Kid
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- Body Shape -->
+                            <div class="col-md-6 measurement-field">
+                                <label class="form-label">
+                                    Body Shape
+                                </label>
+                                <select class="form-control" name="body_shape">
+                                    <option value="Slim">
+                                        Slim
+                                    </option>
+                                    <option value="Regular">
+                                        Regular
+                                    </option>
+                                    <option value="Athletic">
+                                        Athletic
+                                    </option>
+                                    <option value="Broad">
+                                        Broad
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- Mesh File -->
+                            <div class="col-md-6 measurement-field">
+                                <label class="form-label">
+                                    Mesh File
+                                </label>
+                                <input type="text" class="form-control" name="mesh_file" placeholder="mesh001.obj"
+                                    required>
+                            </div>
                         </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Weight (KG)
-                            </label>
-                            <input type="number" class="form-control" name="weight" required>
+                        <!-- Submit -->
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary measurement-btn">
+                                <i class="bi bi-save2 me-2"></i>
+                                Save Measurements
+                            </button>
                         </div>
-
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Age
-                            </label>
-                            <input type="number" class="form-control" name="age" required>
-                        </div>
-
-                        <!-- <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Chest
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="chest"
-                                required>
-                        </div> -->
-
-                        <!-- <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Neck
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="neck"
-                                required>
-                        </div> -->
-
-                        <!-- <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Waist
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="waist"
-                                required>
-                        </div> -->
-
-                        <!-- <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Arm Length
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="arm_length"
-                                required>
-                        </div> -->
-
-                        <!-- <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Leg Length
-                            </label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                name="leg_length"
-                                required>
-                        </div> -->
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Category
-                            </label>
-
-                            <select class="form-control" name="category">
-
-                                <option value="Male">
-                                    Male
-                                </option>
-
-                                <option value="Female">
-                                    Female
-                                </option>
-
-                                <option value="kid">
-                                    Kid
-                                </option>
-
-                            </select>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Body Shape
-                            </label>
-
-                            <select class="form-control" name="body_shape">
-
-                                <option value="Slim">
-                                    Slim
-                                </option>
-
-                                <option value="Regular">
-                                    Regular
-                                </option>
-
-                                <option value="Athletic">
-                                    Athletic
-                                </option>
-
-                                <option value="Broad">
-                                    Broad
-                                </option>
-
-                            </select>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Mesh File
-                            </label>
-
-                            <input type="text" class="form-control" name="mesh_file" placeholder="mesh001.obj" required>
-                        </div>
-
                     </div>
-
-                    <div class="text-center mt-4">
-
-                        <button type="submit" class="btn btn-primary measurement-btn">
-
-                            Save Measurements
-
-                        </button>
-
-                    </div>
-
                 </div>
-
             </div>
-
         </form>
-
-
-
-        <div class="measurement-info mt-4">
-            <h5 class="mt-5">
-                Measurement Tips
-            </h5>
+        <!-- Measurement Tips -->
+        <div class="measurement-info">
+            <div class="measurement-info-header">
+                <i class="bi bi-lightbulb-fill"></i>
+                <h5>
+                    Measurement Tips
+                </h5>
+            </div>
             <ul>
-                <li>Measure chest around the fullest part.</li>
-                <li>Measure waist at natural waistline.</li>
-                <li>Measure shoulder from edge to edge.</li>
-                <li>Measure arm and leg lengths accurately.</li>
+                <li>
+                    Measure chest around the fullest part.
+                </li>
+                <li>
+                    Measure waist at natural waistline.
+                </li>
+                <li>
+                    Measure shoulder from edge to edge.
+                </li>
+                <li>
+                    Measure arm and leg lengths accurately.
+                </li>
             </ul>
-
         </div>
-
     </div>
-
 </div>
-
 {% endblock %}

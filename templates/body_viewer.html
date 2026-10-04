@@ -1,359 +1,1005 @@
 {% extends "base.html" %}
-
 {% block head %}
-<link rel="stylesheet" href="{{url_for('static', filename='css/body_viewer.css')}}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/body_viewer.css') }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-<!-- 
-  Inline override: increases the 3D viewer height and re-flows the lower
-  row now that "View Options" has been removed and measurements take
-  the full width. Move these rules into body_viewer.css when convenient.
--->
 <style>
-    /*
-      base.html's outer wrapper was constraining this page's width, so
-      the whole layout sat with dead space on both sides instead of
-      spanning the viewport like container-fluid is supposed to.
-      Force this page's own container-fluid to go true full-bleed.
-    */
-    body:has(.avs-wrap) {
+    /* =========================================================
+   AI ALTERFIT - 3D BODY VIEWER
+   UI ONLY - EXISTING FUNCTIONALITY PRESERVED
+   ========================================================= */
+    body:has(.alterfit-viewer-page) {
         overflow-x: hidden;
     }
-
-    .avs-wrap {
+    .alterfit-viewer-page {
         width: 100%;
-        max-width: 100%;
+        padding: 25px 20px 50px;
+        background: #f5f6f8;
     }
-
-    .avs-wrap>.container-fluid {
-        width: 100%;
-        max-width: 100%;
-        padding-left: 20px;
-        padding-right: 20px;
-        margin-left: 0;
-        margin-right: 0;
+    /* =========================================================
+   PAGE HEADER
+   ========================================================= */
+    .viewer-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 90% 10%,
+                rgba(139, 124, 246, 0.28),
+                transparent 32%),
+            linear-gradient(135deg, #10131a, #1b1f2b);
+        border-radius: 22px;
+        padding: 28px 32px;
+        margin-bottom: 22px;
+        color: white;
+        box-shadow: 0 15px 40px rgba(16, 19, 26, 0.14);
     }
-
-    /* 3D mesh is the main attraction (measurements + virtual try-on
-       are supporting features) — give it a lot more room */
+    .viewer-hero::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        right: -65px;
+        top: -80px;
+        background: rgba(139, 124, 246, 0.10);
+    }
+    .viewer-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    .viewer-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 50px;
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #ddd9ff;
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .viewer-hero h1 {
+        margin: 0 0 6px;
+        font-size: 1.8rem;
+        font-weight: 750;
+        letter-spacing: -0.4px;
+    }
+    .viewer-hero p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.70);
+        font-size: 0.92rem;
+    }
+    /* =========================================================
+   MAIN GRID
+   ========================================================= */
+    .viewer-layout {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr) 350px;
+        gap: 20px;
+        align-items: start;
+    }
+    /* =========================================================
+   3D VIEWER CARD
+   ========================================================= */
+    .viewer-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow:
+            0 12px 35px rgba(16, 19, 26, 0.07);
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+    .viewer-card:hover {
+        box-shadow:
+            0 18px 45px rgba(16, 19, 26, 0.11);
+    }
+    .viewer-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 17px 20px;
+        border-bottom: 1px solid #e9ebef;
+    }
+    .viewer-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+    .viewer-title-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(91, 91, 214, 0.10);
+        color: #5b5bd6;
+        font-size: 1.1rem;
+    }
+    .viewer-title h5 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #171a21;
+    }
+    .viewer-title small {
+        color: #777e89;
+    }
+    /* Viewer buttons */
+    .viewer-tools {
+        display: flex;
+        gap: 7px;
+    }
+    .viewer-tools button {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        transition: all 0.2s ease;
+    }
+    .viewer-tools button:hover {
+        transform: translateY(-2px);
+        border-color: #5b5bd6;
+        color: #5b5bd6;
+    }
+    /* =========================================================
+   THREE JS VIEWER
+   ========================================================= */
     #viewer-container {
-        height: 780px;
-        min-height: 60vh;
-    }
-
-    .avs-viewer-card {
         width: 100%;
+        height: 690px;
+        min-height: 550px;
+        position: relative;
+        background:
+            radial-gradient(circle at center,
+                #ffffff 0%,
+                #f5f6f9 60%,
+                #eef0f4 100%);
+        overflow: hidden;
     }
-
-    .avs-lower-row .avs-measure-full {
+    .avs-viewer-hint {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(16, 19, 26, 0.78);
+        color: rgba(255, 255, 255, 0.82);
+        border-radius: 50px;
+        padding: 8px 15px;
+        font-size: 0.72rem;
+        white-space: nowrap;
+        backdrop-filter: blur(8px);
+        z-index: 10;
+    }
+    /* =========================================================
+   RIGHT SIDE
+   ========================================================= */
+    .tryon-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    /* =========================================================
+   CONTROL CARDS
+   ========================================================= */
+    .tryon-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 17px;
+        padding: 18px;
+        box-shadow:
+            0 8px 25px rgba(16, 19, 26, 0.055);
+        transition:
+            transform 0.22s ease,
+            box-shadow 0.22s ease;
+    }
+    .tryon-card:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 14px 32px rgba(16, 19, 26, 0.09);
+    }
+    /* Card heading */
+    .tryon-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .tryon-icon {
+        width: 37px;
+        height: 37px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(91, 91, 214, 0.10);
+        color: #5b5bd6;
+        font-size: 1rem;
+    }
+    .tryon-card-header h6 {
+        margin: 0;
+        color: #171a21;
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+    .tryon-card-header span {
+        display: block;
+        margin-top: 2px;
+        color: #858b95;
+        font-size: 0.72rem;
+    }
+    /* =========================================================
+   FORM CONTROLS
+   ========================================================= */
+    .tryon-card label {
+        display: block;
+        color: #444952;
+        font-size: 0.78rem;
+        font-weight: 650;
+        margin-bottom: 6px;
+    }
+    .tryon-card .form-select,
+    .tryon-card .form-control {
+        min-height: 43px;
+        border-radius: 9px;
+        border: 1px solid #dfe2e7;
+        font-size: 0.84rem;
+        box-shadow: none;
+        transition: all 0.2s ease;
+    }
+    .tryon-card .form-select:focus,
+    .tryon-card .form-control:focus {
+        border-color: #7777df;
+        box-shadow:
+            0 0 0 4px rgba(91, 91, 214, 0.09);
+    }
+    /* =========================================================
+   GARMENT BUTTONS
+   ========================================================= */
+    .garment-btn {
         width: 100%;
+        min-height: 43px;
+        border: none;
+        border-radius: 9px;
+        font-size: 0.84rem;
+        font-weight: 650;
+        transition: all 0.22s ease;
     }
-
-    .avs-measure-grid {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    .garment-btn:hover {
+        transform: translateY(-2px);
     }
-
-    #shirtSelect,
-#pantSelect {
-    display: block !important;
-    width: 100%;
-    min-height: 48px;
-
-    color: #ffffff !important;
-    font-size: 16px;
-    font-weight: 600;
-
-    visibility: visible !important;
-    opacity: 1 !important;
-}
+    .btn-shirt {
+        background: linear-gradient(135deg, #5b5bd6, #4545b8);
+        color: white;
+        box-shadow:
+            0 7px 17px rgba(91, 91, 214, 0.20);
+    }
+    .btn-pant {
+        background: linear-gradient(135deg, #343a46, #171a21);
+        color: white;
+        box-shadow:
+            0 7px 17px rgba(16, 19, 26, 0.18);
+    }
+    /* =========================================================
+   MODIFY BUTTONS
+   ========================================================= */
+    .modify-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    .modify-btn {
+        min-height: 39px;
+        border-radius: 9px;
+        border: 1px solid #dfe2e7;
+        background: #f8f9fb;
+        color: #3e434c;
+        font-size: 0.76rem;
+        font-weight: 650;
+        transition: all 0.2s ease;
+    }
+    .modify-btn:hover,
+    .modify-btn.active {
+        background: rgba(91, 91, 214, 0.08);
+        border-color: #7777df;
+        color: #5b5bd6;
+        transform: translateY(-1px);
+    }
+    /* =========================================================
+   COLOR PICKER
+   ========================================================= */
+    .color-control {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px;
+        border: 1px solid #dfe2e7;
+        border-radius: 9px;
+        margin-bottom: 13px;
+    }
+    .color-control span {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #454a53;
+    }
+    #garmentColor {
+        width: 52px;
+        height: 32px;
+        padding: 2px;
+        border-radius: 7px;
+        cursor: pointer;
+    }
+    /* =========================================================
+   APPLY FIT
+   ========================================================= */
+    .apply-fit-btn {
+        width: 100%;
+        min-height: 43px;
+        border: none;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #198754, #157347);
+        color: white;
+        font-weight: 650;
+        font-size: 0.83rem;
+        transition: all 0.22s ease;
+        box-shadow:
+            0 7px 17px rgba(25, 135, 84, 0.17);
+    }
+    .apply-fit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 11px 22px rgba(25, 135, 84, 0.23);
+    }
+    /* =========================================================
+   AI MEASUREMENTS
+   ========================================================= */
+    .measurements-card {
+        margin-top: 20px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow:
+            0 10px 30px rgba(16, 19, 26, 0.06);
+    }
+    .measurements-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 17px;
+    }
+    .measurements-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .measurements-heading-icon {
+        width: 37px;
+        height: 37px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(91, 91, 214, 0.10);
+        color: #5b5bd6;
+    }
+    .measurements-heading h6 {
+        margin: 0;
+        font-size: 0.98rem;
+        font-weight: 700;
+    }
+    .measurements-heading small {
+        color: #818792;
+    }
+    .measurement-grid {
+        display: grid;
+        grid-template-columns:
+            repeat(6, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .measurement-item {
+        min-height: 76px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border-radius: 11px;
+        background: #f7f8fa;
+        border: 1px solid #eaebef;
+        transition: all 0.2s ease;
+    }
+    .measurement-item:hover {
+        background: #ffffff;
+        border-color: #d9dbea;
+        transform: translateY(-2px);
+        box-shadow:
+            0 7px 17px rgba(16, 19, 26, 0.06);
+    }
+    .measurement-item i {
+        color: #5b5bd6;
+        font-size: 1rem;
+    }
+    .measurement-item .label {
+        display: block;
+        color: #858b94;
+        font-size: 0.68rem;
+        margin-bottom: 2px;
+    }
+    .measurement-item .value {
+        display: block;
+        color: #20232a;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+    .mesh-info {
+        margin-top: 13px;
+        color: #858b94;
+        font-size: 0.73rem;
+    }
+    /* =========================================================
+   RESPONSIVE
+   ========================================================= */
+    @media (max-width: 1200px) {
+        .viewer-layout {
+            grid-template-columns:
+                minmax(0, 1fr) 320px;
+        }
+        .measurement-grid {
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+        }
+        #viewer-container {
+            height: 620px;
+        }
+    }
+    @media (max-width: 991px) {
+        .viewer-layout {
+            grid-template-columns: 1fr;
+        }
+        .tryon-sidebar {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+        #viewer-container {
+            height: 650px;
+        }
+    }
+    @media (max-width: 767px) {
+        .alterfit-viewer-page {
+            padding: 18px 12px 40px;
+        }
+        .viewer-hero {
+            padding: 24px 20px;
+            border-radius: 18px;
+        }
+        .viewer-hero h1 {
+            font-size: 1.45rem;
+        }
+        .viewer-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+        .viewer-tools {
+            width: 100%;
+        }
+        .viewer-tools button {
+            flex: 1;
+        }
+        #viewer-container {
+            height: 500px;
+            min-height: 450px;
+        }
+        .tryon-sidebar {
+            grid-template-columns: 1fr;
+        }
+        .measurement-grid {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+        .avs-viewer-hint {
+            font-size: 0.63rem;
+        }
+    }
+    @media (max-width: 450px) {
+        .measurement-grid {
+            grid-template-columns: 1fr;
+        }
+        .modify-buttons {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
-
 {% block title %}
-Personalized 3D Body
+Personalized 3D Body | AI AlterFit
 {% endblock %}
-
-
 {% block content %}
-
-<div class="avs-wrap">
-    <div class="container-fluid">
-        <div class="row g-3">
-
-            <!-- ===================================== -->
-            <!-- LEFT : CATEGORY / GARMENT NAV -->
-            <!-- ===================================== -->
-            <div class="col-lg-2 col-md-3 col-xl-2">
-                <div class="avs-sidebar">
-                    <h6>Categories</h6>
-                    <div class="list-group">
-                        <div class="list-group-item active"><i class="bi bi-gender-male avs-ic"></i> Male</div>
-                        <div class="list-group-item"><i class="bi bi-gender-female avs-ic"></i> Female</div>
-                        <div class="list-group-item"><i class="bi bi-emoji-smile avs-ic"></i> Kids</div>
-                    </div>
-                    <h6>Garments</h6>
-                    <div class="list-group">
-                        <div class="list-group-item active"><i class="bi bi-vest avs-ic"></i> Shirts</div>
-                        <div class="list-group-item"><i class="bi bi-bookmark avs-ic"></i> Pants</div>
-                    </div>
-                </div>
+<div class="alterfit-viewer-page">
+    <!-- =====================================================
+         PAGE HERO
+         ===================================================== -->
+    <div class="viewer-hero">
+        <div class="viewer-hero-content">
+            <div class="viewer-badge">
+                <i class="bi bi-stars"></i>
+                AI Virtual Fitting
             </div>
-
-            <!-- ===================================== -->
-            <!-- CENTER : 3D VIEWER + MEASUREMENTS -->
-            <!-- ===================================== -->
-            <div class="col-lg-8 col-md-9 col-xl-8 avs-center-col">
-
-                <div class="avs-viewer-card mb-3">
-                    <div class="avs-viewer-topbar">
+            <h1>
+                Your Personalized 3D Body
+            </h1>
+            <p>
+                Explore your AI-generated body model, add garments,
+                and customize your virtual outfit before alteration.
+            </p>
+        </div>
+    </div>
+    <!-- =====================================================
+         MAIN VIEWER + TRY ON
+         ===================================================== -->
+    <div class="viewer-layout">
+        <!-- =================================================
+             LEFT : 3D BODY VIEWER
+             ================================================= -->
+        <div>
+            <div class="viewer-card">
+                <div class="viewer-card-header">
+                    <div class="viewer-title">
+                        <div class="viewer-title-icon">
+                            <i class="bi bi-person-bounding-box"></i>
+                        </div>
                         <div>
-                            <h5 class="mb-0"><i class="bi bi-person-bounding-box"></i> Your Personalized 3D Body</h5>
-                            <small class="text-muted">AI-predicted measurements &middot; Virtual try-on preview</small>
-                        </div>
-                        <div class="avs-viewer-tools">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnReset"
-                                title="Reset view"><i class="bi bi-arrow-clockwise"></i></button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnSnapshot"
-                                title="Snapshot"><i class="bi bi-camera"></i></button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnFullscreen"
-                                title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
-
+                            <h5>
+                                AI Personalized 3D Body
+                            </h5>
+                            <small>
+                                Body prediction & virtual try-on preview
+                            </small>
                         </div>
                     </div>
-                    <div id="viewer-container">
-                        <div class="viewer-loading"></div>
-                        <div class="avs-viewer-hint"><i class="bi bi-mouse"></i> Left: Rotate &nbsp; Right: Pan &nbsp;
-                            <i class="bi bi-arrow-down-up"></i> Scroll: Zoom
-                        </div>
-                    </div>
-                </div>
-
-                <!--
-                Lower row: "View Options" panel removed permanently.
-                "AI Generated Measurements" now takes the full width
-                that used to be split between col-md-8 / col-md-4.
-            -->
-                <div class="row g-3 avs-lower-row">
-                    <div class="col-12">
-                        <div class="avs-panel avs-measure-full">
-                            <h6><i class="bi bi-rulers"></i> AI Generated Measurements</h6>
-                            <div class="avs-measure-grid">
-                                <div class="avs-measure-item"><i class="bi bi-arrows-vertical avs-ic"></i>
-                                    <div><span class="lbl">Height</span><span class="val">{{ prediction.height }}</span>
-                                    </div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-speedometer2 avs-ic"></i>
-                                    <div><span class="lbl">Weight</span><span class="val">{{ prediction.weight }}</span>
-                                    </div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-calendar3 avs-ic"></i>
-                                    <div><span class="lbl">Age</span><span class="val">{{ prediction.age }}</span></div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-tag avs-ic"></i>
-                                    <div><span class="lbl">Category</span><span class="val">{{ prediction.category
-                                            }}</span></div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-person-lines-fill avs-ic"></i>
-                                    <div><span class="lbl">Body Shape</span><span class="val">{{ prediction.body_shape
-                                            }}</span></div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-circle avs-ic"></i>
-                                    <div><span class="lbl">Neck</span><span class="val">{{ prediction.neck }}</span>
-                                    </div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-arrows-angle-expand avs-ic"></i>
-                                    <div><span class="lbl">Shoulder</span><span class="val">{{ prediction.shoulder
-                                            }}</span></div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-square avs-ic"></i>
-                                    <div><span class="lbl">Chest</span><span class="val">{{ prediction.chest }}</span>
-                                    </div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-dash-circle avs-ic"></i>
-                                    <div><span class="lbl">Waist</span><span class="val">{{ prediction.waist }}</span>
-                                    </div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-triangle avs-ic"></i>
-                                    <div><span class="lbl">Hip</span><span class="val">{{ prediction.hip }}</span></div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-arrow-left-right avs-ic"></i>
-                                    <div><span class="lbl">Arm Length</span><span class="val">{{ prediction.arm_length
-                                            }}</span></div>
-                                </div>
-                                <div class="avs-measure-item"><i class="bi bi-arrow-down-up avs-ic"></i>
-                                    <div><span class="lbl">Leg Length</span><span class="val">{{ prediction.leg_length
-                                            }}</span></div>
-                                </div>
-                            </div>
-                            <div class="small text-muted mt-2">Mesh file: {{ prediction.mesh_file }}</div>
-                        </div>
+                    <div class="viewer-tools">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnReset" title="Reset View">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnSnapshot"
+                            title="Take Snapshot">
+                            <i class="bi bi-camera"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnFullscreen"
+                            title="Fullscreen">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </button>
                     </div>
                 </div>
-
+                <!-- THREE JS VIEWER -->
+                <div id="viewer-container">
+                    <div class="viewer-loading"></div>
+                    <div class="avs-viewer-hint">
+                        <i class="bi bi-mouse"></i>
+                        Rotate
+                        &nbsp; • &nbsp;
+                        <i class="bi bi-arrows-move"></i>
+                        Pan
+                        &nbsp; • &nbsp;
+                        <i class="bi bi-arrow-down-up"></i>
+                        Zoom
+                    </div>
+                </div>
             </div>
-
-            <!-- ===================================== -->
-            <!-- RIGHT : GARMENT CUSTOMIZATION -->
-            <!-- ===================================== -->
-            <!-- ================================================= -->
-            <!-- GARMENT SELECTION PANEL -->
-            <!-- ================================================= -->
-
-            <div class="card mt-3 p-3">
-                <h5 class="mb-3">
-                    Virtual Try-On
-                </h5>
-
-                <!-- SHIRT -->
-                <label for="shirtSelect">Select Shirt</label>
-                <select id="shirtSelect" class="form-select mb-2"><option value=""> Loading shirts... </option>
+            <!-- =================================================
+                 AI GENERATED MEASUREMENTS
+                 ================================================= -->
+            <div class="measurements-card">
+                <div class="measurements-header">
+                    <div class="measurements-heading">
+                        <div class="measurements-heading-icon">
+                            <i class="bi bi-rulers"></i>
+                        </div>
+                        <div>
+                            <h6>
+                                AI Generated Measurements
+                            </h6>
+                            <small>
+                                Measurements predicted from your body data
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="measurement-grid">
+                    <div class="measurement-item">
+                        <i class="bi bi-arrows-vertical"></i>
+                        <div>
+                            <span class="label">
+                                Height
+                            </span>
+                            <span class="value">
+                                {{ prediction.height }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-speedometer2"></i>
+                        <div>
+                            <span class="label">
+                                Weight
+                            </span>
+                            <span class="value">
+                                {{ prediction.weight }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-calendar3"></i>
+                        <div>
+                            <span class="label">
+                                Age
+                            </span>
+                            <span class="value">
+                                {{ prediction.age }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-tag"></i>
+                        <div>
+                            <span class="label">
+                                Category
+                            </span>
+                            <span class="value">
+                                {{ prediction.category }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-person-lines-fill"></i>
+                        <div>
+                            <span class="label">
+                                Body Shape
+                            </span>
+                            <span class="value">
+                                {{ prediction.body_shape }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-circle"></i>
+                        <div>
+                            <span class="label">
+                                Neck
+                            </span>
+                            <span class="value">
+                                {{ prediction.neck }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-arrows-angle-expand"></i>
+                        <div>
+                            <span class="label">
+                                Shoulder
+                            </span>
+                            <span class="value">
+                                {{ prediction.shoulder }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-square"></i>
+                        <div>
+                            <span class="label">
+                                Chest
+                            </span>
+                            <span class="value">
+                                {{ prediction.chest }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-dash-circle"></i>
+                        <div>
+                            <span class="label">
+                                Waist
+                            </span>
+                            <span class="value">
+                                {{ prediction.waist }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-triangle"></i>
+                        <div>
+                            <span class="label">
+                                Hip
+                            </span>
+                            <span class="value">
+                                {{ prediction.hip }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <div>
+                            <span class="label">
+                                Arm Length
+                            </span>
+                            <span class="value">
+                                {{ prediction.arm_length }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="measurement-item">
+                        <i class="bi bi-arrow-down-up"></i>
+                        <div>
+                            <span class="label">
+                                Leg Length
+                            </span>
+                            <span class="value">
+                                {{ prediction.leg_length }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mesh-info">
+                    <i class="bi bi-file-earmark-3d me-1"></i>
+                    Mesh file:
+                    {{ prediction.mesh_file }}
+                </div>
+            </div>
+        </div>
+        <!-- =================================================
+             RIGHT : GARMENT CONTROLS
+             ================================================= -->
+        <div class="tryon-sidebar">
+            <!-- =================================================
+                 ADD SHIRT
+                 ================================================= -->
+            <div class="tryon-card">
+                <div class="tryon-card-header">
+                    <div class="tryon-icon">
+                        <i class="bi bi-person-standing"></i>
+                    </div>
+                    <div>
+                        <h6>
+                            Add Shirt
+                        </h6>
+                        <span>
+                            Select a shirt for virtual try-on
+                        </span>
+                    </div>
+                </div>
+                <label for="shirtSelect">
+                    Shirt
+                </label>
+                <select id="shirtSelect" class="form-select mb-3">
+                    <option value="">
+                        Loading shirts...
+                    </option>
                 </select>
-                <button type="button" class="btn btn-success w-100 mb-3" style="color:aliceblue;" onclick="applySelectedShirt()">
-                    Apply Shirt
+                <button type="button" class="garment-btn btn-shirt" onclick="applySelectedShirt()">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Shirt
                 </button>
-
-
-                <!-- PANT -->
-                <label for="pantSelect">Select Pant</label>
-
-                <select id="pantSelect" class="form-select mb-2">
+            </div>
+            <!-- =================================================
+                 ADD PANT
+                 ================================================= -->
+            <div class="tryon-card">
+                <div class="tryon-card-header">
+                    <div class="tryon-icon">
+                        <i class="bi bi-person-standing-dress"></i>
+                    </div>
+                    <div>
+                        <h6>
+                            Add Pant
+                        </h6>
+                        <span>
+                            Select a pant for virtual try-on
+                        </span>
+                    </div>
+                </div>
+                <label for="pantSelect">
+                    Pant
+                </label>
+                <select id="pantSelect" class="form-select mb-3">
                     <option value="">
                         Loading pants...
                     </option>
                 </select>
-
-                <button type="button" class="btn btn-success w-100" style="color: antiquewhite;" onclick="applySelectedPant()">
-                    Apply Pant
+                <button type="button" class="garment-btn btn-pant" onclick="applySelectedPant()">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Pant
                 </button>
-
-                <label for="customizeTarget">Customize</label>
+            </div>
+            <!-- =================================================
+                 MODIFY SHIRT / PANT
+                 ================================================= -->
+            <div class="tryon-card">
+                <div class="tryon-card-header">
+                    <div class="tryon-icon">
+                        <i class="bi bi-sliders"></i>
+                    </div>
+                    <div>
+                        <h6>
+                            Modify Garment
+                        </h6>
+                        <span>
+                            Select which garment you want to customize
+                        </span>
+                    </div>
+                </div>
+                <div class="modify-buttons">
+                    <button type="button" class="modify-btn active" onclick="
+                            document.getElementById('customizeTarget').value='shirt';
+                            this.classList.add('active');
+                            this.nextElementSibling.classList.remove('active');
+                        ">
+                        <i class="bi bi-person-standing me-1"></i>
+                        Modify Shirt
+                    </button>
+                    <button type="button" class="modify-btn" onclick="
+                            document.getElementById('customizeTarget').value='pant';
+                            this.classList.add('active');
+                            this.previousElementSibling.classList.remove('active');
+                        ">
+                        <i class="bi bi-person-standing-dress me-1"></i>
+                        Modify Pant
+                    </button>
+                </div>
+                <label for="customizeTarget">
+                    Selected Garment
+                </label>
                 <select id="customizeTarget" class="form-select mb-3">
-                    <option value="shirt">shirt</option>
-                    <option value="pant">pant</option>
+                    <option value="shirt">
+                        Shirt
+                    </option>
+                    <option value="pant">
+                        Pant
+                    </option>
                 </select>
-
-                
-                <!-- color -->
-                <label for="garmentColor">Garment Color</label>
-                <input type="color" id="garmentColor" value="#ffffff" class="form-control form-control-color" onclick="changeGarmentColor(this.value)">
-           
-
-            <!-- febrics -->
-             <label for="fabricSelect">Fabric</label>
-             <select name="" id="fabricSelect" class="form-select mb-3" onchange="changeGarmentFabric(this.value)">
-                <option value="">select fabric</option>
-                <option value="cotton">cotton</option>
-                <option value="denim">denim</option>
-                <option value="silk">silk</option>
-                <option value="wool">wool</option>
-                <option value="linen">linen</option>
-             </select>
-
-             <!-- pattern  -->
-              <label for="patternSelect">Pattern</label>
-              <select name="" id="patternSelect" class="form-select mb-3" onchange="changeGarmentPattern(this.value)">
-                <option value="plain">plain</option>
-                <option value="stripes">stripes</option>
-                <option value="checks">checks</option>
-                <option value="floral">floral</option>
-                <option value="dots">dots</option>
-              </select>
-
-              <label for="fitType" class="mt-3">
-                Fit Type
-              </label>
-              <select name="" id="fitType" class="form-select mb-3">
-                <option value="slim">Slim</option>
-                <option value="regular">Regular</option>
-                <option value="loose">Loose</option>
-              </select>
-              <button class="btn btn-primary w-1000" onclick="applyFit()">Apply fit </button>
-
-               </div>
-            <!-- main cards -->
-
-            
-
-<!-- ===================================== -->
-<!-- Pass OBJ file to JavaScript -->
-<!-- ===================================== -->
-
-<link rel="stylesheet" href="{{url_for('static', filename='css/body_viewer.css')}}">
+                <!-- COLOR -->
+                <label for="garmentColor">
+                    Garment Color
+                </label>
+                <div class="color-control">
+                    <span>
+                        Choose Color
+                    </span>
+                    <input type="color" id="garmentColor" value="#ffffff" class="form-control form-control-color"
+                        onclick="changeGarmentColor(this.value)">
+                </div>
+                <!-- FABRIC -->
+                <label for="fabricSelect">
+                    Fabric
+                </label>
+                <select id="fabricSelect" class="form-select mb-3" onchange="changeGarmentFabric(this.value)">
+                    <option value="">
+                        Select Fabric
+                    </option>
+                    <option value="cotton">
+                        Cotton
+                    </option>
+                    <option value="denim">
+                        Denim
+                    </option>
+                    <option value="silk">
+                        Silk
+                    </option>
+                    <option value="wool">
+                        Wool
+                    </option>
+                    <option value="linen">
+                        Linen
+                    </option>
+                </select>
+                <!-- PATTERN -->
+                <label for="patternSelect">
+                    Pattern
+                </label>
+                <select id="patternSelect" class="form-select mb-3" onchange="changeGarmentPattern(this.value)">
+                    <option value="plain">
+                        Plain
+                    </option>
+                    <option value="stripes">
+                        Stripes
+                    </option>
+                    <option value="checks">
+                        Checks
+                    </option>
+                    <option value="floral">
+                        Floral
+                    </option>
+                    <option value="dots">
+                        Dots
+                    </option>
+                </select>
+                <!-- FIT -->
+                <label for="fitType">
+                    Fit Type
+                </label>
+                <select id="fitType" class="form-select mb-3">
+                    <option value="slim">
+                        Slim
+                    </option>
+                    <option value="regular">
+                        Regular
+                    </option>
+                    <option value="loose">
+                        Loose
+                    </option>
+                </select>
+                <button type="button" class="apply-fit-btn" onclick="applyFit()">
+                    <i class="bi bi-check2-circle me-1"></i>
+                    Apply Fit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =========================================================
+     EXISTING THREE.JS / VIRTUAL TRY-ON FUNCTIONALITY
+     DO NOT CHANGE
+     ========================================================= -->
 <script>
-    const OBJ_FILE = "{{ url_for('static', filename='generated/processed_body.obj') }}";
-    const MTL_FILE = "{{ url_for('static', filename='generated/human_body.mtl') }}";
+    const OBJ_FILE ="{{ url_for('static', filename='generated/processed_body.obj') }}";
+    const MTL_FILE ="{{ url_for('static', filename='generated/human_body.mtl') }}";
 </script>
-
-<!-- ===================================== -->
 <!-- Three.js -->
-<!-- ===================================== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
-
-<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/fitEngine.js') }}"></script>  
-<script type="module" src="{{ url_for('static', filename='js/viewer.js') }}"></script>
-<!-- <script type="module" src="{{ url_for('static',filename='js/virtual_tryon/garmentManager.js')}}"></script> -->
-<!-- <script src="{{ url_for('static', filename='js/virtual_tryon/materialEngine.js') }}"></script>  -->
-
-VIRTUAL TRY-ON FILES new  added for the btn click 
-<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/bodyEngine.js') }}"></script> 
-<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/garmentEngine.js') }}"></script>  
-<!-- <script type="module" src="{{ url_for('static', filename='js/virtual_tryon/garmentManager.js') }}"></script>   -->
-<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/materialEngine.js') }}"></script>  <script>
-    // ---- Custom colour pickers ----
-    const pantColorPicker = document.getElementById("garmentColor");
-    pantColorPicker.addEventListener("input", function () {
-        changePantColor(this.value);
-    });
-
-    const shirtColorPicker = document.getElementById("garmentColor");
-    shirtColorPicker.addEventListener("input", function () {
-        changeShirtColor(this.value);
-    });
-
+<!-- Existing Virtual Try-On -->
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/fitEngine.js') }}">
+</script>
+<script type="module" src="{{ url_for('static', filename='js/viewer.js') }}">
+</script>
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/bodyEngine.js') }}">
+</script>
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/garmentEngine.js') }}">
+</script>
+<script type="module" src="{{ url_for('static', filename='js/virtual_tryon/materialEngine.js') }}">
+</script>
+<!-- =========================================================
+     EXISTING COLOR FUNCTIONALITY
+     ========================================================= -->
+<script>
+    const garmentColorPicker = document.getElementById("garmentColor");
+    garmentColorPicker.addEventListener( "input", function () {
+            changePantColor(this.value);
+            changeShirtColor(this.value);
+        }
+    );
     function changePantColor(color) {
-        console.log("Selected Pant Color:", color);
+        console.log("Selected Pant Color:", color );
         if (typeof pant !== "undefined") {
             pant.traverse(function (child) {
-                if (child.isMesh) child.material.color.set(color);
-            });
-        }
-    }
-
-    function changeShirtColor(color) {
-        console.log("Selected Shirt Color:", color);
-        if (typeof shirt !== "undefined") {
-            shirt.traverse(function (child) {
-                if (child.isMesh) child.material.color.set(color);
-            });
-        }
-    }
-
-    // ---- Swatch/pattern selection highlight (visual only) ----
-    document.querySelectorAll('.avs-color-dot input[type="radio"]').forEach(function (input) {
-        input.addEventListener('change', function () {
-            document.querySelectorAll('.avs-color-dot').forEach(function (dot) {
-                if (dot.querySelector('input') && dot.querySelector('input').name === input.name) {
-                    dot.classList.remove('checked');
+                if (child.isMesh) {
+                    child.material.color.set(color);
                 }
             });
-            input.closest('.avs-color-dot').classList.add('checked');
-        });
-    });
-
-    document.querySelectorAll('.avs-pattern input[type="radio"]').forEach(function (input) {
-        input.addEventListener('change', function () {
-            document.querySelectorAll('.avs-pattern').forEach(function (p) {
-                if (p.querySelector('input').name === input.name) p.classList.remove('checked');
+        }
+    }
+    function changeShirtColor(color) {
+        console.log( "Selected Shirt Color:", color
+        );
+        if (typeof shirt !== "undefined") {
+            shirt.traverse(function (child) {
+                if (child.isMesh) {
+                    child.material.color.set(color);
+                }
             });
-            input.closest('.avs-pattern').classList.add('checked');
-        });
-    });
+        }
+    }
 </script>
-
 {% endblock %}

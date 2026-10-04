@@ -26,24 +26,30 @@ def index():
     return render_template(
         'index.html'
     )
+    
 @app.route('/dashboard')
 def dashboard():
     return render_template(
         'dashboard.html'
     )
+    
 # cutomer tracking 
 @app.route("/customer-tracking")
 def customer_tracking():
     return render_template("customer_tracking.html")
+
 @app.route('/measurement')
 def measurement():
     return render_template(
         'measurement_form.html'
     )
+    
 # request details
 @app.route("/request-detail")
 def request_detail():
     return render_template("request_detail.html")
+
+
 @app.route('/profile')
 def profile():
     return render_template(
@@ -55,42 +61,34 @@ def profile():
 @app.route("/tailor_dashboard")
 def tailor_dashboard():
     return render_template('tailor_dashboard.html')
+
 # PRINT/SAVE PDF = REQUEST DATA
 @app.route("/print-request") 
 def print_request(): 
     return render_template("print_request.html")
-
 
 # =========================
 # quality check route 
 # =====================
 @app.route("/quality_check/<int:request_id>", methods=["GET", "POST"])
 def quality_check(request_id):
-
     request_data = get_request(request_id)
-
     if not request_data:
         return "Alteration request not found", 404
-
     if request.method == "POST":
-
         quality_notes = request.form.get(
             "quality_notes",
             ""
         ).strip()
-
         if not quality_notes:
-
             flash(
                 "Please enter quality check notes before approval.",
                 "warning"
             )
-
             return render_template(
                 "quality_check.html",
                 request_data=request_data
             )
-
         try:
 
             update_request_status(

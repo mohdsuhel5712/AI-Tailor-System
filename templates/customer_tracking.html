@@ -1,888 +1,1255 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
+{% block title %}AI AlterFit | Track Request{% endblock %}
 {% block head %}
-
-<title>AI AlterFit | Customer Tracking</title>
-
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap"
+    rel="stylesheet">
 <style>
-    .tracking-page {
-        min-height: 100vh;
-        background:
-            linear-gradient(rgba(245, 247, 251, 0.94), rgba(245, 247, 251, 0.97)),
-            url("https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1800&q=80")
-            center / cover fixed;
-        padding-bottom: 50px;
+    :root {
+        --track-bg: #f3f4f6;
+        --track-surface: #ffffff;
+        --track-border: #e5e7eb;
+        --track-text: #181a20;
+        --track-muted: #737780;
+        --track-light: #a7aab1;
+        --track-primary: #5b5bd6;
+        --track-success: #198754;
+        --track-warning: #b7791f;
+        --track-danger: #dc3545;
+        --track-radius: 18px;
+        --track-shadow: 0 10px 35px rgba(20, 22, 30, 0.07);
     }
 
-    .hero-card {
+    .tracking-page {
+        max-width: 1120px;
+        margin: 35px auto 75px;
+        padding: 0 20px;
+        animation: trackFade 0.55s ease both;
+    }
+
+    @keyframes trackFade {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ================= HERO ================= */
+    .tracking-hero {
         position: relative;
         overflow: hidden;
-        border-radius: 24px;
-        background: linear-gradient(135deg, #111827, #343a40);
-        color: #ffffff;
-        padding: 38px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        padding: 42px 38px;
+        margin-bottom: 22px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 90% 10%,
+                rgba(139, 124, 246, 0.22),
+                transparent 32%),
+            linear-gradient(135deg,
+                #171922,
+                #25283a);
+        color: #fff;
+        box-shadow: 0 18px 50px rgba(20, 22, 30, 0.16);
     }
 
-    .hero-card::after {
+    .tracking-hero::after {
         content: "";
         position: absolute;
-        width: 260px;
-        height: 260px;
+        width: 230px;
+        height: 230px;
         right: -90px;
-        top: -100px;
+        bottom: -120px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.10);
     }
 
-    .hero-content {
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        color: #aaa8ff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+    }
+
+    .hero-eyebrow::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #8b7cf6;
+        box-shadow: 0 0 0 5px rgba(139, 124, 246, 0.12);
+    }
+
+    .tracking-title {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 43px);
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+    }
+
+    .tracking-subtitle {
+        max-width: 620px;
+        margin: 12px 0 0;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    /* ================= SEARCH ================= */
+    .search-panel {
+        margin-top: -7px;
         position: relative;
         z-index: 2;
-    }
-
-    .brand-label {
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        opacity: 0.7;
-    }
-
-    .hero-title {
-        font-size: clamp(28px, 4vw, 42px);
-        font-weight: 800;
-        margin-bottom: 10px;
-    }
-
-    .hero-text {
-        max-width: 650px;
-        color: rgba(255, 255, 255, 0.75);
-        margin-bottom: 0;
-    }
-
-    .navigation-card {
-        margin-top: 24px;
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #e9ecef;
-        border-radius: 20px;
         padding: 18px;
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--track-border);
+        border-radius: 17px;
+        background: #fff;
+        box-shadow: var(--track-shadow);
     }
 
-    .navigation-title {
-        font-size: 12px;
-        font-weight: 800;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 12px;
+    .search-form {
+        display: flex;
+        gap: 10px;
     }
 
-    .workflow-link {
+    .search-input-wrap {
+        position: relative;
+        flex: 1;
+    }
+
+    .search-input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--track-light);
+    }
+
+    .search-input {
+        width: 100%;
+        height: 50px;
+        border: 1px solid var(--track-border);
+        border-radius: 12px;
+        padding: 0 16px 0 45px;
+        color: var(--track-text);
+        background: #fafafb;
+        font-size: 14px;
+        font-weight: 500;
+        transition: 0.25s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        background: #fff;
+        border-color: var(--track-primary);
+        box-shadow: 0 0 0 4px rgba(91, 91, 214, 0.10);
+    }
+
+    .search-btn {
+        height: 50px;
+        padding: 0 23px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--track-text);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .search-btn:hover {
+        background: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(20, 22, 30, 0.14);
+    }
+
+    /* ================= ERROR ================= */
+    .track-error {
+        display: none;
+        margin-top: 14px;
+        padding: 13px 16px;
+        border-radius: 11px;
+        border: 1px solid #f0cccc;
+        background: #fff5f5;
+        color: #9c3333;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    /* ================= RESULT ================= */
+    .tracking-result {
+        display: none;
+        margin-top: 25px;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        padding: 23px;
+        border: 1px solid var(--track-border);
+        border-radius: var(--track-radius);
+        background: #fff;
+        box-shadow: var(--track-shadow);
+    }
+
+    .order-customer {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
-        border-radius: 12px;
-        color: #343a40;
-        text-decoration: none;
-        font-size: 14px;
+        gap: 13px;
+    }
+
+    .customer-avatar {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #5b5bd6, #8b7cf6);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(91, 91, 214, 0.20);
+    }
+
+    .order-name {
+        color: var(--track-text);
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .order-id {
+        margin-top: 3px;
+        color: var(--track-muted);
+        font-size: 12px;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 13px;
+        border-radius: 999px;
+        background: #fff5df;
+        border: 1px solid #f1dfb7;
+        color: #91621c;
+        font-size: 11.5px;
+        font-weight: 700;
+    }
+
+    .status-pill::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    /* ================= PROGRESS ================= */
+    .progress-card {
+        margin-top: 15px;
+        padding: 26px;
+        border: 1px solid var(--track-border);
+        border-radius: var(--track-radius);
+        background: #fff;
+        box-shadow: var(--track-shadow);
+    }
+
+    .section-heading {
+        margin-bottom: 25px;
+    }
+
+    .section-title {
+        margin: 0;
+        color: var(--track-text);
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .section-subtitle {
+        margin: 5px 0 0;
+        color: var(--track-muted);
+        font-size: 12.5px;
+    }
+
+    .progress-track {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        position: relative;
+        gap: 0;
+    }
+
+    .progress-line {
+        position: absolute;
+        left: 4%;
+        right: 4%;
+        top: 17px;
+        height: 2px;
+        background: #e8e9ed;
+        z-index: 0;
+    }
+
+    .progress-line-active {
+        position: absolute;
+        left: 4%;
+        top: 17px;
+        height: 2px;
+        width: 0;
+        background: var(--track-primary);
+        z-index: 1;
+        transition: width 0.7s ease;
+    }
+
+    .progress-step {
+        position: relative;
+        z-index: 2;
+        width: 14.28%;
+        text-align: center;
+    }
+
+    .step-circle {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 9px;
+        border: 2px solid #e3e4e8;
+        border-radius: 50%;
+        background: #fff;
+        color: #a8abb2;
+        font-size: 12px;
+        transition: all 0.35s ease;
+    }
+
+    .progress-step.active .step-circle {
+        border-color: var(--track-primary);
+        background: var(--track-primary);
+        color: #fff;
+        box-shadow: 0 0 0 6px rgba(91, 91, 214, 0.10);
+    }
+
+    .progress-step.completed .step-circle {
+        border-color: var(--track-success);
+        background: var(--track-success);
+        color: #fff;
+    }
+
+    .step-label {
+        color: var(--track-muted);
+        font-size: 10.5px;
         font-weight: 600;
-        transition: 0.2s ease;
+        line-height: 1.35;
     }
 
-    .workflow-link:hover {
-        background: #f1f3f5;
-        color: #000000;
-        transform: translateY(-1px);
+    .progress-step.active .step-label,
+    .progress-step.completed .step-label {
+        color: var(--track-text);
     }
 
-    .workflow-link.active {
-        background: #212529;
-        color: #ffffff;
+    /* ================= DETAILS ================= */
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 15px;
     }
 
-    .tracking-card,
-    .status-card {
-        border: 1px solid #e9ecef;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.97);
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
+    .detail-card {
+        padding: 23px;
+        border: 1px solid var(--track-border);
+        border-radius: var(--track-radius);
+        background: #fff;
+        box-shadow: var(--track-shadow);
     }
 
-    .search-card {
-        margin-top: 24px;
-    }
-
-    .search-header {
-        padding: 24px 28px;
-        background: #212529;
-        color: #ffffff;
-    }
-
-    .search-body {
-        padding: 28px;
-    }
-
-    .form-control {
-        border-radius: 12px;
-        border-color: #dee2e6;
-    }
-
-    .form-control:focus {
-        border-color: #6c757d;
-        box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.1);
-    }
-
-    .track-button {
-        border-radius: 12px;
-        font-weight: 700;
-    }
-
-    #requestSection {
-        display: none;
-    }
-
-    #errorMessage {
-        display: none;
-    }
-
-    #loadingMessage {
-        display: none;
-    }
-
-    .status-card {
-        margin-top: 24px;
-    }
-
-    .card-section-header {
-        padding: 18px 24px;
-        background: #ffffff;
-        border-bottom: 1px solid #eeeeee;
-    }
-
-    .card-section-header h5 {
-        font-weight: 700;
+    .detail-list {
         margin: 0;
     }
 
-    .status-body {
-        padding: 28px;
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 13px 0;
+        border-bottom: 1px solid #eff0f2;
     }
 
-    .info-label {
-        font-size: 11px;
-        font-weight: 800;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        margin-bottom: 5px;
+    .detail-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
     }
 
-    .info-value {
+    .detail-label {
+        color: var(--track-muted);
+        font-size: 12px;
+    }
+
+    .detail-value {
+        color: var(--track-text);
+        font-size: 12.5px;
         font-weight: 600;
-        color: #212529;
-        margin-bottom: 20px;
+        text-align: right;
         word-break: break-word;
     }
 
-    .current-status {
-        font-size: clamp(24px, 4vw, 32px);
-        font-weight: 800;
-        color: #212529;
+    /* ================= HISTORY ================= */
+    .history-card {
+        margin-top: 15px;
+        padding: 25px;
+        border: 1px solid var(--track-border);
+        border-radius: var(--track-radius);
+        background: #fff;
+        box-shadow: var(--track-shadow);
     }
 
-    .status-badge {
-        padding: 9px 15px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 800;
-    }
-
-    .timeline {
+    .history-list {
         position: relative;
         margin-top: 5px;
     }
 
-    .timeline-item {
+    .history-item {
         position: relative;
-        padding-left: 48px;
-        padding-bottom: 28px;
+        display: flex;
+        gap: 14px;
+        padding-bottom: 22px;
     }
 
-    .timeline-item:last-child {
+    .history-item:last-child {
         padding-bottom: 0;
     }
 
-    .timeline-item::before {
+    .history-item::before {
         content: "";
         position: absolute;
-        left: 15px;
-        top: 30px;
-        width: 2px;
-        height: calc(100% - 5px);
-        background: #dee2e6;
+        left: 6px;
+        top: 14px;
+        bottom: 0;
+        width: 1px;
+        background: #e6e7ea;
     }
 
-    .timeline-item:last-child::before {
+    .history-item:last-child::before {
         display: none;
     }
 
-    .timeline-icon {
-        position: absolute;
-        left: 4px;
-        top: 0;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: #198754;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
+    .history-dot {
+        position: relative;
         z-index: 2;
-        box-shadow: 0 0 0 5px #ffffff;
+        width: 13px;
+        height: 13px;
+        flex: 0 0 13px;
+        margin-top: 3px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        background: var(--track-primary);
+        box-shadow: 0 0 0 1px #d6d7dd;
     }
 
-    .timeline-content {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 14px;
-        padding: 16px;
-    }
-
-    .timeline-status {
-        font-weight: 800;
-        margin-bottom: 6px;
-    }
-
-    .timeline-date {
+    .history-status {
+        color: var(--track-text);
         font-size: 13px;
-        color: #6c757d;
+        font-weight: 700;
     }
 
-    .empty-history {
-        color: #6c757d;
+    .history-date {
+        margin-top: 4px;
+        color: var(--track-muted);
+        font-size: 11.5px;
+    }
+
+    .history-note {
+        margin-top: 6px;
+        color: #555861;
+        font-size: 12px;
+        line-height: 1.55;
+    }
+
+    /* ================= LOADING ================= */
+    .tracking-loading {
+        display: none;
+        padding: 55px 20px;
         text-align: center;
-        padding: 30px;
+        color: var(--track-muted);
+        font-size: 13px;
     }
 
-    @media (max-width: 768px) {
-        .tracking-page {
-            padding-bottom: 30px;
+    .tracking-spinner {
+        width: 31px;
+        height: 31px;
+        margin: 0 auto 12px;
+        border: 2.5px solid #e7e8ec;
+        border-top-color: var(--track-primary);
+        border-radius: 50%;
+        animation: trackingSpin 0.8s linear infinite;
+    }
+
+    @keyframes trackingSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 800px) {
+        .tracking-hero {
+            padding: 32px 25px;
         }
 
-        .hero-card {
-            padding: 26px 22px;
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .progress-card {
+            overflow-x: auto;
+        }
+
+        .progress-track {
+            min-width: 700px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .tracking-page {
+            margin-top: 20px;
+            padding: 0 14px;
+        }
+
+        .tracking-hero {
+            padding: 29px 21px;
             border-radius: 18px;
         }
 
-        .search-body,
-        .status-body {
-            padding: 20px;
+        .search-form {
+            flex-direction: column;
         }
 
-        .navigation-card {
-            padding: 12px;
+        .search-btn {
+            width: 100%;
         }
 
-        .workflow-link {
-            justify-content: center;
+        .order-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .order-header .status-pill {
+            margin-left: 61px;
+        }
+
+        .detail-card,
+        .history-card,
+        .progress-card {
+            padding: 19px;
         }
     }
 </style>
-
 {% endblock %}
-
 {% block content %}
-
 <div class="tracking-page">
-
-<div class="container py-4">
-
-    <!-- HERO -->
-    <div class="hero-card">
-
-        <div class="hero-content">
-
-            <div class="brand-label mb-2">
-                AI ALTERFIT
+    <!-- ================= HERO ================= -->
+    <section class="tracking-hero">
+        <div class="hero-eyebrow">
+            AI ALTERFIT
+        </div>
+        <h1 class="tracking-title">
+            Track Your Alteration
+        </h1>
+        <p class="tracking-subtitle">
+            Enter your request ID to see the current status,
+            alteration progress, tailor information and complete
+            service history.
+        </p>
+    </section>
+    <!-- ================= SEARCH ================= -->
+    <section class="search-panel">
+        <form id="trackingForm" class="search-form">
+            <div class="search-input-wrap">
+                <i class="bi bi-search search-input-icon"></i>
+                <input type="number" id="requestIdInput" class="search-input" placeholder="Enter Request ID, e.g. 14"
+                    min="1" required>
             </div>
-
-            <h1 class="hero-title">
-                Customer Tracking
-            </h1>
-
-            <p class="hero-text">
-                Track your alteration request, view the current
-                progress, and follow every stage of your garment
-                service in one place.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <!-- WORKFLOW NAVIGATION -->
-    <div class="navigation-card">
-
-        <div class="navigation-title">
-            AlterFit Workflow
-        </div>
-
-        <div class="d-flex flex-wrap gap-2">
-
-            <a href="/dashboard" class="workflow-link">
-                <i class="bi bi-grid-1x2-fill"></i>
-                Dashboard
-            </a>
-
-            <a href="/customer-tracking"
-               class="workflow-link active">
+            <button type="submit" class="search-btn">
                 <i class="bi bi-search"></i>
-                Customer Tracking
-            </a>
-
-            <a href="/tailor_dashboard" class="workflow-link">
-                <i class="bi bi-person-workspace"></i>
-                Tailor Dashboard
-            </a>
-
-            <a href="/delivery-management" class="workflow-link">
-                <i class="bi bi-truck"></i>
-                Delivery Management
-            </a>
-
+                Track Request
+            </button>
+        </form>
+        <div id="trackError" class="track-error">
         </div>
-
+    </section>
+    <!-- ================= LOADING ================= -->
+    <div id="trackingLoading" class="tracking-loading">
+        <div class="tracking-spinner"></div>
+        Loading request information...
     </div>
-
-
-    <!-- SEARCH -->
-    <div class="tracking-card search-card">
-
-        <div class="search-header">
-
-            <h3 class="h4 fw-bold mb-2">
-                <i class="bi bi-search me-2"></i>
-                Track Your Alteration Request
-            </h3>
-
-            <p class="mb-0 text-white-50">
-                Enter your Request ID to check the current
-                status of your order.
-            </p>
-
-        </div>
-
-        <div class="search-body">
-
-            <div class="row align-items-end">
-
-                <div class="col-md-9 mb-3 mb-md-0">
-
-                    <label for="requestIdInput"
-                           class="form-label fw-semibold">
-
-                        Request ID
-
-                    </label>
-
-                    <input
-                        type="number"
-                        id="requestIdInput"
-                        class="form-control form-control-lg"
-                        placeholder="Enter Request ID"
-                        min="1">
-
+    <!-- ================= RESULT ================= -->
+    <div id="trackingResult" class="tracking-result">
+        <!-- ORDER HEADER -->
+        <section class="order-header">
+            <div class="order-customer">
+                <div id="customerAvatar" class="customer-avatar">
+                    AF
                 </div>
-
-                <div class="col-md-3">
-
-                    <button
-                        type="button"
-                        id="trackButton"
-                        class="btn btn-dark btn-lg w-100 track-button">
-
-                        <i class="bi bi-search me-1"></i>
-                        Track Request
-
-                    </button>
-
+                <div>
+                    <div id="customerName" class="order-name">
+                        --
+                    </div>
+                    <div class="order-id">
+                        Request #<span id="requestId">--</span>
+                    </div>
                 </div>
-
             </div>
-
-
-            <!-- ERROR -->
-            <div id="errorMessage"
-                 class="alert alert-danger mt-3 mb-0">
-            </div>
-
-
-            <!-- LOADING -->
-            <div id="loadingMessage"
-                 class="text-center mt-4">
-
-                <div class="spinner-border text-dark"
-                     role="status">
-                </div>
-
-                <p class="mt-2 mb-0 text-muted">
-                    Loading request details...
+            <span id="statusPill" class="status-pill">
+                REQUESTED
+            </span>
+        </section>
+        <!-- ================= PROGRESS ================= -->
+        <section class="progress-card">
+            <div class="section-heading">
+                <h2 class="section-title">
+                    Alteration Progress
+                </h2>
+                <p class="section-subtitle">
+                    Follow your request from pickup to delivery.
                 </p>
-
             </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- REQUEST SECTION -->
-    <div id="requestSection">
-
-
-        <!-- CURRENT STATUS -->
-        <div class="status-card">
-
-            <div class="status-body">
-
-                <div class="row align-items-center">
-
-                    <div class="col-md-8">
-
-                        <div class="info-label">
-                            Current Status
-                        </div>
-
-                        <div id="currentStatus"
-                             class="current-status">
-                            -
-                        </div>
-
-                        <div class="mt-2 text-muted">
-                            Request ID:
-                            <strong id="displayRequestId">
-                                -
-                            </strong>
-                        </div>
-
+            <div class="progress-track">
+                <div class="progress-line"></div>
+                <div id="progressLineActive" class="progress-line-active"></div>
+                <div class="progress-step" data-status="REQUESTED">
+                    <div class="step-circle">
+                        <i class="bi bi-file-earmark-plus"></i>
                     </div>
-
-                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
-
-                        <span id="statusBadge"
-                              class="badge bg-secondary status-badge">
-                            -
+                    <div class="step-label">
+                        Request
+                    </div>
+                </div>
+                <div class="progress-step" data-status="PICKED_UP">
+                    <div class="step-circle">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div class="step-label">
+                        Picked Up
+                    </div>
+                </div>
+                <div class="progress-step" data-status="TAILOR_ASSIGNED">
+                    <div class="step-circle">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <div class="step-label">
+                        Tailor
+                    </div>
+                </div>
+                <div class="progress-step" data-status="ALTERATION_IN_PROGRESS">
+                    <div class="step-circle">
+                        <i class="bi bi-scissors"></i>
+                    </div>
+                    <div class="step-label">
+                        Alteration
+                    </div>
+                </div>
+                <div class="progress-step" data-status="QUALITY_CHECK">
+                    <div class="step-circle">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <div class="step-label">
+                        Quality
+                    </div>
+                </div>
+                <div class="progress-step" data-status="OUT_FOR_DELIVERY">
+                    <div class="step-circle">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div class="step-label">
+                        Delivery
+                    </div>
+                </div>
+                <div class="progress-step" data-status="COMPLETED">
+                    <div class="step-circle">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <div class="step-label">
+                        Completed
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ================= DETAILS ================= -->
+        <div class="details-grid">
+            <section class="detail-card">
+                <div class="section-heading">
+                    <h2 class="section-title">
+                        Request Details
+                    </h2>
+                    <p class="section-subtitle">
+                        Information associated with your alteration.
+                    </p>
+                </div>
+                <div class="detail-list">
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            Garment
                         </span>
-
+                        <span id="garmentType" class="detail-value">
+                            --
+                        </span>
                     </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- REQUEST INFORMATION -->
-        <div class="status-card">
-
-            <div class="card-section-header">
-
-                <h5>
-                    <i class="bi bi-file-text me-2"></i>
-                    Request Information
-                </h5>
-
-            </div>
-
-            <div class="status-body">
-
-                <div class="row">
-
-                    <div class="col-md-4">
-
-                        <div class="info-label">
-                            Customer Name
-                        </div>
-
-                        <div id="customerName"
-                             class="info-value">
-                            -
-                        </div>
-
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            Service
+                        </span>
+                        <span id="serviceType" class="detail-value">
+                            --
+                        </span>
                     </div>
-
-                    <div class="col-md-4">
-
-                        <div class="info-label">
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            Alteration
+                        </span>
+                        <span id="alterationType" class="detail-value">
+                            Not specified
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">
                             Phone
-                        </div>
-
-                        <div id="phone"
-                             class="info-value">
-                            -
-                        </div>
-
+                        </span>
+                        <span id="phone" class="detail-value">
+                            --
+                        </span>
                     </div>
-
-                    <div class="col-md-4">
-
-                        <div class="info-label">
-                            Garment Type
-                        </div>
-
-                        <div id="garmentType"
-                             class="info-value">
-                            -
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <div class="info-label">
-                            Service Type
-                        </div>
-
-                        <div id="serviceType"
-                             class="info-value">
-                            -
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <div class="info-label">
-                            Alteration Type
-                        </div>
-
-                        <div id="alterationType"
-                             class="info-value">
-                            -
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <div class="info-label">
-                            Tailor
-                        </div>
-
-                        <div id="tailorName"
-                             class="info-value">
+                </div>
+            </section>
+            <section class="detail-card">
+                <div class="section-heading">
+                    <h2 class="section-title">
+                        Service Information
+                    </h2>
+                    <p class="section-subtitle">
+                        Pickup and tailor information.
+                    </p>
+                </div>
+                <div class="detail-list">
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            Assigned Tailor
+                        </span>
+                        <span id="tailorName" class="detail-value">
                             Not assigned
-                        </div>
-
+                        </span>
                     </div>
-
-                    <div class="col-md-12">
-
-                        <div class="info-label">
-                            Pickup Address
-                        </div>
-
-                        <div id="pickupAddress"
-                             class="info-value">
-                            -
-                        </div>
-
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            Pickup Date
+                        </span>
+                        <span id="pickupDate" class="detail-value">
+                            --
+                        </span>
                     </div>
-
-                    <div class="col-md-12">
-
-                        <div class="info-label">
-                            Description
-                        </div>
-
-                        <div id="description"
-                             class="info-value">
-                            -
-                        </div>
-
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            Pickup Time
+                        </span>
+                        <span id="pickupTime" class="detail-value">
+                            --
+                        </span>
                     </div>
-
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            Created
+                        </span>
+                        <span id="createdAt" class="detail-value">
+                            --
+                        </span>
+                    </div>
                 </div>
-
-            </div>
-
+            </section>
         </div>
-
-
-        <!-- STATUS TIMELINE -->
-        <div class="status-card">
-
-            <div class="card-section-header">
-
-                <h5>
-                    <i class="bi bi-clock-history me-2"></i>
-                    Status Timeline
-                </h5>
-
+        <!-- ================= HISTORY ================= -->
+        <section class="history-card">
+            <div class="section-heading">
+                <h2 class="section-title">
+                    Activity History
+                </h2>
+                <p class="section-subtitle">
+                    Complete status history of this request.
+                </p>
             </div>
-
-            <div class="status-body">
-
-                <div id="statusHistory"
-                     class="timeline">
-                </div>
-
+            <div id="historyList" class="history-list">
             </div>
-
-        </div>
-
+        </section>
     </div>
-
 </div>
-
-</div>
-
+{% endblock %}
+{% block scripts %}
 <script>
-const requestIdInput = document.getElementById("requestIdInput");
-const trackButton = document.getElementById("trackButton");
-const requestSection = document.getElementById("requestSection");
-const errorMessage = document.getElementById("errorMessage");
-const loadingMessage = document.getElementById("loadingMessage");
-
-trackButton.addEventListener("click", function () {
-    const requestId = requestIdInput.value.trim();
-
-    if (!requestId) {
-        showError("Please enter a Request ID.");
-        return;
-    }
-
-    loadRequest(requestId);
-});
-
-requestIdInput.addEventListener("keypress", function (event) {
-    if (event.key === "Enter") {
-        trackButton.click();
-    }
-});
-
-async function loadRequest(requestId) {
-    hideError();
-    requestSection.style.display = "none";
-    loadingMessage.style.display = "block";
-    trackButton.disabled = true;
-
-    try {
-        const response = await fetch(`/api/alteration-request/${requestId}`);
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || "Request not found.");
+    const TRACKING_STEPS = [
+        "REQUESTED",
+        "PICKED_UP",
+        "TAILOR_ASSIGNED",
+        "ALTERATION_IN_PROGRESS",
+        "QUALITY_CHECK",
+        "OUT_FOR_DELIVERY",
+        "COMPLETED"
+    ];
+    document
+        .getElementById("trackingForm")
+        .addEventListener(
+            "submit",
+            function (event) {
+                event.preventDefault();
+                const requestId =
+                    document
+                        .getElementById("requestIdInput")
+                        .value
+                        .trim();
+                if (!requestId) {
+                    showTrackError(
+                        "Please enter a valid Request ID."
+                    );
+                    return;
+                }
+                loadTracking(requestId);
+            }
+        );
+    /* =========================================================
+       LOAD REQUEST
+    ========================================================= */
+    async function loadTracking(requestId) {
+        const result =
+            document.getElementById(
+                "trackingResult"
+            );
+        const loading =
+            document.getElementById(
+                "trackingLoading"
+            );
+        try {
+            hideTrackError();
+            result.style.display = "none";
+            loading.style.display = "block";
+            /* ================= REQUEST ================= */
+            const requestResponse =
+                await fetch(
+                    `/api/alteration-request/${requestId}`
+                );
+            const requestResult =
+                await requestResponse.json();
+            if (
+                !requestResponse.ok ||
+                !requestResult.success
+            ) {
+                throw new Error(
+                    requestResult.message ||
+                    "Request not found."
+                );
+            }
+            const data =
+                requestResult.data;
+            /* ================= HISTORY ================= */
+            const historyResponse =
+                await fetch(
+                    `/api/alteration-request/${requestId}/history`
+                );
+            const historyResult =
+                await historyResponse.json();
+            const history =
+                historyResult.success
+                    ? historyResult.data || []
+                    : [];
+            /* ================= DISPLAY ================= */
+            setText(
+                "requestId",
+                data.request_id
+            );
+            setText(
+                "customerName",
+                data.customer_name ||
+                "Customer"
+            );
+            setText(
+                "phone",
+                data.phone
+            );
+            setText(
+                "garmentType",
+                data.garment_type
+            );
+            setText(
+                "serviceType",
+                data.service_type
+            );
+            setText(
+                "alterationType",
+                data.alteration_type ||
+                "Not specified"
+            );
+            setText(
+                "tailorName",
+                data.tailor_name ||
+                "Not assigned"
+            );
+            setText(
+                "pickupDate",
+                formatValue(
+                    data.preferred_pickup_date
+                )
+            );
+            setText(
+                "pickupTime",
+                formatValue(
+                    data.preferred_pickup_time
+                )
+            );
+            setText(
+                "createdAt",
+                formatDate(data.created_at)
+            );
+            /* ================= AVATAR ================= */
+            document
+                .getElementById("customerAvatar")
+                .textContent =
+                getInitials(
+                    data.customer_name
+                );
+            /* ================= STATUS ================= */
+            updateStatus(
+                data.status
+            );
+            /* ================= PROGRESS ================= */
+            updateProgress(
+                data.status
+            );
+            /* ================= HISTORY ================= */
+            renderHistory(
+                history
+            );
+            loading.style.display = "none";
+            result.style.display = "block";
+            window.scrollTo({
+                top: result.offsetTop - 90,
+                behavior: "smooth"
+            });
+        } catch (error) {
+            console.error(
+                "Tracking Error:",
+                error
+            );
+            loading.style.display = "none";
+            showTrackError(
+                error.message ||
+                "Unable to load request."
+            );
         }
-
-        const data = result.data;
-
-        displayRequest(data);
-        await loadStatusHistory(requestId);
-
-        requestSection.style.display = "block";
     }
-    catch (error) {
-        console.error("LOAD REQUEST ERROR:", error);
-        showError(error.message || "Unable to load request.");
+    /* =========================================================
+       UPDATE STATUS
+    ========================================================= */
+    function updateStatus(status) {
+        const pill =
+            document.getElementById(
+                "statusPill"
+            );
+        const normalized =
+            String(status || "REQUESTED")
+                .toUpperCase();
+        pill.textContent =
+            formatStatus(normalized);
+        const styles = {
+            COMPLETED: [
+                "#eaf7ef",
+                "#187344",
+                "#ccebd8"
+            ],
+            CANCELLED: [
+                "#fff0f0",
+                "#b33a3a",
+                "#f1cccc"
+            ],
+            PICKED_UP: [
+                "#eef4ff",
+                "#3564a8",
+                "#d4e1f7"
+            ],
+            TAILOR_ASSIGNED: [
+                "#f2edff",
+                "#6545a5",
+                "#ded3f5"
+            ],
+            ALTERATION_IN_PROGRESS: [
+                "#fff5df",
+                "#91621c",
+                "#f1dfb7"
+            ],
+            QUALITY_CHECK: [
+                "#eef8f7",
+                "#237b75",
+                "#cfe9e6"
+            ],
+            OUT_FOR_DELIVERY: [
+                "#edf5ff",
+                "#2865a5",
+                "#d3e3f7"
+            ]
+        };
+        const style =
+            styles[normalized] ||
+            [
+                "#fff5df",
+                "#91621c",
+                "#f1dfb7"
+            ];
+        pill.style.background =
+            style[0];
+        pill.style.color =
+            style[1];
+        pill.style.borderColor =
+            style[2];
     }
-    finally {
-        loadingMessage.style.display = "none";
-        trackButton.disabled = false;
-    }
-}
-
-function displayRequest(data) {
-    document.getElementById("displayRequestId").textContent = data.request_id || "-";
-    document.getElementById("customerName").textContent = data.customer_name || "-";
-    document.getElementById("phone").textContent = data.phone || "-";
-    document.getElementById("garmentType").textContent = data.garment_type || "-";
-    document.getElementById("serviceType").textContent = data.service_type || "-";
-    document.getElementById("alterationType").textContent = data.alteration_type || "-";
-    document.getElementById("tailorName").textContent = data.tailor_name || "Not assigned";
-    document.getElementById("pickupAddress").textContent = data.pickup_address || "-";
-    document.getElementById("description").textContent = data.description || "-";
-
-    const status = data.status || "REQUESTED";
-
-    document.getElementById("currentStatus").textContent = formatStatus(status);
-
-    const statusBadge = document.getElementById("statusBadge");
-
-    statusBadge.textContent = formatStatus(status);
-    statusBadge.className = `badge status-badge ${getStatusBadgeClass(status)}`;
-}
-
-async function loadStatusHistory(requestId) {
-    const historyContainer = document.getElementById("statusHistory");
-
-    historyContainer.innerHTML = "";
-
-    try {
-        const response = await fetch(`/api/alteration-request/${requestId}/history`);
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || "Unable to load status history.");
-        }
-
-        const history = result.data || [];
-
-        if (history.length === 0) {
-            historyContainer.innerHTML = `
-                <div class="empty-history">
-                    No status history available.
-                </div>
-            `;
+    /* =========================================================
+       PROGRESS
+    ========================================================= */
+    function updateProgress(status) {
+        const normalized =
+            String(status || "REQUESTED")
+                .toUpperCase();
+        const steps =
+            document.querySelectorAll(
+                ".progress-step"
+            );
+        steps.forEach(function (step) {
+            step.classList.remove(
+                "active",
+                "completed"
+            );
+        });
+        if (normalized === "CANCELLED") {
+            document
+                .getElementById(
+                    "progressLineActive"
+                )
+                .style.width = "0%";
             return;
         }
-
-        history.forEach(function (item) {
-            const oldStatus = item.old_status ? formatStatus(item.old_status) : "NEW REQUEST";
-            const newStatus = formatStatus(item.new_status);
-            const notes = item.notes || "No notes";
-            const date = formatDate(item.created_at);
-
-            const timelineItem = document.createElement("div");
-
-            timelineItem.className = "timeline-item";
-
-            timelineItem.innerHTML = `
-                <div class="timeline-icon">
-                    <i class="bi bi-check"></i>
-                </div>
-
-                <div class="timeline-content">
-
-                    <div class="timeline-status">
-                        ${escapeHtml(newStatus)}
-                    </div>
-
-                    <div class="mb-2 text-muted">
-                        ${escapeHtml(oldStatus)}
-                        <i class="bi bi-arrow-right mx-1"></i>
-                        ${escapeHtml(newStatus)}
-                    </div>
-
-                    <div class="mb-2">
-                        <strong>Notes:</strong>
-                        ${escapeHtml(notes)}
-                    </div>
-
-                    <div class="timeline-date">
-                        <i class="bi bi-clock me-1"></i>
-                        ${escapeHtml(date)}
-                    </div>
-
-                </div>
-            `;
-
-            historyContainer.appendChild(timelineItem);
-        });
+        let currentIndex =
+            TRACKING_STEPS.indexOf(
+                normalized
+            );
+        if (currentIndex < 0) {
+            currentIndex = 0;
+        }
+        steps.forEach(
+            function (step, index) {
+                if (index < currentIndex) {
+                    step.classList.add(
+                        "completed"
+                    );
+                } else if (
+                    index === currentIndex
+                ) {
+                    step.classList.add(
+                        "active"
+                    );
+                }
+            }
+        );
+        const percentage =
+            currentIndex /
+            (TRACKING_STEPS.length - 1) *
+            92;
+        document
+            .getElementById(
+                "progressLineActive"
+            )
+            .style.width =
+            `${percentage}%`;
     }
-    catch (error) {
-        console.error("LOAD HISTORY ERROR:", error);
-
-        historyContainer.innerHTML = `
-            <div class="alert alert-warning mb-0">
-                Unable to load status history.
+    /* =========================================================
+       HISTORY
+    ========================================================= */
+    function renderHistory(history) {
+        const container =
+            document.getElementById(
+                "historyList"
+            );
+        container.innerHTML = "";
+        if (!history || history.length === 0) {
+            container.innerHTML = `
+            <div class="history-item">
+                <div class="history-dot"></div>
+                <div>
+                    <div class="history-status">
+                        No history available
+                    </div>
+                    <div class="history-date">
+                        Status history has not been recorded yet.
+                    </div>
+                </div>
             </div>
         `;
+            return;
+        }
+        history
+            .slice()
+            .reverse()
+            .forEach(function (item) {
+                const status =
+                    item.status ||
+                    "UNKNOWN";
+                const date =
+                    item.created_at ||
+                    item.updated_at;
+                const note =
+                    item.admin_notes ||
+                    item.notes ||
+                    item.message ||
+                    "";
+                const historyItem =
+                    document.createElement(
+                        "div"
+                    );
+                historyItem.className =
+                    "history-item";
+                historyItem.innerHTML = `
+                <div class="history-dot"></div>
+                <div>
+                    <div class="history-status">
+                        ${escapeHtml(
+                    formatStatus(status)
+                )}
+                    </div>
+                    <div class="history-date">
+                        ${escapeHtml(
+                    formatDate(date)
+                )}
+                    </div>
+                    ${note
+                        ? `
+                            <div class="history-note">
+                                ${escapeHtml(note)}
+                            </div>
+                          `
+                        : ""
+                    }
+                </div>
+            `;
+                container.appendChild(
+                    historyItem
+                );
+            });
     }
-}
-
-function formatStatus(status) {
-    if (!status) {
-        return "-";
+    /* =========================================================
+       HELPERS
+    ========================================================= */
+    function setText(id, value) {
+        const element =
+            document.getElementById(id);
+        if (!element) {
+            return;
+        }
+        element.textContent =
+            value ?? "--";
     }
-
-    return status
-        .replaceAll("_", " ")
-        .toLowerCase()
-        .replace(/\b\w/g, function (char) {
-            return char.toUpperCase();
-        });
-}
-
-function getStatusBadgeClass(status) {
-    switch (status) {
-        case "REQUESTED":
-            return "bg-secondary";
-
-        case "PICKUP_SCHEDULED":
-            return "bg-info text-dark";
-
-        case "PICKED_UP":
-            return "bg-primary";
-
-        case "TAILOR_ASSIGNED":
-            return "bg-warning text-dark";
-
-        case "ALTERATION_IN_PROGRESS":
-            return "bg-warning text-dark";
-
-        case "QUALITY_CHECK":
-            return "bg-info text-dark";
-
-        case "OUT_FOR_DELIVERY":
-            return "bg-primary";
-
-        case "COMPLETED":
-            return "bg-success";
-
-        case "CANCELLED":
-            return "bg-danger";
-
-        default:
-            return "bg-secondary";
+    function formatStatus(status) {
+        return String(status || "")
+            .toLowerCase()
+            .split("_")
+            .map(
+                word =>
+                    word.charAt(0).toUpperCase() +
+                    word.slice(1)
+            )
+            .join(" ");
     }
-}
-
-function formatDate(dateString) {
-    if (!dateString) {
-        return "-";
+    function formatValue(value) {
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "--";
+        }
+        return value;
     }
-
-    const date = new Date(dateString);
-
-    if (isNaN(date.getTime())) {
-        return dateString;
+    function formatDate(value) {
+        if (!value) {
+            return "--";
+        }
+        try {
+            const date =
+                new Date(value);
+            if (isNaN(date.getTime())) {
+                return value;
+            }
+            return date.toLocaleString(
+                undefined,
+                {
+                    dateStyle: "medium",
+                    timeStyle: "short"
+                }
+            );
+        } catch (error) {
+            return value;
+        }
     }
-
-    return date.toLocaleString("en-IN", {
-        dateStyle: "medium",
-        timeStyle: "short"
-    });
-}
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) {
-        return "";
+    function getInitials(name) {
+        if (!name) {
+            return "AF";
+        }
+        const parts =
+            String(name)
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+        if (parts.length === 1) {
+            return parts[0]
+                .substring(0, 2)
+                .toUpperCase();
+        }
+        return (
+            parts[0][0] +
+            parts[parts.length - 1][0]
+        ).toUpperCase();
     }
-
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-function showError(message) {
-    errorMessage.textContent = message;
-    errorMessage.style.display = "block";
-}
-
-function hideError() {
-    errorMessage.textContent = "";
-    errorMessage.style.display = "none";
-}
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    function showTrackError(message) {
+        const error =
+            document.getElementById(
+                "trackError"
+            );
+        error.textContent =
+            message;
+        error.style.display =
+            "block";
+    }
+    function hideTrackError() {
+        const error =
+            document.getElementById(
+                "trackError"
+            );
+        error.style.display =
+            "none";
+    }
 </script>
-
 {% endblock %}

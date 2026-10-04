@@ -4,419 +4,791 @@ AI AlterFit | Quality Check
 {% endblock %}
 {% block content %}
 <style>
-      .quality-page {
-            padding: 35px 0 60px;
-            background: #f6f8fb;
-            min-height: calc(100vh - 70px);
-      }
-
-      .page-header {
-            background: linear-gradient(135deg,
-                        #212529,
-                        #343a40);
-            color: white;
-            border-radius: 18px;
-            padding: 28px 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      }
-
-      .page-header h2 {
-            font-weight: 700;
-            margin-bottom: 6px;
-      }
-
-      .page-header p {
-            margin-bottom: 0;
-            color: #d7dce1;
-      }
-
-      .request-card {
-            background: white;
-            border: 0;
-            border-radius: 18px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
-            overflow: hidden;
-      }
-
-      .request-card-header {
-            padding: 22px 25px;
-            border-bottom: 1px solid #edf0f3;
-      }
-
-      .request-card-body {
-            padding: 25px;
-      }
-
-      .section-title {
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 18px;
-      }
-
-      .info-box {
-            background: #f8f9fa;
-            border: 1px solid #edf0f2;
-            border-radius: 12px;
-            padding: 15px 17px;
-            height: 100%;
-      }
-
-      .info-label {
+    .quality-page {
+        min-height: 100vh;
+        background:
+            radial-gradient(circle at 8% 0%, rgba(91, 91, 214, 0.08), transparent 28%),
+            radial-gradient(circle at 92% 8%, rgba(139, 124, 246, 0.07), transparent 25%),
+            var(--alterfit-bg, #f5f6f8);
+        padding: 28px 0 60px;
+    }
+    /* ================================
+       HERO
+    ================================= */
+    .quality-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg,
+                #10131a 0%,
+                #171b24 55%,
+                #292d40 100%);
+        color: white;
+        border-radius: 24px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 45px rgba(16, 19, 26, 0.16);
+    }
+    .quality-hero::before {
+        content: "";
+        position: absolute;
+        width: 230px;
+        height: 230px;
+        border-radius: 50%;
+        background: rgba(139, 124, 246, 0.12);
+        top: -120px;
+        right: -55px;
+    }
+    .quality-hero::after {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        bottom: -100px;
+        left: 35%;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    .hero-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #b9b5ff;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .hero-kicker i {
+        font-size: 15px;
+    }
+    .quality-hero h1 {
+        font-size: clamp(28px, 4vw, 42px);
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 9px;
+    }
+    .quality-hero p {
+        color: #b9bec9;
+        max-width: 680px;
+        line-height: 1.7;
+        margin: 0;
+    }
+    /* ================================
+       QUICK NAV
+    ================================= */
+    .quick-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 23px;
+    }
+    .quick-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        color: #dfe2ea;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        transition: all 0.2s ease;
+    }
+    .quick-nav a:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.14);
+        transform: translateY(-2px);
+    }
+    .quick-nav a.active {
+        color: white;
+        background: rgba(139, 124, 246, 0.22);
+        border-color: rgba(139, 124, 246, 0.35);
+    }
+    /* ================================
+       STATUS
+    ================================= */
+    .hero-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 14px;
+        border-radius: 30px;
+        background: rgba(255, 193, 7, 0.13);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        color: #ffd76a;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+    .hero-status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ffc107;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.10);
+    }
+    /* ================================
+       MAIN CARD
+    ================================= */
+    .quality-card {
+        background: white;
+        border: 1px solid var(--alterfit-border, #e7e9ed);
+        border-radius: 21px;
+        overflow: hidden;
+        box-shadow:
+            var(--alterfit-shadow,
+                0 12px 35px rgba(16, 19, 26, 0.08));
+        animation: cardIn 0.45s ease both;
+    }
+    .quality-card-header {
+        padding: 21px 25px;
+        border-bottom: 1px solid #eceef2;
+        background: linear-gradient(to right, #ffffff, #fafbfc);
+    }
+    .request-label {
+        font-size: 10px;
+        color: #858a94;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+    .request-id {
+        color: #171a21;
+        font-size: 22px;
+        font-weight: 800;
+    }
+    .quality-card-body {
+        padding: 26px;
+    }
+    /* ================================
+       SECTION
+    ================================= */
+    .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .section-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: rgba(91, 91, 214, 0.1);
+        color: #5b5bd6;
+        font-size: 17px;
+    }
+    .section-title {
+        color: #171a21;
+        font-size: 17px;
+        font-weight: 800;
+        margin: 0;
+    }
+    .section-description {
+        color: #747985;
+        font-size: 13px;
+        margin-top: 2px;
+    }
+    /* ================================
+       INFORMATION BOXES
+    ================================= */
+    .info-box {
+        height: 100%;
+        padding: 16px;
+        border-radius: 14px;
+        background: #fafbfc;
+        border: 1px solid #eceef2;
+        transition: all 0.2s ease;
+    }
+    .info-box:hover {
+        background: #f8f8ff;
+        border-color: rgba(91, 91, 214, 0.20);
+        transform: translateY(-2px);
+    }
+    .info-label {
+        color: #858a94;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        margin-bottom: 6px;
+    }
+    .info-value {
+        color: #20232a;
+        font-size: 14px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+    /* ================================
+       REQUIREMENT
+    ================================= */
+    .requirement-box {
+        padding: 18px;
+        border-radius: 15px;
+        background:
+            linear-gradient(135deg,
+                rgba(91, 91, 214, 0.05),
+                rgba(139, 124, 246, 0.08));
+        border: 1px solid rgba(91, 91, 214, 0.12);
+        color: #454951;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+    /* ================================
+       INSPECTION PANEL
+    ================================= */
+    .inspection-panel {
+        margin-top: 6px;
+        padding: 22px;
+        border-radius: 17px;
+        background: #f8f9fb;
+        border: 1px solid #e7e9ed;
+    }
+    .inspection-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+        border: 1px solid #e8ebef;
+        border-radius: 13px;
+        transition: all 0.2s ease;
+    }
+    .inspection-item:last-child {
+        margin-bottom: 0;
+    }
+    .inspection-item:hover {
+        transform: translateX(3px);
+        border-color: rgba(91, 91, 214, 0.20);
+        box-shadow: 0 6px 18px rgba(16, 19, 26, 0.05);
+    }
+    .inspection-icon {
+        width: 35px;
+        height: 35px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(25, 135, 84, 0.10);
+        color: #198754;
+    }
+    .inspection-title {
+        color: #20232a;
+        font-size: 14px;
+        font-weight: 800;
+        margin-bottom: 3px;
+    }
+    .inspection-description {
+        color: #747985;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+    /* ================================
+       NOTES
+    ================================= */
+    .notes-wrapper {
+        margin-top: 22px;
+    }
+    .quality-textarea {
+        min-height: 145px;
+        resize: vertical;
+        border-radius: 13px;
+        border-color: #dfe3e8;
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+    .quality-textarea:focus {
+        border-color: #5b5bd6;
+        box-shadow: 0 0 0 0.2rem rgba(91, 91, 214, 0.10);
+    }
+    /* ================================
+       ACTION AREA
+    ================================= */
+    .action-area {
+        margin-top: 24px;
+        padding: 20px;
+        border-radius: 17px;
+        background:
+            linear-gradient(135deg,
+                rgba(91, 91, 214, 0.06),
+                rgba(139, 124, 246, 0.09));
+        border: 1px solid rgba(91, 91, 214, 0.12);
+    }
+    .action-icon {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: white;
+        color: #5b5bd6;
+        box-shadow: 0 5px 15px rgba(16, 19, 26, 0.07);
+        font-size: 19px;
+    }
+    .action-title {
+        color: #171a21;
+        font-size: 15px;
+        font-weight: 800;
+    }
+    .action-description {
+        color: #707783;
+        font-size: 12px;
+        line-height: 1.5;
+        margin-top: 3px;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+    }
+    .quality-btn {
+        border-radius: 11px;
+        padding: 11px 17px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+    .quality-btn:hover {
+        transform: translateY(-2px);
+    }
+    .approve-btn {
+        border: 0;
+        box-shadow: 0 7px 18px rgba(25, 135, 84, 0.14);
+    }
+    .approve-btn:hover {
+        box-shadow: 0 10px 22px rgba(25, 135, 84, 0.22);
+    }
+    /* ================================
+       ALERT
+    ================================= */
+    .alterfit-alert {
+        border: 0;
+        border-radius: 14px;
+        padding: 14px 18px;
+        box-shadow: 0 7px 20px rgba(16, 19, 26, 0.06);
+    }
+    /* ================================
+       ANIMATION
+    ================================= */
+    @keyframes cardIn {
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    /* ================================
+       MOBILE
+    ================================= */
+    @media (max-width: 768px) {
+        .quality-page {
+            padding: 20px 0 45px;
+        }
+        .quality-hero {
+            padding: 24px 20px;
+            border-radius: 20px;
+        }
+        .quality-card-header,
+        .quality-card-body {
+            padding: 18px;
+        }
+        .inspection-panel {
+            padding: 16px;
+        }
+        .action-area {
+            padding: 16px;
+        }
+        .action-buttons {
+            width: 100%;
+        }
+        .action-buttons .btn {
+            width: 100%;
+        }
+        .hero-status {
+            font-size: 10px;
+        }
+        .quick-nav {
+            gap: 7px;
+        }
+        .quick-nav a {
+            padding: 9px 11px;
             font-size: 12px;
-            font-weight: 600;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-bottom: 5px;
-      }
-
-      .info-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: #212529;
-            word-break: break-word;
-      }
-
-      .status-badge {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 700;
-            background: #fff3cd;
-            color: #664d03;
-      }
-
-      .check-panel {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            padding: 22px;
-      }
-
-      .check-item {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-      }
-
-      .check-item:last-child {
-            margin-bottom: 0;
-      }
-
-      .check-item strong {
-            color: #212529;
-      }
-
-      .quality-textarea {
-            min-height: 150px;
-            resize: vertical;
-            border-radius: 12px;
-      }
-
-      .action-area {
-            border-top: 1px solid #edf0f3;
-            margin-top: 25px;
-            padding-top: 22px;
-      }
-
-      .btn-main {
-            border-radius: 10px;
-            padding: 11px 22px;
-            font-weight: 600;
-      }
-
-      .alert {
-            border-radius: 12px;
-            border: 0;
-      }
-
-      .small-note {
-            font-size: 13px;
-            color: #6c757d;
-      }
+        }
+    }
 </style>
 <div class="quality-page">
-      <div class="container">
-            <!-- =========================================
-             PAGE HEADER
+    <div class="container">
+        <!-- =========================================
+             HERO
         ========================================== -->
-            <div class="page-header">
-                  <div class="d-flex
-                        justify-content-between
-                        align-items-center
-                        flex-wrap
-                        gap-3">
-                        <div>
-                              <div class="small
-                                text-uppercase
-                                mb-2">
-                                    AI AlterFit
-                              </div>
-                              <h2>
-                                    Quality Check
-                              </h2>
-                              <p>
-                                    Inspect the completed alteration before
-                                    sending the garment for delivery.
-                              </p>
-                        </div>
-                        <div>
-                              <span class="status-badge">
-                                    {{ request_data.status or "UNKNOWN" }}
-                              </span>
-                        </div>
-                  </div>
+        <section class="quality-hero">
+            <div class="hero-content">
+                <div class="hero-kicker">
+                    <i class="bi bi-shield-check"></i>
+                    AI ALTERFIT • QUALITY CONTROL
+                </div>
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                    <div>
+                        <h1>Quality Check</h1>
+                        <p>
+                            Inspect the completed alteration carefully before
+                            approving the garment for customer delivery.
+                        </p>
+                    </div>
+                    <div class="hero-status">
+                        <span class="hero-status-dot"></span>
+                        {{ request_data.status or "UNKNOWN" }}
+                    </div>
+                </div>
+                <!-- QUICK NAV -->
+                <div class="quick-nav">
+                    <a href="/dashboard">
+                        <i class="bi bi-grid"></i>
+                        Requests
+                    </a>
+                    <a href="/tailor_dashboard">
+                        <i class="bi bi-person-workspace"></i>
+                        Tailor Dashboard
+                    </a>
+                    <a href="/customer-tracking">
+                        <i class="bi bi-geo-alt"></i>
+                        Customer Tracking
+                    </a>
+                    <a href="/delivery-management">
+                        <i class="bi bi-truck"></i>
+                        Deliveries
+                    </a>
+                </div>
             </div>
-            <!-- =========================================
+        </section>
+        <!-- =========================================
              FLASH MESSAGES
         ========================================== -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} mb-4">
-                  {{ message }}
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-            <!-- =========================================
-             REQUEST INFORMATION
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alterfit-alert mb-4">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <!-- =========================================
+             MAIN REQUEST CARD
         ========================================== -->
-            <div class="request-card">
-                  <div class="request-card-header">
-                        <div class="d-flex
-                            justify-content-between
-                            align-items-center
-                            flex-wrap
-                            gap-2">
-                              <div>
-                                    <div class="small text-muted">
-                                          ALTERATION REQUEST
-                                    </div>
-                                    <h4 class="fw-bold mb-0">
-                                          Request #{{ request_data.request_id }}
-                                    </h4>
-                              </div>
-                              <a href="/request-detail?id={{ request_data.request_id }}"
-                                    class="btn btn-outline-dark btn-sm">
-                                    View Full Request
-                              </a>
+        <div class="quality-card">
+            <!-- HEADER -->
+            <div class="quality-card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <div class="request-label">
+                            Alteration Request
                         </div>
-                  </div>
-                  <div class="request-card-body">
-                        <!-- =================================
-                     CUSTOMER INFORMATION
+                        <div class="request-id">
+                            Request #{{ request_data.request_id }}
+                        </div>
+                    </div>
+                    <a href="/request-detail?id={{ request_data.request_id }}" class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-file-text me-1"></i>
+                        View Full Request
+                    </a>
+                </div>
+            </div>
+            <!-- BODY -->
+            <div class="quality-card-body">
+                <!-- =================================
+                     CUSTOMER & GARMENT
                 ================================== -->
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="bi bi-person-vcard"></i>
+                    </div>
+                    <div>
                         <h5 class="section-title">
-                              Customer & Garment Information
+                            Customer & Garment Information
                         </h5>
-                        <div class="row g-3 mb-4">
-                              <div class="col-md-4">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Customer
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.customer_name or "-" }}
-                                          </div>
-                                    </div>
-                              </div>
-                              <div class="col-md-4">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Phone
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.phone or "-" }}
-                                          </div>
-                                    </div>
-                              </div>
-                              <div class="col-md-4">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Category
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.category or "-" }}
-                                          </div>
-                                    </div>
-                              </div>
-                              <div class="col-md-4">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Garment
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.garment_type or "-" }}
-                                          </div>
-                                    </div>
-                              </div>
-                              <div class="col-md-4">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Service
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.service_type or "-" }}
-                                          </div>
-                                    </div>
-                              </div>
-                              <div class="col-md-4">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Alteration
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.alteration_type or "-" }}
-                                          </div>
-                                    </div>
-                              </div>
+                        <div class="section-description">
+                            Review the request details before inspection.
                         </div>
-                        <!-- =================================
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Customer
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.customer_name or "-" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Phone
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.phone or "-" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Category
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.category or "-" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Garment
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.garment_type or "-" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Service
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.service_type or "-" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Alteration
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.alteration_type or "-" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- =================================
                      TAILOR INFORMATION
                 ================================== -->
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <div>
                         <h5 class="section-title">
-                              Tailor Information
+                            Tailor Information
                         </h5>
-                        <div class="row g-3 mb-4">
-                              <div class="col-md-6">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Assigned Tailor
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.tailor_name or "Not Assigned" }}
-                                          </div>
-                                    </div>
-                              </div>
-                              <div class="col-md-6">
-                                    <div class="info-box">
-                                          <div class="info-label">
-                                                Current Status
-                                          </div>
-                                          <div class="info-value">
-                                                {{ request_data.status or "-" }}
-                                          </div>
-                                    </div>
-                              </div>
+                        <div class="section-description">
+                            Confirm who completed the alteration work.
                         </div>
-                        <!-- =================================
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Assigned Tailor
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.tailor_name or "Not Assigned" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="info-box">
+                            <div class="info-label">
+                                Current Status
+                            </div>
+                            <div class="info-value">
+                                {{ request_data.status or "-" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- =================================
                      CUSTOMER REQUIREMENT
                 ================================== -->
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="bi bi-chat-square-text"></i>
+                    </div>
+                    <div>
                         <h5 class="section-title">
-                              Customer Requirement
+                            Customer Requirement
                         </h5>
-                        <div class="info-box mb-4">
-                              <div class="info-value">
-                                    {{ request_data.description
-                                    or "No customer requirement provided." }}
-                              </div>
+                        <div class="section-description">
+                            Compare the completed work against the original request.
                         </div>
-                        <!-- =================================
-                     QUALITY CHECK
+                    </div>
+                </div>
+                <div class="requirement-box mb-4">
+                    {{ request_data.description
+                    or "No customer requirement provided." }}
+                </div>
+                <!-- =================================
+                     QUALITY CHECK FORM
                 ================================== -->
-                        <form method="POST" action="{{ url_for(
+                <form method="POST" action="{{ url_for(
                         'quality_check',
                         request_id=request_data.request_id
                     ) }}">
-                              <div class="check-panel">
-                                    <h5 class="section-title mb-3">
-                                          Garment Inspection
-                                    </h5>
-                                    <p class="small-note mb-3">
-                                          Verify the garment before approving it
-                                          for delivery.
-                                    </p>
-                                    <div class="check-item">
-                                          <strong>
-                                                Measurement & fitting
-                                          </strong>
-                                          <div class="small-note">
-                                                Confirm the requested alteration
-                                                has been completed correctly.
-                                          </div>
-                                    </div>
-                                    <div class="check-item">
-                                          <strong>
-                                                Stitching quality
-                                          </strong>
-                                          <div class="small-note">
-                                                Check stitching, seams and alteration
-                                                work for visible defects.
-                                          </div>
-                                    </div>
-                                    <div class="check-item">
-                                          <strong>
-                                                Finishing
-                                          </strong>
-                                          <div class="small-note">
-                                                Check threads, finishing and overall
-                                                garment appearance.
-                                          </div>
-                                    </div>
-                                    <div class="check-item">
-                                          <strong>
-                                                Final garment condition
-                                          </strong>
-                                          <div class="small-note">
-                                                Confirm that the garment is ready
-                                                to be returned to the customer.
-                                          </div>
-                                    </div>
-                                    <!-- =================================
+                    <div class="inspection-panel">
+                        <div class="section-heading mb-3">
+                            <div class="section-icon">
+                                <i class="bi bi-clipboard2-check"></i>
+                            </div>
+                            <div>
+                                <h5 class="section-title">
+                                    Garment Inspection
+                                </h5>
+                                <div class="section-description">
+                                    Verify each quality point before approval.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CHECK 1 -->
+                        <div class="inspection-item">
+                            <div class="inspection-icon">
+                                <i class="bi bi-rulers"></i>
+                            </div>
+                            <div>
+                                <div class="inspection-title">
+                                    Measurement & Fitting
+                                </div>
+                                <div class="inspection-description">
+                                    Confirm that the requested alteration has
+                                    been completed correctly and the garment
+                                    fits according to the requirement.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CHECK 2 -->
+                        <div class="inspection-item">
+                            <div class="inspection-icon">
+                                <i class="bi bi-scissors"></i>
+                            </div>
+                            <div>
+                                <div class="inspection-title">
+                                    Stitching Quality
+                                </div>
+                                <div class="inspection-description">
+                                    Check stitching, seams and alteration work
+                                    for visible defects or loose threads.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CHECK 3 -->
+                        <div class="inspection-item">
+                            <div class="inspection-icon">
+                                <i class="bi bi-stars"></i>
+                            </div>
+                            <div>
+                                <div class="inspection-title">
+                                    Finishing
+                                </div>
+                                <div class="inspection-description">
+                                    Check thread finishing, edges and overall
+                                    garment appearance.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CHECK 4 -->
+                        <div class="inspection-item">
+                            <div class="inspection-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div>
+                                <div class="inspection-title">
+                                    Final Garment Condition
+                                </div>
+                                <div class="inspection-description">
+                                    Confirm that the garment is clean,
+                                    complete and ready to be returned to
+                                    the customer.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- =================================
                              QUALITY NOTES
                         ================================== -->
-                                    <div class="mt-4">
-                                          <label for="quality_notes" class="form-label fw-semibold">
-                                                Quality Check Notes
-                                          </label>
-                                          <textarea id="quality_notes" name="quality_notes"
-                                                class="form-control quality-textarea"
-                                                placeholder="Example: Sleeve adjusted by 2 cm. Stitching checked, fitting verified and finishing completed successfully."
-                                                required>{{ request_data.admin_notes or "" }}</textarea>
-                                          <div class="form-text">
-                                                Record the final inspection result
-                                                for future reference.
-                                          </div>
-                                    </div>
-                                    <!-- =================================
-                             ACTIONS
+                        <div class="notes-wrapper">
+                            <label for="quality_notes" class="form-label fw-bold">
+                                <i class="bi bi-journal-text me-1"></i>
+                                Quality Check Notes
+                            </label>
+                            <textarea id="quality_notes" name="quality_notes" class="form-control quality-textarea"
+                                placeholder="Example: Sleeve adjusted by 2 cm. Stitching checked, fitting verified and finishing completed successfully."
+                                required>{{ request_data.admin_notes or "" }}</textarea>
+                            <div class="form-text">
+                                Record the final inspection result for future reference.
+                            </div>
+                        </div>
+                        <!-- =================================
+                             ACTION AREA
                         ================================== -->
-                                    <div class="action-area">
-                                          <div class="d-flex
-                                        justify-content-between
-                                        align-items-center
-                                        flex-wrap
-                                        gap-3">
-                                                <div>
-                                                      <div class="fw-semibold">
-                                                            Ready for delivery?
-                                                      </div>
-                                                      <div class="small-note">
-                                                            Approval will change the request
-                                                            status to OUT_FOR_DELIVERY.
-                                                      </div>
-                                                </div>
-                                                <div class="d-flex gap-2">
-                                                      <a href="/tailor_dashboard"
-                                                            class="btn btn-outline-secondary btn-main text-light">
-                                                            Back to Dashboard
-                                                      </a>
-                                                      <a href="{{ url_for('delivery_management') }}"
-                                                            class="btn btn-primary">
-                                                            Delivery Management
-                                                      </a>
-                                                </div>
-                                          </div>
+                        <div class="action-area">
+                            <div class="row align-items-center g-3">
+                                <div class="col-lg-7">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="action-icon">
+                                            <i class="bi bi-shield-check"></i>
+                                        </div>
+                                        <div>
+                                            <div class="action-title">
+                                                Ready for delivery?
+                                            </div>
+                                            <div class="action-description">
+                                                Approving this quality check will
+                                                move the request to
+                                                <strong>OUT_FOR_DELIVERY</strong>.
+                                            </div>
+                                        </div>
                                     </div>
-                              </div>
-                        </form>
-                  </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="action-buttons justify-content-lg-end">
+                                        <a href="/tailor_dashboard" class="btn btn-outline-secondary quality-btn">
+                                            <i class="bi bi-arrow-left me-1"></i>
+                                            Dashboard
+                                        </a>
+                                        <button type="submit" class="btn btn-success quality-btn approve-btn">
+                                            <i class="bi bi-check2-circle me-1"></i>
+                                            Approve & Send to Delivery
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-      </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

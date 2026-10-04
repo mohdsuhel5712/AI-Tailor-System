@@ -1,597 +1,825 @@
 {% extends 'base.html' %}
-
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cards.css') }}">
+<style>
+    :root {
+        --alterfit-primary: #6c63ff;
+        --alterfit-secondary: #00c6ff;
+        --alterfit-dark: #0b1020;
+        --alterfit-card: #11182b;
+        --alterfit-muted: #9da7bd;
+        --alterfit-border: rgba(255, 255, 255, 0.08);
+    }
 
+    body {
+        background: #f5f7fb;
+    }
+
+    /* HERO */
+    .welcome-hero {
+        position: relative;
+        overflow: hidden;
+        min-height: 500px;
+        background:
+            radial-gradient(circle at 15% 20%, rgba(108, 99, 255, .30), transparent 30%),
+            radial-gradient(circle at 85% 70%, rgba(0, 198, 255, .20), transparent 30%),
+            linear-gradient(135deg, #080d1c, #111a32 55%, #0b1020);
+        border-radius: 0 0 35px 35px;
+        color: white;
+    }
+
+    .welcome-hero::before {
+        content: "";
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, .06);
+        right: -130px;
+        top: -150px;
+    }
+
+    .welcome-hero::after {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, .05);
+        left: -120px;
+        bottom: -150px;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 50px;
+        background: rgba(255, 255, 255, .08);
+        border: 1px solid rgba(255, 255, 255, .12);
+        font-size: .85rem;
+        color: #dce4ff;
+    }
+
+    .hero-title {
+        font-size: clamp(2.3rem, 5vw, 4.5rem);
+        line-height: 1.05;
+        font-weight: 800;
+        letter-spacing: -2px;
+    }
+
+    .hero-title span {
+        background: linear-gradient(90deg, #8f87ff, #00d4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-description {
+        max-width: 650px;
+        color: #b7c0d4;
+        font-size: 1.08rem;
+        line-height: 1.8;
+    }
+
+    .hero-image-wrapper {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-image-wrapper img {
+        width: 100%;
+        max-height: 430px;
+        object-fit: contain;
+        filter: drop-shadow(0 25px 45px rgba(0, 0, 0, .4));
+    }
+
+    /* SECTION */
+    .section-heading {
+        margin-bottom: 45px;
+    }
+
+    .section-heading .eyebrow {
+        color: var(--alterfit-primary);
+        font-size: .8rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+        font-weight: 800;
+        color: #151a2d;
+    }
+
+    .section-heading p {
+        color: #6d7487;
+        max-width: 650px;
+        margin: auto;
+    }
+
+    /* SERVICE CARDS */
+    .service-main-card {
+        border: 1px solid var(--alterfit-border);
+        border-radius: 24px;
+        overflow: hidden;
+        background: var(--alterfit-card);
+        color: white;
+        transition: all .3s ease;
+        height: 100%;
+    }
+
+    .service-main-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(15, 20, 40, .18);
+    }
+
+    .service-main-card .service-image {
+        height: 210px;
+        overflow: hidden;
+    }
+
+    .service-main-card .service-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .4s ease;
+    }
+
+    .service-main-card:hover .service-image img {
+        transform: scale(1.05);
+    }
+
+    .service-main-card .card-body {
+        padding: 28px;
+    }
+
+    .service-icon {
+        width: 52px;
+        height: 52px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: rgba(108, 99, 255, .15);
+        font-size: 1.5rem;
+        margin-bottom: 18px;
+    }
+
+    .service-main-card p {
+        color: var(--alterfit-muted);
+        line-height: 1.7;
+    }
+
+    /* CATEGORY */
+    .category-card {
+        height: 100%;
+        border: 0;
+        border-radius: 22px;
+        overflow: hidden;
+        background: white;
+        transition: all .3s ease;
+    }
+
+    .category-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 20px 45px rgba(20, 30, 60, .12) !important;
+    }
+
+    .category-image {
+        height: 220px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(145deg, #f1f3ff, #f8faff);
+    }
+
+    .category-image img {
+        max-width: 230px;
+        max-height: 205px;
+        object-fit: contain;
+    }
+
+    .category-card .card-body {
+        padding: 25px;
+    }
+
+    .category-card p {
+        color: #70788b;
+        line-height: 1.6;
+    }
+
+    /* OUTFIT */
+    .outfit-card {
+        border: 0;
+        border-radius: 20px;
+        background: white;
+        padding: 30px 25px;
+        height: 100%;
+        transition: all .3s ease;
+    }
+
+    .outfit-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px rgba(20, 30, 60, .10);
+    }
+
+    .outfit-icon {
+        font-size: 2.6rem;
+        margin-bottom: 15px;
+    }
+
+    .outfit-card p {
+        color: #72798a;
+    }
+
+    /* FEATURES */
+    .feature-card {
+        border: 0;
+        border-radius: 20px;
+        background: white;
+        padding: 28px 20px;
+        height: 100%;
+        transition: all .3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(20, 30, 60, .10);
+    }
+
+    .feature-number {
+        font-size: 2.1rem;
+        margin-bottom: 15px;
+    }
+
+    .feature-card p {
+        color: #72798a;
+        margin-bottom: 0;
+    }
+
+    /* WORKFLOW */
+    .workflow-wrapper {
+        position: relative;
+    }
+
+    .step-card {
+        position: relative;
+        border: 0;
+        border-radius: 20px;
+        background: white;
+        padding: 30px 20px;
+        height: 100%;
+        box-shadow: 0 8px 25px rgba(20, 30, 60, .06);
+    }
+
+    .step-number {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--alterfit-primary), var(--alterfit-secondary));
+        color: white;
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+    .step-card p {
+        color: #737b8d;
+    }
+
+    /* CTA */
+    .final-cta {
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        padding: 60px 30px;
+        background:
+            radial-gradient(circle at 85% 20%, rgba(0, 198, 255, .20), transparent 30%),
+            linear-gradient(135deg, #0a1020, #151e39);
+        color: white;
+    }
+
+    .final-cta p {
+        color: #adb6cb;
+        max-width: 650px;
+        margin: 15px auto 25px;
+    }
+
+    /* BUTTONS */
+    .btn-alterfit {
+        border: 0;
+        color: white;
+        background: linear-gradient(135deg, var(--alterfit-primary), var(--alterfit-secondary));
+        box-shadow: 0 8px 25px rgba(108, 99, 255, .25);
+        transition: all .25s ease;
+    }
+
+    .btn-alterfit:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(108, 99, 255, .35);
+    }
+
+    .btn-outline-light-custom {
+        border: 1px solid rgba(255, 255, 255, .25);
+        color: white;
+        background: rgba(255, 255, 255, .05);
+    }
+
+    .btn-outline-light-custom:hover {
+        background: white;
+        color: #11182b;
+    }
+
+    @media (max-width: 767px) {
+        .welcome-hero {
+            border-radius: 0 0 25px 25px;
+        }
+
+        .hero-title {
+            letter-spacing: -1px;
+        }
+
+        .hero-image-wrapper {
+            margin-top: 25px;
+        }
+
+        .service-main-card .service-image {
+            height: 180px;
+        }
+    }
+</style>
 {% endblock %}
-
 {% block content %}
-
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="hero-section">
-                <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
-
-                    <div class="carousel-inner">
-
-                        <div class="carousel-item active">
-                            <img src="{{ url_for('static', filename='images/slide.png') }}" class="carousel-img"
-                                alt="Kids">
-                        </div>
-
-                        <div class="carousel-item">
-                            <img src="{{ url_for('static', filename='images/slide2.png') }}" class="carousel-img"
-                                alt="Male">
-                        </div>
-
-                        <div class="carousel-item">
-                            <img src="{{ url_for('static', filename='images/slide3.png') }}" class="carousel-img"
-                                alt="Female">
-                        </div>
-
-                        <div class="carousel-item">
-                            <img src="{{ url_for('static', filename='images/hero.png') }}" class="carousel-img"
-                                alt="Female">
-                        </div>
-
-                        <div class="carousel-item">
-                            <img src="{{ url_for('static', filename='images/tech.png') }}" class="carousel-img"
-                                alt="Female">
-                        </div>
-
-                    </div>
-
+<!-- =========================================================
+     HERO
+========================================================= -->
+<section class="welcome-hero">
+    <div class="container py-5">
+        <div class="row align-items-center g-5 py-lg-5">
+            <div class="col-lg-7 hero-content">
+                <div class="hero-badge mb-4">
+                    <i class="bi bi-stars"></i>
+                    AI Powered Garment & Virtual Fitting Platform
                 </div>
-
+                <h1 class="hero-title mb-4">
+                    Welcome to <span>AI AlterFit</span>
+                </h1>
+                <p class="hero-description mb-4">
+                    A smart clothing platform that combines AI body measurement,
+                    3D body prediction, virtual fitting and professional garment
+                    alteration services in one place.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/measurement" class="btn btn-alterfit btn-lg px-4 py-3 rounded-3">
+                        <i class="bi bi-person-bounding-box me-2"></i>
+                        Start Virtual Fitting
+                    </a>
+                    <a href="/alteration_request" class="btn btn-outline-light-custom btn-lg px-4 py-3 rounded-3">
+                        <i class="bi bi-scissors me-2"></i>
+                        Request Alteration
+                    </a>
+                </div>
+                <div class="d-flex flex-wrap gap-4 mt-4 small text-light opacity-75">
+                    <span>
+                        <i class="bi bi-check-circle me-1"></i>
+                        AI Body Prediction
+                    </span>
+                    <span>
+                        <i class="bi bi-check-circle me-1"></i>
+                        3D Virtual Fitting
+                    </span>
+                    <span>
+                        <i class="bi bi-check-circle me-1"></i>
+                        Tailor Services
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-5 hero-image-wrapper text-center">
+                <img src="{{ url_for('static', filename='images/hero.png') }}" alt="AI AlterFit Virtual Fitting">
             </div>
         </div>
     </div>
-</div>
-
-<!-- carousel slider  -->
-<div class="container">
-
-    <!-- HERO SECTION -->
-
-    <!-- <div class="row align-items-center hero-section">
-
-        <div class="col-lg-6" card shadow-lg rounded-4 p-4>
-
-            <h1 class="display-3 fw-bold">
-
-                AI Virtual Try-On
-
-            </h1>
-
-            <p class="lead">
-
-                Predict and visualize how shirts and
-                pants look using body measurements
-                and AI prediction.
-
+</section>
+<!-- =========================================================
+     MAIN SERVICES
+========================================================= -->
+<section class="py-5 my-4">
+    <div class="container">
+        <div class="section-heading text-center">
+            <div class="eyebrow mb-2">
+                AI AlterFit Platform
+            </div>
+            <h2 class="display-6">
+                What Can You Do?
+            </h2>
+            <p>
+                Choose between intelligent virtual fitting and real-world
+                garment alteration services.
             </p>
-
-            <a href="/measurement"
-               class="btn btn-primary btn-lg">
-
-                Start Measuring
-
-            </a>
-
         </div>
-
-        <div class="col-lg-6 text-center card shadow-lg rounded-4 p-4">
-
-            <img
-            src="{{ url_for('static',
-            filename='images/hero.png') }}"
-            class="img-fluid hero-image">
-
-        </div>
-
-    </div> -->
-
-    <hr class="my-5">
-
-    <!-- BASIC FEATURES -->
-
-
-
-    <div class="container my-5">
-
-        <h1 class="text-center fw-bold my-5">
-            👤 Select Your Category
-        </h1>
-
         <div class="row g-4">
-
-            <!-- KIDS -->
-            <div class="col-lg-4 col-md-6" style="height: 200px;">
-                <div class="card category-card shadow-lg border-1 h-60">
-
-                    <img src="{{ url_for('static', filename='images/kids.png') }}" class="card-img-top p-4" alt="Kids"
-                        style="width: 250px;">
-
-                    <div class="card-body text-center">
-
-                        <h3 class="fw-bold text-primary">
-                            👦 KIDS
-                        </h3>
-
-                        <p class="text-muted">
-                            Generate a personalized 3D kid avatar from body
-                            measurements and visualize clothing.
-                        </p>
-
-                        <hr>
-
-                        <div class="text-start small">
-
-                            <!-- <p>📏 Take Body Measurements</p>
-                        <p>🤖 AI Body Prediction</p>
-                        <p>🧍 Generate 3D Mesh</p>
-                        <p>👕 Apply Clothes</p> -->
-
-                        </div>
-                        <!-- # api ka path dena hai na ki app.py  -->
-                        <!-- app.py me blueprint banake xall kkardena hai  -->
-                        <a href="/measurement?gender=kids" class="btn btn-primary w-100 mt-3">
-                            Get Started
-                        </a>
-
+            <!-- VIRTUAL FITTING -->
+            <div class="col-lg-6">
+                <div class="service-main-card">
+                    <div class="service-image">
+                        <img src="{{ url_for('static', filename='images/tech.png') }}" alt="AI Virtual Fitting">
                     </div>
-
+                    <div class="card-body">
+                        <div class="service-icon">
+                            🧍
+                        </div>
+                        <h3 class="fw-bold">
+                            AI Virtual Fitting
+                        </h3>
+                        <p>
+                            Enter your body measurements, generate an AI-based
+                            3D body model and visualize garments on your virtual
+                            body before choosing your clothing.
+                        </p>
+                        <a href="/measurement" class="btn btn-alterfit px-4">
+                            Start Fitting
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-
+            <!-- ALTERATION -->
+            <div class="col-lg-6">
+                <div class="service-main-card">
+                    <div class="service-image">
+                        <img src="{{ url_for('static', filename='images/slide.png') }}" alt="Garment Alteration">
+                    </div>
+                    <div class="card-body">
+                        <div class="service-icon">
+                            ✂️
+                        </div>
+                        <h3 class="fw-bold">
+                            Garment Alteration
+                        </h3>
+                        <p>
+                            Submit your alteration or stitching request,
+                            schedule pickup, track tailor work, complete
+                            quality checking and receive your garment back.
+                        </p>
+                        <a href="/alteration_request" class="btn btn-alterfit px-4">
+                            Request Alteration
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- =========================================================
+     CATEGORY
+========================================================= -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="section-heading text-center">
+            <div class="eyebrow mb-2">
+                Personalised Experience
+            </div>
+            <h2 class="display-6">
+                Select Your Category
+            </h2>
+            <p>
+                Choose the category that matches the person for whom you
+                want to create a virtual body and clothing experience.
+            </p>
+        </div>
+        <div class="row g-4">
+            <!-- KIDS -->
+            <div class="col-lg-4 col-md-6">
+                <div class="category-card shadow-sm">
+                    <div class="category-image">
+                        <img src="{{ url_for('static', filename='images/kids.png') }}" alt="Kids">
+                    </div>
+                    <div class="card-body text-center">
+                        <span class="badge bg-primary-subtle text-primary mb-2">
+                            Kids
+                        </span>
+                        <h3 class="fw-bold">
+                            👦 Kids
+                        </h3>
+                        <p>
+                            Generate a personalised 3D body model and
+                            visualize suitable garments for kids.
+                        </p>
+                        <a href="/measurement?gender=kids" class="btn btn-alterfit w-100">
+                            Get Started
+                        </a>
+                    </div>
+                </div>
+            </div>
             <!-- MALE -->
             <div class="col-lg-4 col-md-6">
-                <div class="card category-card shadow-lg border-0 h-90">
-
-                    <img src="{{ url_for('static', filename='images/male.png') }}" class="card-img-top p-4" alt="Male"
-                        style="width: 250px;">
-
+                <div class="category-card shadow-sm">
+                    <div class="category-image">
+                        <img src="{{ url_for('static', filename='images/male.png') }}" alt="Male">
+                    </div>
                     <div class="card-body text-center">
-
-                        <h3 class="fw-bold text-success">
-                            👨 MALE
+                        <span class="badge bg-success-subtle text-success mb-2">
+                            Male
+                        </span>
+                        <h3 class="fw-bold">
+                            👨 Male
                         </h3>
-
-                        <p class="text-muted">
-                            Create an accurate male 3D body model from
-                            measurements and preview garments.
+                        <p>
+                            Create an AI-generated male 3D body and
+                            preview garments using virtual fitting.
                         </p>
-
-                        <hr>
-
-                        <div class="text-start small">
-
-                            <!-- <p>📏 Take Body Measurements</p>
-                        <p>🤖 AI Body Prediction</p>
-                        <p>🧍 Generate 3D Mesh</p>
-                        <p>👔 Try Clothes</p> -->
-
-                        </div>
-
-                        <a href="/measurement?gender=male" class="btn btn-primary w-100 mt-3">
+                        <a href="/measurement?gender=male" class="btn btn-alterfit w-100">
                             Get Started
                         </a>
-
                     </div>
-
                 </div>
             </div>
-
             <!-- FEMALE -->
             <div class="col-lg-4 col-md-6">
-                <div class="card category-card shadow-lg border-0 h-90">
-
-                    <img src="{{ url_for('static', filename='images/female.png') }}" class="card-img-top p-4"
-                        alt="Female" style="width: 250px;">
-
+                <div class="category-card shadow-sm">
+                    <div class="category-image">
+                        <img src="{{ url_for('static', filename='images/female.png') }}" alt="Female">
+                    </div>
                     <div class="card-body text-center">
-
-                        <h3 class="fw-bold text-danger">
-                            👩 FEMALE
+                        <span class="badge bg-danger-subtle text-danger mb-2">
+                            Female
+                        </span>
+                        <h3 class="fw-bold">
+                            👩 Female
                         </h3>
-
-                        <p class="text-muted">
-                            Generate a realistic female avatar and visualize
-                            dresses, suits and other garments.
+                        <p>
+                            Generate a realistic female virtual body and
+                            visualize dresses, suits and other garments.
                         </p>
-
-                        <hr>
-
-                        <div class="text-start small">
-
-                            <!-- <p>📏 Take Body Measurements</p>
-                        <p>🤖 AI Body Prediction</p>
-                        <p>🧍 Generate 3D Mesh</p>
-                        <p>👗 Apply Clothes</p> -->
-
-                        </div>
-
-                        <a href="/measurement?gender=female" class="btn btn-primary w-100 mt-3">
+                        <a href="/measurement?gender=female" class="btn btn-alterfit w-100">
                             Get Started
                         </a>
-
                     </div>
-
                 </div>
             </div>
-
         </div>
-
     </div>
-    <hr class="my-5">
-
-    <!-- CUSTOMIZATION -->
-
-    <section class="features-section mt-5">
-
-        <div class="text-center mt-5 card shadow-lg rounded-4 p-4">
-
-            <h2 class="fw-bold">
-
-                What Would You Like To Stitch?
-
+</section>
+<!-- =========================================================
+     OUTFIT OPTIONS
+========================================================= -->
+<section class="py-5 my-4">
+    <div class="container">
+        <div class="section-heading text-center">
+            <div class="eyebrow mb-2">
+                Virtual Fitting
+            </div>
+            <h2 class="display-6">
+                Choose Your Outfit
             </h2>
-
             <p>
-
-                Choose your customization option
-
+                Select the type of clothing you want to visualize.
             </p>
-
         </div>
-
-        <div class="row g-4 mt-5">
-
-            <!-- SHIRT -->
-
-            <div class="col-md-4 ">
-
-                <div class="feature-card card shadow-lg rounded-4 p-4">
-
-                    <div class="emoji">
-
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="outfit-card text-center shadow-sm">
+                    <div class="outfit-icon">
                         👔
-
                     </div>
-
-                    <h3>
-
-                        Shirt Only
-
-                    </h3>
-
+                    <h4 class="fw-bold">
+                        Shirt
+                    </h4>
                     <p>
-
-                        Provide shirt measurements
-                        and get AI size.
-
+                        Preview shirt fitting on your AI-generated
+                        virtual body.
                     </p>
-
-                    <a href="/measurement" class="btn btn-primary">
-
+                    <a href="/measurement" class="btn btn-outline-primary">
                         Select
-
                     </a>
-
                 </div>
-
             </div>
-
-            <!-- PANT -->
-
-            <div class="col-md-4 ">
-
-                <div class="feature-card card shadow-lg rounded-4 p-4">
-
-                    <div class="emoji">
-
+            <div class="col-md-4">
+                <div class="outfit-card text-center shadow-sm">
+                    <div class="outfit-icon">
                         👖
-
                     </div>
-
-                    <h3>
-
-                        Pant Only
-
-                    </h3>
-
+                    <h4 class="fw-bold">
+                        Pant
+                    </h4>
                     <p>
-
-                        Enter pant measurements
-                        and preview your fitting.
-
+                        Enter your measurements and visualize
+                        pant fitting virtually.
                     </p>
-
-                    <a href="/measurement" class="btn btn-primary">
-
+                    <a href="/measurement" class="btn btn-outline-primary">
                         Select
-
                     </a>
-
                 </div>
-
             </div>
-
-            <!-- BOTH -->
-
-            <div class="col-md-4 ">
-
-                <div class="feature-card card shadow-lg rounded-4 p-4">
-
-                    <div class="emoji">
-
+            <div class="col-md-4">
+                <div class="outfit-card text-center shadow-sm">
+                    <div class="outfit-icon">
                         🧥
-
                     </div>
-
-                    <h3>
-
+                    <h4 class="fw-bold">
                         Complete Outfit
-
-                    </h3>
-
+                    </h4>
                     <p>
-
-                        Shirt + Pant with AI
-                        recommendation.
-
+                        Combine upper and lower garments for a
+                        complete virtual outfit.
                     </p>
-
-                    <a href="/measurement" class="btn btn-primary">
-
+                    <a href="/measurement" class="btn btn-outline-primary">
                         Select
-
                     </a>
-
                 </div>
-
             </div>
-
         </div>
-
-    </section>
-    <hr class="my-5">
-
-    <!-- AI FEATURES -->
-
-    <section class="services-section">
-
-        <div class="text-center  my-5 card shadow-lg rounded-4 p-4">
-
-            <h2 class="fw-bold">
-
-                AI Tailor System Features
-
+    </div>
+</section>
+<!-- =========================================================
+     PLATFORM FEATURES
+========================================================= -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="section-heading text-center">
+            <div class="eyebrow mb-2">
+                Platform Features
+            </div>
+            <h2 class="display-6">
+                AI AlterFit Features
             </h2>
-
+            <p>
+                From body measurement to garment delivery, the platform
+                connects the complete tailoring experience.
+            </p>
         </div>
-
         <div class="row g-4">
-
-            <div class="col-md-3 ">
-
-                <div class="service-card card shadow-lg rounded-4 p-3">
-
-                    <h1>
-
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center shadow-sm">
+                    <div class="feature-number">
                         📏
-
-                    </h1>
-
-                    <h5>
-
-                        Measurements
-
+                    </div>
+                    <h5 class="fw-bold">
+                        AI Measurements
                     </h5>
-
                     <p>
-
-                        Store body dimensions
-
+                        Capture and process body measurements
+                        for personalised fitting.
                     </p>
-
                 </div>
-
             </div>
-
-            <div class="col-md-3 ">
-
-                <div class="service-card card shadow-lg rounded-4 p-3">
-
-                    <h1>
-
-                        🤖
-
-                    </h1>
-
-                    <h5>
-
-                        AI Prediction
-
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center shadow-sm">
+                    <div class="feature-number">
+                        🧠
+                    </div>
+                    <h5 class="fw-bold">
+                        AI Body Prediction
                     </h5>
-
                     <p>
-
-                        Predict body shape
-
+                        Predict body characteristics and generate
+                        a personalised 3D body model.
                     </p>
-
                 </div>
-
             </div>
-
-            <div class="col-md-3 ">
-
-                <div class="service-card card shadow-lg rounded-4 p-3">
-
-                    <h1>
-
-                        👕
-
-                    </h1>
-
-                    <h5>
-
-                        Size Recommendation
-
-                    </h5>
-
-                    <p>
-
-                        Recommend perfect fit
-
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="col-md-3 ">
-
-                <div class="service-card card shadow-lg rounded-4 p-3">
-
-                    <h1>
-
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center shadow-sm">
+                    <div class="feature-number">
                         🧍
-
-                    </h1>
-
-                    <h5>
-
-                        Virtual Try-On
-
+                    </div>
+                    <h5 class="fw-bold">
+                        3D Virtual Body
                     </h5>
-
                     <p>
-
-                        Preview garments
-
+                        Visualize your generated body inside
+                        the virtual fitting environment.
                     </p>
-
                 </div>
-
             </div>
-
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center shadow-sm">
+                    <div class="feature-number">
+                        ✂️
+                    </div>
+                    <h5 class="fw-bold">
+                        Smart Alteration
+                    </h5>
+                    <p>
+                        Request alteration, track tailoring,
+                        quality checking and delivery.
+                    </p>
+                </div>
+            </div>
         </div>
-
-    </section>
-
-    <hr class="my-5">
-    <!-- HOW IT WORKS -->
-
-    <section class="workflow-section">
-
-        <div class="text-center my-5 card shadow-lg" p-4>
-
-            <h2 class="fw-bold">
-
-                How It Works
-
+    </div>
+</section>
+<!-- =========================================================
+     HOW IT WORKS
+========================================================= -->
+<section class="py-5 my-4">
+    <div class="container">
+        <div class="section-heading text-center">
+            <div class="eyebrow mb-2">
+                Simple Process
+            </div>
+            <h2 class="display-6">
+                How AI AlterFit Works
             </h2>
-
+            <p>
+                A connected workflow from measurements and virtual fitting
+                to professional garment services.
+            </p>
         </div>
-
         <div class="row g-4">
-
-            <div class="col-md-3 ">
-
-                <div class="step-card card shadow-lg p-2">
-
-                    <h1>
-
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card text-center">
+                    <div class="step-number">
                         1
-
-                    </h1>
-
-                    <h5>
-
+                    </div>
+                    <h5 class="fw-bold">
                         Enter Measurements
-
                     </h5>
-
+                    <p>
+                        Provide your body measurements for the
+                        AI fitting system.
+                    </p>
                 </div>
-
             </div>
-
-            <div class="col-md-3">
-
-                <div class="step-card card shadow-lg p-2">
-
-                    <h1>
-
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card text-center">
+                    <div class="step-number">
                         2
-
-                    </h1>
-
-                    <h5>
-
-                        AI Prediction
-
+                    </div>
+                    <h5 class="fw-bold">
+                        AI Body Prediction
                     </h5>
-
+                    <p>
+                        Generate a personalised 3D body representation.
+                    </p>
                 </div>
-
             </div>
-
-            <div class="col-md-3">
-
-                <div class="step-card card shadow-lg p-2">
-
-                    <h1>
-
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card text-center">
+                    <div class="step-number">
                         3
-
-                    </h1>
-
-                    <h5>
-
-                        Generate Size
-
+                    </div>
+                    <h5 class="fw-bold">
+                        Virtual Fitting
                     </h5>
-
+                    <p>
+                        Apply garments and inspect the virtual fitting.
+                    </p>
                 </div>
-
             </div>
-
-            <div class="col-md-3">
-
-                <div class="step-card card shadow-lg p-2">
-
-                    <h1>
-
+            <div class="col-lg-3 col-md-6">
+                <div class="step-card text-center">
+                    <div class="step-number">
                         4
-
-                    </h1>
-
-                    <h5>
-
-                        Virtual Try-On
-
+                    </div>
+                    <h5 class="fw-bold">
+                        Alteration & Delivery
                     </h5>
-
+                    <p>
+                        Submit alteration requests and track the
+                        complete tailoring workflow.
+                    </p>
                 </div>
-
             </div>
-
         </div>
-
-    </section>
-
-</div>
-
-<script>
-    var myCarousel = document.getElementById('myCarousel')
-
-    myCarousel.addEventListener('slide.bs.carousel', function () {
-        // do something...
-    })
-</script>
+    </div>
+</section>
+<!-- =========================================================
+     FINAL CTA
+========================================================= -->
+<section class="container py-5 mb-5">
+    <div class="final-cta text-center">
+        <div class="mb-3 fs-1">
+            ✨
+        </div>
+        <h2 class="fw-bold">
+            Experience Smart Tailoring with AI
+        </h2>
+        <p>
+            Build your virtual body, explore garments and manage
+            your alteration requests through one connected platform.
+        </p>
+        <div class="d-flex justify-content-center flex-wrap gap-3">
+            <a href="/measurement" class="btn btn-alterfit btn-lg px-4">
+                <i class="bi bi-person-bounding-box me-2"></i>
+                Start Virtual Fitting
+            </a>
+            <a href="/alteration_request" class="btn btn-outline-light-custom btn-lg px-4">
+                <i class="bi bi-scissors me-2"></i>
+                Request Alteration
+            </a>
+        </div>
+    </div>
+</section>
 {% endblock %}

@@ -1,637 +1,1448 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}AI AlterFit | Tailor Dashboard{% endblock %}
 {% block head %}
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI AlterFit | Tailor Dashboard</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap"
+    rel="stylesheet">
 <style>
-      body {
-            background: #f5f7fb;
-      }
-
-      .dashboard-header {
-            background: white;
-            border-radius: 14px;
-            padding: 24px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.532);
-            margin-bottom: 10px;
-      }
-
-      .request-card {
-            border: 1px solid #0000 !important;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.493);
-            transition: 0.2s;
-      }
-
-      .request-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.09);
-      }
-
-      .request-header {
-            background: white;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-      }
-
-      .request-body {
-            padding: 20px;
-      }
-
-      .info-label {
-            font-size: 12px;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-      }
-
-      .info-value {
-            font-weight: 500;
-            margin-top: 3px;
-      }
-
-      .work-panel {
-            background: #f8f9fa;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
+    :root {
+        --tailor-bg: #f3f4f6;
+        --tailor-surface: #ffffff;
+        --tailor-border: #e5e7eb;
+        --tailor-text: #181a20;
+        --tailor-muted: #737780;
+        --tailor-light: #a7aab1;
+        --tailor-primary: #5b5bd6;
+        --tailor-primary-dark: #4747bb;
+        --tailor-success: #198754;
+        --tailor-warning: #b7791f;
+        --tailor-danger: #dc3545;
+        --tailor-radius: 18px;
+        --tailor-shadow: 0 10px 35px rgba(20, 22, 30, 0.07);
+        --tailor-shadow-hover: 0 18px 42px rgba(20, 22, 30, 0.12);
+    }
+    /* =====================================================
+       PAGE
+    ===================================================== */
+    .tailor-page {
+        max-width: 1180px;
+        margin: 35px auto 75px;
+        padding: 0 20px;
+        animation: tailorFade 0.55s ease both;
+    }
+    @keyframes tailorFade {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    /* =====================================================
+       HERO
+    ===================================================== */
+    .tailor-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 38px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 90% 10%,
+                rgba(139, 124, 246, 0.22),
+                transparent 32%),
+            linear-gradient(135deg,
+                #171922,
+                #25283a);
+        color: #fff;
+        box-shadow:
+            0 18px 50px rgba(20, 22, 30, 0.16);
+    }
+    .tailor-hero::after {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        right: -120px;
+        bottom: -150px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+    .tailor-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        color: #aaa8ff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+    }
+    .tailor-eyebrow::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #8b7cf6;
+        box-shadow:
+            0 0 0 5px rgba(139, 124, 246, 0.12);
+    }
+    .tailor-hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 720px;
+    }
+    .tailor-title {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 43px);
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+    }
+    .tailor-subtitle {
+        margin: 12px 0 0;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 14px;
+        line-height: 1.7;
+    }
+    /* =====================================================
+       TAILOR SELECTOR
+    ===================================================== */
+    .tailor-control {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 480px;
+    }
+    .tailor-select {
+        flex: 1;
+        height: 48px;
+        padding: 0 15px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 11px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        outline: none;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+    }
+    .tailor-select option {
+        background: #1d1f29;
+        color: #fff;
+    }
+    .tailor-select:focus {
+        border-color: rgba(139, 124, 246, 0.8);
+        box-shadow:
+            0 0 0 4px rgba(139, 124, 246, 0.12);
+    }
+    .refresh-btn {
+        width: 48px;
+        height: 48px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 11px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+    .refresh-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: rotate(20deg);
+    }
+    /* =====================================================
+       QUICK NAV
+    ===================================================== */
+    .tailor-quick-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0;
+    }
+    .tailor-nav-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 15px;
+        border: 1px solid var(--tailor-border);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--tailor-text);
+        text-decoration: none;
+        font-size: 12.5px;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+    .tailor-nav-chip:hover {
+        color: var(--tailor-primary);
+        border-color: #cfd0ee;
+        transform: translateY(-2px);
+        box-shadow:
+            0 7px 20px rgba(20, 22, 30, 0.06);
+    }
+    .tailor-nav-chip.active {
+        background: var(--tailor-text);
+        border-color: var(--tailor-text);
+        color: #fff;
+    }
+    /* =====================================================
+       ERROR
+    ===================================================== */
+    .tailor-error {
+        display: none;
+        padding: 13px 17px;
+        margin-bottom: 16px;
+        border: 1px solid #f0cccc;
+        border-radius: 11px;
+        background: #fff5f5;
+        color: #9c3333;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    /* =====================================================
+       STATS
+    ===================================================== */
+    .tailor-stats {
+        display: grid;
+        grid-template-columns:
+            repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+    .stat-card {
+        position: relative;
+        overflow: hidden;
+        padding: 21px;
+        border: 1px solid var(--tailor-border);
+        border-radius: var(--tailor-radius);
+        background: #fff;
+        box-shadow: var(--tailor-shadow);
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tailor-shadow-hover);
+    }
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        border-radius: 11px;
+        background: #f0f0ff;
+        color: var(--tailor-primary);
+        font-size: 16px;
+    }
+    .stat-label {
+        color: var(--tailor-muted);
+        font-size: 11.5px;
+        font-weight: 600;
+    }
+    .stat-value {
+        margin-top: 4px;
+        color: var(--tailor-text);
+        font-size: 27px;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+    }
+    /* =====================================================
+       MAIN PANEL
+    ===================================================== */
+    .requests-panel {
+        padding: 25px;
+        border: 1px solid var(--tailor-border);
+        border-radius: var(--tailor-radius);
+        background: #fff;
+        box-shadow: var(--tailor-shadow);
+    }
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+    .panel-title {
+        margin: 0;
+        color: var(--tailor-text);
+        font-size: 17px;
+        font-weight: 700;
+    }
+    .panel-subtitle {
+        margin: 5px 0 0;
+        color: var(--tailor-muted);
+        font-size: 12px;
+    }
+    .request-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 28px;
+        padding: 0 9px;
+        border-radius: 999px;
+        background: #f0f0ff;
+        color: var(--tailor-primary);
+        font-size: 12px;
+        font-weight: 700;
+    }
+    /* =====================================================
+       LOADING
+    ===================================================== */
+    .tailor-loading {
+        padding: 65px 20px;
+        text-align: center;
+        color: var(--tailor-muted);
+        font-size: 13px;
+    }
+    .tailor-spinner {
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 12px;
+        border: 2.5px solid #e7e8ec;
+        border-top-color: var(--tailor-primary);
+        border-radius: 50%;
+        animation: tailorSpin 0.8s linear infinite;
+    }
+    @keyframes tailorSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    /* =====================================================
+       EMPTY
+    ===================================================== */
+    .tailor-empty {
+        display: none;
+        padding: 65px 20px;
+        text-align: center;
+        color: var(--tailor-muted);
+    }
+    .empty-icon {
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: #f2f2f5;
+        font-size: 23px;
+    }
+    .empty-title {
+        color: var(--tailor-text);
+        font-size: 15px;
+        font-weight: 700;
+    }
+    .empty-text {
+        margin-top: 5px;
+        font-size: 12px;
+    }
+    /* =====================================================
+       REQUEST CARDS
+    ===================================================== */
+    .requests-grid {
+        display: grid;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+        gap: 15px;
+    }
+    .request-card {
+        position: relative;
+        padding: 21px;
+        border: 1px solid var(--tailor-border);
+        border-radius: 16px;
+        background: #fff;
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease,
+            border-color 0.3s ease;
+    }
+    .request-card:hover {
+        transform: translateY(-4px);
+        border-color: #d4d4ea;
+        box-shadow:
+            0 16px 35px rgba(20, 22, 30, 0.09);
+    }
+    .request-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+    .request-number {
+        color: var(--tailor-primary);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+    }
+    .customer-name {
+        margin-top: 4px;
+        color: var(--tailor-text);
+        font-size: 16px;
+        font-weight: 700;
+    }
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        background: #fff5df;
+        color: #91621c;
+    }
+    .status-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+    .request-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 15px 0;
+        border-top: 1px solid #eff0f2;
+        border-bottom: 1px solid #eff0f2;
+    }
+    .info-label {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--tailor-muted);
+        font-size: 10.5px;
+    }
+    .info-value {
+        display: block;
+        color: var(--tailor-text);
+        font-size: 12.5px;
+        font-weight: 600;
+        word-break: break-word;
+    }
+    .request-description {
+        margin-top: 14px;
+        padding: 11px 12px;
+        border-radius: 10px;
+        background: #f8f8fa;
+        color: #62656d;
+        font-size: 11.5px;
+        line-height: 1.55;
+    }
+    /* =====================================================
+       CARD ACTIONS
+    ===================================================== */
+    .request-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 17px;
+    }
+    .request-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 37px;
+        padding: 0 12px;
+        border-radius: 9px;
+        border: 1px solid var(--tailor-border);
+        background: #fff;
+        color: var(--tailor-text);
+        text-decoration: none;
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.22s ease;
+    }
+    .request-btn:hover {
+        transform: translateY(-2px);
+        border-color: #c9c9d8;
+        box-shadow:
+            0 6px 16px rgba(20, 22, 30, 0.07);
+    }
+    .request-btn.primary {
+        border-color: var(--tailor-primary);
+        background: var(--tailor-primary);
+        color: #fff;
+    }
+    .request-btn.primary:hover {
+        background: var(--tailor-primary-dark);
+        border-color: var(--tailor-primary-dark);
+        color: #fff;
+    }
+    .request-btn.success {
+        border-color: #cce8d8;
+        background: #effaf3;
+        color: #197342;
+    }
+    .request-btn.danger {
+        border-color: #f0cccc;
+        background: #fff5f5;
+        color: #a43838;
+    }
+    /* =====================================================
+       MODAL
+    ===================================================== */
+    .status-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 17, 24, 0.58);
+        backdrop-filter: blur(6px);
+    }
+    .status-modal {
+        width: 100%;
+        max-width: 500px;
+        padding: 25px;
+        border-radius: 20px;
+        background: #fff;
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.25);
+        animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn {
+        from {
+            opacity: 0;
+            transform: scale(0.96) translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .modal-title {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--tailor-text);
+    }
+    .modal-close {
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        background: #f3f3f5;
+        color: var(--tailor-muted);
+        cursor: pointer;
+    }
+    .modal-label {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--tailor-text);
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .modal-select,
+    .modal-textarea {
+        width: 100%;
+        border: 1px solid var(--tailor-border);
+        border-radius: 10px;
+        padding: 11px 12px;
+        background: #fafafb;
+        color: var(--tailor-text);
+        font-size: 13px;
+        outline: none;
+    }
+    .modal-select:focus,
+    .modal-textarea:focus {
+        background: #fff;
+        border-color: var(--tailor-primary);
+        box-shadow:
+            0 0 0 4px rgba(91, 91, 214, 0.09);
+    }
+    .modal-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 9px;
+        margin-top: 18px;
+    }
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 900px) {
+        .tailor-stats {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+        .requests-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 600px) {
+        .tailor-page {
+            margin-top: 20px;
+            padding: 0 14px;
+        }
+        .tailor-hero {
+            padding: 29px 21px;
+            border-radius: 18px;
+        }
+        .tailor-control {
+            max-width: 100%;
+        }
+        .tailor-stats {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-card {
+            padding: 16px;
+        }
+        .stat-value {
+            font-size: 23px;
+        }
+        .requests-panel {
             padding: 18px;
-      }
-
-      .status-badge {
-            font-size: 12px;
-            padding: 7px 11px;
-            border-radius: 20px;
-      }
-
-      .empty-state {
-            background: white;
-            border-radius: 14px;
-            padding: 60px 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-      }
-
-      .loading-state {
-            background: white;
-            border-radius: 14px;
-            padding: 50px;
-            text-align: center;
-      }
+        }
+        .panel-header {
+            align-items: flex-start;
+        }
+        .request-card {
+            padding: 17px;
+        }
+        .request-info {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 400px) {
+        .tailor-stats {
+            grid-template-columns: 1fr;
+        }
+        .tailor-control {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .refresh-btn {
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}
 {% block content %}
-<div class="container py-4">
-      <!-- =====================================================
-         DASHBOARD HEADER
-    ====================================================== -->
-      <div class="dashboard-header mb-4">
-            <div class="d-flex
-                    justify-content-between
-                    align-items-center
-                    flex-wrap
-                    gap-3">
-                  <div>
-                        <h2 class="fw-bold mb-1">
-                              Tailor Dashboard
-                        </h2>
-                        <p class="text-muted mb-0">
-                              Manage assigned alteration and repair work
-                        </p>
-                  </div>
-                  <div>
-                        <a href="/dashboard" class="btn btn-outline-dark text-light">
-                              Admin Dashboard
-                        </a>
-                  </div>
+<div class="tailor-page">
+    <!-- =================================================
+         HERO
+    ================================================== -->
+    <section class="tailor-hero">
+        <div class="tailor-hero-content">
+            <div class="tailor-eyebrow">
+                AI ALTERFIT · WORKSPACE
             </div>
-      </div>
-      <!-- =====================================================
-         TAILOR SELECTION
-    ====================================================== -->
-      <div class="card border-0 shadow-md mb-4">
-            <div class="card-body p-4">
-                  <div class="row align-items-end">
-                        <div class="col-md-8">
-                              <label for="tailorSelect" class="form-label fw-semibold">
-                                    Select Tailor
-                              </label>
-                              <select id="tailorSelect" class="form-select">
-                                    <option value="">
-                                          Select Tailor
-                                    </option>
-                                    <option value="Rahul">
-                                          Rahul
-                                    </option>
-                                    <option value="Taj Bhai">
-                                          Taj Bhai
-                                    </option>
-                                    <option value="Imran">
-                                          Imran
-                                    </option>
-                                    <option value="Arif">
-                                          Arif
-                                    </option>
-                                    <option value="Sameer">
-                                          Sameer
-                                    </option>
-                              </select>
-                        </div>
-                        <div class="col-md-4 mt-3 mt-md-0">
-                              <div class="text-muted small">
-                                    Select a tailor to view their
-                                    assigned requests.
-                              </div>
-                        </div>
-                  </div>
+            <h1 class="tailor-title">
+                Tailor Dashboard
+            </h1>
+            <p class="tailor-subtitle">
+                Manage assigned alteration requests, update work
+                progress, review customer requirements and move
+                garments through the AlterFit workflow.
+            </p>
+            <div class="tailor-control">
+                <select id="tailorSelector" class="tailor-select">
+                    <option value="">
+                        Select Tailor
+                    </option>
+                    <option value="Rahul">
+                        Rahul
+                    </option>
+                    <option value="Taj Bhai">
+                        Taj Bhai
+                    </option>
+                    <option value="Imran">
+                        Imran
+                    </option>
+                    <option value="Arif">
+                        Arif
+                    </option>
+                    <option value="Sameer">
+                        Sameer
+                    </option>
+                </select>
+                <button id="refreshButton" class="refresh-btn" type="button" title="Refresh Requests">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
             </div>
-      </div>
-      <!-- =====================================================
-         REQUEST CONTAINER
-    ====================================================== -->
-      <div id="requestsContainer">
-            <div class="empty-state">
-                  <h5 class="fw-bold">
-                        No Tailor Selected
-                  </h5>
-                  <p class="text-muted mb-0">
-                        Select a tailor above to view assigned work.
-                  </p>
+        </div>
+    </section>
+    <!-- =================================================
+         QUICK NAVIGATION
+    ================================================== -->
+    <div class="tailor-quick-nav">
+        <a href="/dashboard" class="tailor-nav-chip">
+            <i class="bi bi-grid"></i>
+            Dashboard
+        </a>
+        <a href="/tailor_dashboard" class="tailor-nav-chip active">
+            <i class="bi bi-scissors"></i>
+            Tailors
+        </a>
+        <a href="/customer-tracking" class="tailor-nav-chip">
+            <i class="bi bi-search"></i>
+            Customer Tracking
+        </a>
+        <a href="/delivery-management" class="tailor-nav-chip">
+            <i class="bi bi-truck"></i>
+            Deliveries
+        </a>
+    </div>
+    <!-- =================================================
+         ERROR
+    ================================================== -->
+    <div id="tailorError" class="tailor-error">
+    </div>
+    <!-- =================================================
+         STATISTICS
+    ================================================== -->
+    <div class="tailor-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-briefcase"></i>
             </div>
-      </div>
-</div>
-<script>
-      // =========================================================
-      // LOAD TAILOR REQUESTS
-      // =========================================================
-      async function loadTailorRequests(tailorName) {
-            const container =
-                  document.getElementById(
-                        "requestsContainer"
-                  );
-            if (!tailorName) {
-                  container.innerHTML = `
-                <div class="empty-state">
-                    <h5 class="fw-bold">
-                        No Tailor Selected
-                    </h5>
-                    <p class="text-muted mb-0">
-                        Select a tailor above to view assigned work.
-                    </p>
-                </div>
-            `;
-                  return;
-            }
-            container.innerHTML = `
-            <div class="loading-state">
-                <div
-                    class="spinner-border mb-3"
-                    role="status">
-                </div>
-                <p class="text-muted mb-0">
-                    Loading assigned requests...
+            <div class="stat-label">
+                Assigned Requests
+            </div>
+            <div id="totalRequests" class="stat-value">
+                0
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-scissors"></i>
+            </div>
+            <div class="stat-label">
+                In Progress
+            </div>
+            <div id="inProgressRequests" class="stat-value">
+                0
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-check2-circle"></i>
+            </div>
+            <div class="stat-label">
+                Quality Check
+            </div>
+            <div id="qualityRequests" class="stat-value">
+                0
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <div class="stat-label">
+                Completed
+            </div>
+            <div id="completedRequests" class="stat-value">
+                0
+            </div>
+        </div>
+    </div>
+    <!-- =================================================
+         REQUEST PANEL
+    ================================================== -->
+    <section class="requests-panel">
+        <div class="panel-header">
+            <div>
+                <h2 class="panel-title">
+                    Assigned Requests
+                </h2>
+                <p class="panel-subtitle">
+                    Requests currently assigned to the selected tailor.
                 </p>
             </div>
-        `;
-            try {
-                  const response = await fetch(
-                        `/api/tailor_requests/${encodeURIComponent(tailorName)}`
-                  );
-                  const result =
-                        await response.json();
-                  if (!response.ok ||
-                        !result.success) {
-                        throw new Error(
-                              result.message ||
-                              "Failed to load tailor requests"
-                        );
-                  }
-                  displayRequests(result.data);
-            } catch (error) {
-                  console.error(
-                        "LOAD TAILOR REQUESTS ERROR:",
-                        error
-                  );
-                  container.innerHTML = `
-                <div class="alert alert-danger">
-                    <strong>
-                        Unable to load requests.
-                    </strong>
-                    <br>
-                    Please check the server and try again.
-                </div>
-            `;
-            }
-      }
-      // =========================================================
-      // DISPLAY REQUESTS
-      // =========================================================
-      function displayRequests(requests) {
-            const container =
-                  document.getElementById(
-                        "requestsContainer"
-                  );
-            if (!requests ||
-                  requests.length === 0) {
-                  container.innerHTML = `
-                <div class="empty-state">
-                    <h5 class="fw-bold">
-                        No Assigned Requests
-                    </h5>
-                    <p class="text-muted mb-0">
-                        This tailor currently has
-                        no assigned alteration requests.
-                    </p>
-                </div>
-            `;
-                  return;
-            }
-            let html = "";
-            requests.forEach(request => {
-                  const requestId = request.request_id;
-                  const currentStatus = request.status || "";
-                  let statusClass = "bg-primary";
-                  if (currentStatus === "COMPLETED") {
-                        statusClass = "bg-success";
-                  } else if (
-                        currentStatus === "QUALITY_CHECK"
-                  ) {
-                        statusClass = "bg-warning text-dark";
-                  } else if (
-                        currentStatus === "ALTERATION_IN_PROGRESS"
-                  ) {
-                        statusClass = "bg-info text-dark";
-                  } else if (
-                        currentStatus === "OUT_FOR_DELIVERY"
-                  ) {
-                        statusClass = "bg-dark";
-                  } else if (
-                        currentStatus === "CANCELLED"
-                  ) {
-                        statusClass = "bg-danger";
-                  }
-                  html += `
-                <!-- =========================================
-                     REQUEST CARD
-                ========================================== -->
-                <div class="request-card card mb-5 shadow-lg p-3">
-                    <!-- REQUEST HEADER -->
-                    <div class="request-header">
-                        <div class="d-flex
-                                    justify-content-between
-                                    align-items-start
-                                    flex-wrap
-                                    gap-3">
-                            <div>
-                                <div class="small
-                                            text-muted
-                                            mb-1">
-                                    ALTERATION REQUEST
-                                </div>
-                                <h4 class="fw-bold mb-1">
-                                    Request #${requestId}
-                                </h4>
-                                <div class="text-muted">
-                                    Customer:
-                                    <strong>
-                                        ${request.customer_name || "-"}
-                                    </strong>
-                                </div>
-                            </div>
-                            <span
-                                class="badge status-badge ${statusClass}">
-                                ${currentStatus || "-"}
-                            </span>
-                        </div>
-                    </div>
-                    <!-- REQUEST BODY -->
-                    <div class="request-body">
-                        <!-- =================================
-                             BASIC INFORMATION
-                        ================================== -->
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-3">
-                                <div class="info-label">
-                                    Garment
-                                </div>
-                                <div class="info-value">
-                                    ${request.garment_type || "-"}
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="info-label">
-                                    Service
-                                </div>
-                                <div class="info-value">
-                                    ${request.service_type || "-"}
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="info-label">
-                                    Alteration
-                                </div>
-                                <div class="info-value">
-                                    ${request.alteration_type || "-"}
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="info-label">
-                                    Phone
-                                </div>
-                                <div class="info-value">
-                                    ${request.phone || "-"}
-                                </div>
-                            </div>
-                        </div>
-                        <!-- =================================
-                             PICKUP INFORMATION
-                        ================================== -->
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <div class="info-label">
-                                    Pickup Date
-                                </div>
-                                <div class="info-value">
-                                    ${request.preferred_pickup_date
-                        || "-"
-                        }
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="info-label">
-                                    Pickup Time
-                                </div>
-                                <div class="info-value">
-                                    ${request.preferred_pickup_time
-                        || "-"
-                        }
-                                </div>
-                            </div>
-                        </div>
-                        <!-- =================================
-                             CUSTOMER DESCRIPTION
-                        ================================== -->
-                        <div class="mb-4">
-                            <div class="info-label mb-2">
-                                Customer Requirement
-                            </div>
-                            <div class="border
-                                        rounded
-                                        p-3
-                                        bg-light">
-                                ${request.description
-                        || "No description provided."
-                        }
-                            </div>
-                        </div>
-                        <!-- =================================
-                             TAILOR WORK PANEL
-                        ================================== -->
-                        <div class="work-panel">
-                            <h5 class="fw-bold mb-3">
-                                Tailor Work Update
-                            </h5>
-                            <!-- WORK NOTES -->
-                            <div class="mb-3">
-                                <label
-                                    for="notes-${requestId}"
-                                    class="form-label fw-semibold">
-                                    Work Notes
-                                </label>
-                                <textarea
-                                    id="notes-${requestId}"
-                                    class="form-control"
-                                    rows="3"
-                                    placeholder="Describe the alteration or repair work completed...">${request.admin_notes || ""}</textarea>
-                                <div class="form-text">
-                                    Example:
-                                    Sleeve adjusted by 2 cm
-                                    and fitting checked.
-                                </div>
-                            </div>
-                            <!-- STATUS -->
-                            <div class="row g-3">
-                                <div class="col-md-7">
-                                    <label
-                                        for="status-${requestId}"
-                                        class="form-label fw-semibold">
-                                        Work Status
-                                    </label>
-                                    <select
-                                        id="status-${requestId}"
-                                        class="form-select">
-                                        <option
-                                            value="PICKED_UP"
-                                            ${currentStatus ===
-                              "PICKED_UP"
-                              ? "selected"
-                              : ""
-                        }>
-                                            Picked Up
-                                        </option>
-                                        <option
-                                            value="TAILOR_ASSIGNED"
-                                            ${currentStatus ===
-                              "TAILOR_ASSIGNED"
-                              ? "selected"
-                              : ""
-                        }>
-                                            Tailor Assigned
-                                        </option>
-                                        <option
-                                            value="ALTERATION_IN_PROGRESS"
-                                            ${currentStatus ===
-                              "ALTERATION_IN_PROGRESS"
-                              ? "selected"
-                              : ""
-                        }>
-                                            Alteration In Progress
-                                        </option>
-                                        <option
-                                            value="QUALITY_CHECK"
-                                            ${currentStatus ===
-                              "QUALITY_CHECK"
-                              ? "selected"
-                              : ""
-                        }>
-                                            Quality Check
-                                        </option>
-                                        <option
-                                            value="OUT_FOR_DELIVERY"
-                                            ${currentStatus ===
-                              "OUT_FOR_DELIVERY"
-                              ? "selected"
-                              : ""
-                        }>
-                                            Out For Delivery
-                                        </option>
-                                        <option
-                                            value="COMPLETED"
-                                            ${currentStatus ===
-                              "COMPLETED"
-                              ? "selected"
-                              : ""
-                        }>
-                                            Completed
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-5
-                                            d-flex
-                                            align-items-end">
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary w-100"
-                                        onclick="updateTailorStatus(${requestId})">
-                                        Update Work
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- =================================
-                             ACTIONS
-                        ================================== -->
-                        <div class="mt-4 d-flex gap-2 flex-wrap">
-                            <a href="/request-detail?id=${requestId}"  class="btn btn-dark">  View Full Request</a>
-
-                            <!-- quality check -->
-                              <a href="/quality_check/${requestId}" class="btn btn-success">  Quality Check</a>
-
-                              <!-- button = print.save the pdf -->
-                              <button type="button" class="btn btn-outline-dark btn-sm print-btn text-light"
-                     data-request-id="${requestId}">  🖨 Print / Save PDF
-</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            });
-            container.innerHTML = html;
-      }
-      document.addEventListener("click", function (event) {
-            const button = event.target.closest(".print-btn");
-            if (!button) {
-                  return;
-            }
-            const requestId = button.dataset.requestId;
-            console.log("Printing Request:", requestId);
-            window.open(
-                  `/print-request?id=${requestId}`,
-                  "_blank"
-            );
-      });
-      // =========================================================
-      // UPDATE TAILOR STATUS + NOTES
-      // =========================================================
-      async function updateTailorStatus(requestId) {
-            const statusElement = document.getElementById(`status-${requestId}`);
-            const notesElement = document.getElementById(`notes-${requestId}`);
-            if (!statusElement) {
-                  alert(
-                        "Status field not found."
-                  );
-                  return;
-            }
-            const status = statusElement.value;
-            const adminNotes = notesElement
-                  ? notesElement.value.trim()
-                  : "";
-            const tailorName = document.getElementById("tailorSelect").value;
-            if (!tailorName) {
-                  alert(
-                        "Please select a tailor first."
-                  );
-                  return;
-            }
-            // ================================================
-            // REQUIRE NOTES FOR WORK PROGRESS
-            // ================================================
-            if (
-                  status === "ALTERATION_IN_PROGRESS" ||
-                  status === "QUALITY_CHECK" ||
-                  status === "COMPLETED"
-            ) {
-                  if (!adminNotes) {
-                        alert(
-                              "Please enter work notes before updating this status."
-                        );
-                        if (notesElement) {
-                              notesElement.focus();
-                        }
-                        return;
-                  }
-            }
-            try {
-                  const response = await fetch(
-                        `/api/alteration-request/${requestId}/status`,
-                        {
-                              method: "PUT",
-                              headers: {
-                                    "Content-Type":
-                                          "application/json"
-                              },
-                              body: JSON.stringify({
-                                    status: status,
-                                    tailor_name:
-                                          tailorName,
-                                    admin_notes:
-                                          adminNotes
-                              })
-                        }
-                  );
-                  const result =
-                        await response.json();
-                  if (
-                        !response.ok ||
-                        !result.success
-                  ) {
-                        throw new Error(
-                              result.message ||
-                              "Failed to update work"
-                        );
-                  }
-                  alert(
-                        `Request #${requestId} updated successfully.`
-                  );
-                  // ============================================
-                  // RELOAD REQUESTS
-                  // ============================================
-                  await loadTailorRequests(
-                        tailorName
-                  );
-            } catch (error) {
-                  console.error(
-                        "TAILOR WORK UPDATE ERROR:",
-                        error
-                  );
-                  alert(
-                        error.message ||
-                        "Failed to update tailor work."
-                  );
-            }
-      }
-      // =========================================================
-      // TAILOR SELECT CHANGE
-      // =========================================================
-      document
-            .getElementById("tailorSelect")
-            .addEventListener(
-                  "change",
-                  function () {
+            <span id="requestCount" class="request-count">
+                0
+            </span>
+        </div>
+        <!-- LOADING -->
+        <div id="tailorLoading" class="tailor-loading">
+            <div class="tailor-spinner"></div>
+            Select a tailor to load assigned requests.
+        </div>
+        <!-- EMPTY -->
+        <div id="tailorEmpty" class="tailor-empty">
+            <div class="empty-icon">
+                <i class="bi bi-inbox"></i>
+            </div>
+            <div class="empty-title">
+                No requests found
+            </div>
+            <div class="empty-text">
+                This tailor currently has no assigned alteration requests.
+            </div>
+        </div>
+        <!-- REQUESTS -->
+        <div id="requestsGrid" class="requests-grid">
+        </div>
+    </section>
+</div>
+<!-- =====================================================
+     STATUS UPDATE MODAL
+====================================================== -->
+<div id="statusModalBackdrop" class="status-modal-backdrop">
+    <div class="status-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                Update Request
+            </h3>
+            <button type="button" class="modal-close" onclick="closeStatusModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="mb-3">
+            <label class="modal-label">
+                Request Status
+            </label>
+            <select id="modalStatus" class="modal-select">
+                <option value="PICKED_UP">
+                    Picked Up
+                </option>
+                <option value="TAILOR_ASSIGNED">
+                    Tailor Assigned
+                </option>
+                <option value="ALTERATION_IN_PROGRESS">
+                    Alteration In Progress
+                </option>
+                <option value="QUALITY_CHECK">
+                    Quality Check
+                </option>
+                <option value="OUT_FOR_DELIVERY">
+                    Out For Delivery
+                </option>
+                <option value="COMPLETED">
+                    Completed
+                </option>
+            </select>
+        </div>
+        <div>
+            <label class="modal-label">
+                Work Notes
+            </label>
+            <textarea id="modalNotes" class="modal-textarea"
+                placeholder="Add work notes or customer-related information..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="request-btn" onclick="closeStatusModal()">
+                Cancel
+            </button>
+            <button type="button" id="saveStatusButton" class="request-btn primary">
+                <i class="bi bi-check2"></i>
+                Save Update
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    let selectedTailor = "";
+    let selectedRequestId = null;
+    /* =====================================================
+       INITIALIZATION
+    ===================================================== */
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            const selector =
+                document.getElementById(
+                    "tailorSelector"
+                );
+            selector.addEventListener(
+                "change",
+                function () {
+                    selectedTailor =
+                        this.value;
+                    if (selectedTailor) {
                         loadTailorRequests(
-                              this.value
+                            selectedTailor
                         );
-                  }
+                    } else {
+                        clearRequests();
+                    }
+                }
             );
-      /* function to save the pdf /print -->*/
-      function printRequestPDF(requestID) {
-            if (!requestID) {
-                  alert("invalid request id ");
-                  return;
+            document
+                .getElementById(
+                    "refreshButton"
+                )
+                .addEventListener(
+                    "click",
+                    function () {
+                        if (selectedTailor) {
+                            loadTailorRequests(
+                                selectedTailor
+                            );
+                        }
+                    }
+                );
+            document
+                .getElementById(
+                    "saveStatusButton"
+                )
+                .addEventListener(
+                    "click",
+                    saveStatusUpdate
+                );
+        }
+    );
+    /* =====================================================
+       LOAD TAILOR REQUESTS
+    ===================================================== */
+    async function loadTailorRequests(tailorName) {
+        const loading =
+            document.getElementById(
+                "tailorLoading"
+            );
+        const empty =
+            document.getElementById(
+                "tailorEmpty"
+            );
+        const grid =
+            document.getElementById(
+                "requestsGrid"
+            );
+        hideError();
+        loading.style.display =
+            "block";
+        empty.style.display =
+            "none";
+        grid.innerHTML = "";
+        try {
+            const response =
+                await fetch(
+                    `/api/tailor_requests/${encodeURIComponent(tailorName)}`
+                );
+            const result =
+                await response.json();
+            if (
+                !response.ok ||
+                !result.success
+            ) {
+                throw new Error(
+                    result.message ||
+                    "Failed to load tailor requests."
+                );
             }
-            window.open(`/print-request?id=${requestID}`);
-      }
+            const requests =
+                result.data || [];
+            loading.style.display =
+                "none";
+            updateStatistics(
+                requests
+            );
+            document
+                .getElementById(
+                    "requestCount"
+                )
+                .textContent =
+                requests.length;
+            if (requests.length === 0) {
+                empty.style.display =
+                    "block";
+                return;
+            }
+            requests.forEach(
+                function (request) {
+                    grid.appendChild(
+                        createRequestCard(
+                            request
+                        )
+                    );
+                }
+            );
+        } catch (error) {
+            console.error(
+                "Tailor Dashboard Error:",
+                error
+            );
+            loading.style.display =
+                "none";
+            showError(
+                error.message ||
+                "Unable to load requests."
+            );
+        }
+    }
+    /* =====================================================
+       CREATE REQUEST CARD
+    ===================================================== */
+    function createRequestCard(request) {
+        const card =
+            document.createElement(
+                "article"
+            );
+        card.className =
+            "request-card";
+        const status =
+            request.status ||
+            "REQUESTED";
+        const statusClass =
+            getStatusClass(
+                status
+            );
+        card.innerHTML = `
+        <div class="request-top">
+            <div>
+                <div class="request-number">
+                    REQUEST #${escapeHtml(request.request_id)}
+                </div>
+                <div class="customer-name">
+                    ${escapeHtml(
+            request.customer_name ||
+            "Customer"
+        )}
+                </div>
+            </div>
+            <span class="status-badge"
+                  style="
+                    background:${statusClass.background};
+                    color:${statusClass.color};
+                  ">
+                ${escapeHtml(
+            formatStatus(status)
+        )}
+            </span>
+        </div>
+        <div class="request-info">
+            <div>
+                <span class="info-label">
+                    Garment
+                </span>
+                <span class="info-value">
+                    ${escapeHtml(
+            request.garment_type ||
+            "--"
+        )}
+                </span>
+            </div>
+            <div>
+                <span class="info-label">
+                    Service
+                </span>
+                <span class="info-value">
+                    ${escapeHtml(
+            request.service_type ||
+            "--"
+        )}
+                </span>
+            </div>
+            <div>
+                <span class="info-label">
+                    Alteration
+                </span>
+                <span class="info-value">
+                    ${escapeHtml(
+            request.alteration_type ||
+            "Not specified"
+        )}
+                </span>
+            </div>
+            <div>
+                <span class="info-label">
+                    Phone
+                </span>
+                <span class="info-value">
+                    ${escapeHtml(
+            request.phone ||
+            "--"
+        )}
+                </span>
+            </div>
+        </div>
+        ${request.description
+                ? `
+                <div class="request-description">
+                    <strong>
+                        Customer note:
+                    </strong>
+                    ${escapeHtml(
+                    request.description
+                )}
+                </div>
+              `
+                : ""
+            }
+        <div class="request-actions">
+            <a
+                href="/request-detail?id=${encodeURIComponent(request.request_id)}"
+                class="request-btn primary">
+                <i class="bi bi-eye"></i>
+                View Request
+            </a>
+            <button
+                type="button"
+                class="request-btn"
+                onclick="openStatusModal(
+                    ${Number(request.request_id)},
+                    '${escapeJs(request.status || "PICKED_UP")}',
+                    '${escapeJs(request.admin_notes || "")}'
+                )">
+                <i class="bi bi-pencil-square"></i>
+                Update
+            </button>
+            <a
+                href="/quality_check/${encodeURIComponent(request.request_id)}"
+                class="request-btn success">
+                <i class="bi bi-check2-circle"></i>
+                Quality
+            </a>
+            <a
+                href="/print-request?id=${encodeURIComponent(request.request_id)}"
+                class="request-btn">
+                <i class="bi bi-file-earmark-pdf"></i>
+                PDF
+            </a>
+        </div>
+    `;
+        return card;
+    }
+    /* =====================================================
+       STATISTICS
+    ===================================================== */
+    function updateStatistics(requests) {
+        const total =
+            requests.length;
+        const inProgress =
+            requests.filter(
+                request =>
+                    request.status ===
+                    "ALTERATION_IN_PROGRESS"
+            ).length;
+        const quality =
+            requests.filter(
+                request =>
+                    request.status ===
+                    "QUALITY_CHECK"
+            ).length;
+        const completed =
+            requests.filter(
+                request =>
+                    request.status ===
+                    "COMPLETED"
+            ).length;
+        document
+            .getElementById(
+                "totalRequests"
+            )
+            .textContent =
+            total;
+        document
+            .getElementById(
+                "inProgressRequests"
+            )
+            .textContent =
+            inProgress;
+        document
+            .getElementById(
+                "qualityRequests"
+            )
+            .textContent =
+            quality;
+        document
+            .getElementById(
+                "completedRequests"
+            )
+            .textContent =
+            completed;
+    }
+    /* =====================================================
+       OPEN STATUS MODAL
+    ===================================================== */
+    function openStatusModal(
+        requestId,
+        currentStatus,
+        notes
+    ) {
+        selectedRequestId =
+            requestId;
+        document
+            .getElementById(
+                "modalStatus"
+            )
+            .value =
+            currentStatus;
+        document
+            .getElementById(
+                "modalNotes"
+            )
+            .value =
+            notes || "";
+        document
+            .getElementById(
+                "statusModalBackdrop"
+            )
+            .style.display =
+            "flex";
+    }
+    /* =====================================================
+       CLOSE STATUS MODAL
+    ===================================================== */
+    function closeStatusModal() {
+        selectedRequestId =
+            null;
+        document
+            .getElementById(
+                "statusModalBackdrop"
+            )
+            .style.display =
+            "none";
+    }
+    /* =====================================================
+       SAVE STATUS
+    ===================================================== */
+    async function saveStatusUpdate() {
+        if (!selectedRequestId) {
+            return;
+        }
+        const status =
+            document
+                .getElementById(
+                    "modalStatus"
+                )
+                .value;
+        const notes =
+            document
+                .getElementById(
+                    "modalNotes"
+                )
+                .value
+                .trim();
+        const button =
+            document
+                .getElementById(
+                    "saveStatusButton"
+                );
+        const originalText =
+            button.innerHTML;
+        button.disabled =
+            true;
+        button.innerHTML = `
+        <span class="spinner-border spinner-border-sm"></span>
+        Saving...
+    `;
+        try {
+            const response =
+                await fetch(
+                    `/api/alteration-request/${selectedRequestId}/status`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body: JSON.stringify({
+                            status:
+                                status,
+                            tailor_name:
+                                selectedTailor,
+                            admin_notes:
+                                notes
+                        })
+                    }
+                );
+            const result =
+                await response.json();
+            if (
+                !response.ok ||
+                !result.success
+            ) {
+                throw new Error(
+                    result.message ||
+                    "Failed to update request."
+                );
+            }
+            closeStatusModal();
+            await loadTailorRequests(
+                selectedTailor
+            );
+        } catch (error) {
+            console.error(
+                "Status Update Error:",
+                error
+            );
+            showError(
+                error.message ||
+                "Unable to update request."
+            );
+        } finally {
+            button.disabled =
+                false;
+            button.innerHTML =
+                originalText;
+        }
+    }
+    /* =====================================================
+       CLEAR
+    ===================================================== */
+    function clearRequests() {
+        document
+            .getElementById(
+                "requestsGrid"
+            )
+            .innerHTML = "";
+        document
+            .getElementById(
+                "tailorEmpty"
+            )
+            .style.display =
+            "none";
+        document
+            .getElementById(
+                "tailorLoading"
+            )
+            .style.display =
+            "block";
+        document
+            .getElementById(
+                "tailorLoading"
+            )
+            .innerHTML = `
+            <i class="bi bi-person-workspace"
+               style="font-size:28px; display:block; margin-bottom:10px;">
+            </i>
+            Select a tailor to load assigned requests.
+        `;
+        updateStatistics([]);
+    }
+    /* =====================================================
+       STATUS COLORS
+    ===================================================== */
+    function getStatusClass(status) {
+        const colors = {
+            COMPLETED: {
+                background: "#eaf7ef",
+                color: "#187344"
+            },
+            QUALITY_CHECK: {
+                background: "#eef8f7",
+                color: "#237b75"
+            },
+            ALTERATION_IN_PROGRESS: {
+                background: "#fff5df",
+                color: "#91621c"
+            },
+            OUT_FOR_DELIVERY: {
+                background: "#edf5ff",
+                color: "#2865a5"
+            },
+            PICKED_UP: {
+                background: "#eef4ff",
+                color: "#3564a8"
+            },
+            TAILOR_ASSIGNED: {
+                background: "#f2edff",
+                color: "#6545a5"
+            },
+            CANCELLED: {
+                background: "#fff0f0",
+                color: "#b33a3a"
+            }
+        };
+        return colors[status] || {
+            background: "#f3f4f6",
+            color: "#60636b"
+        };
+    }
+    /* =====================================================
+       STATUS FORMAT
+    ===================================================== */
+    function formatStatus(status) {
+        return String(status || "")
+            .toLowerCase()
+            .split("_")
+            .map(
+                word =>
+                    word.charAt(0).toUpperCase() +
+                    word.slice(1)
+            )
+            .join(" ");
+    }
+    /* =====================================================
+       ERROR
+    ===================================================== */
+    function showError(message) {
+        const element =
+            document.getElementById(
+                "tailorError"
+            );
+        element.textContent =
+            message;
+        element.style.display =
+            "block";
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+    function hideError() {
+        document
+            .getElementById(
+                "tailorError"
+            )
+            .style.display =
+            "none";
+    }
+    /* =====================================================
+       HTML ESCAPE
+    ===================================================== */
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    /* =====================================================
+       JS ESCAPE
+    ===================================================== */
+    function escapeJs(value) {
+        return String(value)
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'")
+            .replace(/\n/g, "\\n")
+            .replace(/\r/g, "\\r");
+    }
+    /* =====================================================
+       CLOSE MODAL WHEN CLICKING OUTSIDE
+    ===================================================== */
+    document.addEventListener(
+        "click",
+        function (event) {
+            const backdrop =
+                document.getElementById(
+                    "statusModalBackdrop"
+                );
+            if (
+                event.target === backdrop
+            ) {
+                closeStatusModal();
+            }
+        }
+    );
 </script>
 {% endblock %}

@@ -1,573 +1,480 @@
+
 // =====================================================
 // materialEngine.js
-// Professional Runtime Material Controller
+// Runtime Garment Material, Fabric and Pattern Controller
 // =====================================================
 
 export class MaterialEngine {
     constructor() {
-        this.textureLoader=new THREE.TextureLoader();
+        this.textureLoader = new THREE.TextureLoader();
+        this.textureCache = new Map();
         console.log("✅ Material Engine Initialized");
     }
 
-    // =================================================
-    // APPLY COLOR
-    // =================================================
+    getMaterials(garment) {
+        const materials = [];
 
-    applyColor(garment,color) {
-        if(!garment||!color) {
-            return;
+        if (!garment) {
+            return materials;
         }
 
-        garment.traverse((child)=>{
-            if(!child.isMesh||!child.material) {
+        garment.traverse((child) => {
+            if (!child.isMesh || !child.material) {
                 return;
             }
 
-            const materials=Array.isArray(child.material)
-                ?child.material
-                :[child.material];
+            const childMaterials = Array.isArray(child.material)
+                ? child.material
+                : [child.material];
 
-            materials.forEach((material)=>{
-                if(material.color) {
-                    material.color.set(color);
+            childMaterials.forEach((material) => {
+                if (material) {
+                    materials.push(material);
                 }
-
-                material.needsUpdate=true;
             });
         });
 
-        console.log("🎨 Garment color applied:",color);
+        return materials;
     }
 
-    // =================================================
-    // APPLY TEXTURE
-    // =================================================
-
-    applyTexture(garment,texturePath) {
-        return new Promise((resolve,reject)=>{
-            if(!garment||!texturePath) {
-                reject(
-                    new Error(
-                        "Garment and texture path are required"
-                    )
-                );
-                return;
-            }
-
-            this.textureLoader.load(
-                texturePath,
-                (texture)=>{
-                    texture.wrapS=THREE.RepeatWrapping;
-                    texture.wrapT=THREE.RepeatWrapping;
-                    texture.repeat.set(1,1);
-                    texture.needsUpdate=true;
-
-                    garment.traverse((child)=>{
-                        if(
-                            !child.isMesh||
-                            !child.material
-                        ) {
-                            return;
-                        }
-
-                        const materials=
-                            Array.isArray(child.material)
-                                ?child.material
-                                :[child.material];
-
-                        materials.forEach((material)=>{
-                            material.map=texture;
-                            material.needsUpdate=true;
-                        });
-                    });
-
-                    console.log(
-                        "🧵 Texture applied:",
-                        texturePath
-                    );
-
-                    resolve(texture);
-                },
-                undefined,
-                (error)=>{
-                    console.error(
-                        "❌ Texture loading failed:",
-                        error
-                    );
-
-                    reject(error);
-                }
-            );
-        });
-    }
-
-    // =================================================
-    // REMOVE TEXTURE
-    // =================================================
-
-    removeTexture(garment) {
-        if(!garment) {
+    applyColor(garment, color) {
+        if (!garment || color === null || color === undefined) {
             return;
         }
 
-        garment.traverse((child)=>{
-            if(
-                !child.isMesh||
-                !child.material
-            ) {
-                return;
+        const materials = this.getMaterials(garment);
+
+        materials.forEach((material) => {
+            if (material.color) {
+                material.color.set(color);
             }
 
-            const materials=
-                Array.isArray(child.material)
-                    ?child.material
-                    :[child.material];
+            material.needsUpdate = true;
+        });
 
-            materials.forEach((material)=>{
-                if(material.map) {
-                    material.map.dispose();
+        console.log("🎨 Garment color applied:", color);
+    }
+
+    async applyTexture(garment, texturePath, repeatX = 1, repeatY = 1) {
+        if (!garment || !texturePath) {
+            throw new Error("Garment and texture path are required");
+        }
+
+        try {
+            const texture = await this.loadTexture(texturePath);
+
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(repeatX, repeatY);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.needsUpdate = true;
+
+            const materials = this.getMaterials(garment);
+
+            materials.forEach((material) => {
+                if (material.map && material.map !== texture) {
+                    this.disposeTexture(material.map);
                 }
 
-                material.map=null;
-                material.needsUpdate=true;
+                material.map = texture;
+
+                if (material.color) {
+                    material.color.set(0xffffff);
+                }
+
+                material.needsUpdate = true;
             });
-        });
 
-        console.log("🗑️ Texture removed");
+            console.log("🧵 Texture applied:", texturePath);
+            return texture;
+        } catch (error) {
+            console.error("❌ Texture loading failed:", texturePath, error);
+            throw error;
+        }
     }
 
-    // =================================================
-    // APPLY FABRIC
-    // =================================================
-
-    applyFabric(garment,fabricType) {
-        if(!garment) {
-            return;
+    async applyFabric(garment, fabricType, texturePath = null) {
+        if (!garment) {
+            return null;
         }
 
-        const fabricSettings={
-            cotton:{
-                roughness:0.85,
-                metalness:0.0
+        const fabricSettings = {
+            cotton: {
+                roughness: 0.85,
+                metalness: 0.0,
+                repeat: 4
             },
-            denim:{
-                roughness:0.75,
-                metalness:0.0
+            denim: {
+                roughness: 0.75,
+                metalness: 0.0,
+                repeat: 3
             },
-            silk:{
-                roughness:0.25,
-                metalness:0.0
+            silk: {
+                roughness: 0.25,
+                metalness: 0.0,
+                repeat: 2
             },
-            leather:{
-                roughness:0.35,
-                metalness:0.0
+            leather: {
+                roughness: 0.35,
+                metalness: 0.0,
+                repeat: 2
             },
-            wool:{
-                roughness:0.95,
-                metalness:0.0
+            wool: {
+                roughness: 0.95,
+                metalness: 0.0,
+                repeat: 4
             },
-            polyester:{
-                roughness:0.55,
-                metalness:0.0
+            polyester: {
+                roughness: 0.55,
+                metalness: 0.0,
+                repeat: 4
             }
         };
 
-        const settings=
-            fabricSettings[
-                String(fabricType).toLowerCase()
-            ]||
-            fabricSettings.cotton;
+        const type = String(fabricType || "cotton").toLowerCase();
+        const settings = fabricSettings[type] || fabricSettings.cotton;
 
-        garment.traverse((child)=>{
-            if(
-                !child.isMesh||
-                !child.material
-            ) {
-                return;
-            }
-
-            const materials=
-                Array.isArray(child.material)
-                    ?child.material
-                    :[child.material];
-
-            materials.forEach((material)=>{
-                material.roughness=
-                    settings.roughness;
-
-                material.metalness=
-                    settings.metalness;
-
-                material.needsUpdate=true;
-            });
-        });
-
-        console.log(
-            "🧵 Fabric applied:",
-            fabricType
-        );
-    }
-
-    // =================================================
-    // SET ROUGHNESS
-    // =================================================
-
-    setRoughness(garment,roughness) {
-        if(!garment) {
-            return;
-        }
-
-        garment.traverse((child)=>{
-            if(
-                !child.isMesh||
-                !child.material
-            ) {
-                return;
-            }
-
-            const materials=
-                Array.isArray(child.material)
-                    ?child.material
-                    :[child.material];
-
-            materials.forEach((material)=>{
-                material.roughness=
-                    THREE.MathUtils.clamp(
-                        Number(roughness),
-                        0,
-                        1
-                    );
-
-                material.needsUpdate=true;
-            });
-        });
-    }
-
-    // =================================================
-    // SET METALNESS
-    // =================================================
-
-    setMetalness(garment,metalness) {
-        if(!garment) {
-            return;
-        }
-
-        garment.traverse((child)=>{
-            if(
-                !child.isMesh||
-                !child.material
-            ) {
-                return;
-            }
-
-            const materials=
-                Array.isArray(child.material)
-                    ?child.material
-                    :[child.material];
-
-            materials.forEach((material)=>{
-                material.metalness=
-                    THREE.MathUtils.clamp(
-                        Number(metalness),
-                        0,
-                        1
-                    );
-
-                material.needsUpdate=true;
-            });
-        });
-    }
-}
-
-
-
-// ====================== HERE I GET STRTED TO WORK ON TEXTUTE ON CLICK ON BTN =================
-// =====================================================
-// materialEngine.js
-// Runtime Color, Fabric Texture and Pattern System
-// =====================================================
-
-// =====================================================
-// TEXTURE LOADER
-// =====================================================
-
-const textureLoader = new THREE.TextureLoader();
-// =====================================================
-// GET SELECTED GARMENT
-// =====================================================
-
-function getSelectedGarment(target) {
-
-    const manager = window.garmentManager;
-
-    if (!manager) {
-        console.error(
-            "❌ Garment manager is not available"
+        this.setMaterialProperties(
+            garment,
+            settings.roughness,
+            settings.metalness
         );
 
+        if (texturePath) {
+            return await this.applyTexture(
+                garment,
+                texturePath,
+                settings.repeat,
+                settings.repeat
+            );
+        }
+
+        console.log("🧵 Fabric applied:", type);
         return null;
     }
 
-    console.log(
-        "✅ Garment manager found:",
-        manager
-    );
+    async applyPattern(garment, texturePath, repeatX = 5, repeatY = 5) {
+        if (!garment || !texturePath) {
+            throw new Error("Garment and pattern path are required");
+        }
 
+        const texture = await this.applyTexture(
+            garment,
+            texturePath,
+            repeatX,
+            repeatY
+        );
+
+        console.log("🧩 Pattern applied:", texturePath);
+        return texture;
+    }
+
+    removeTexture(garment) {
+        if (!garment) {
+            return;
+        }
+
+        const materials = this.getMaterials(garment);
+
+        materials.forEach((material) => {
+            if (material.map) {
+                this.disposeTexture(material.map);
+                material.map = null;
+            }
+
+            material.needsUpdate = true;
+        });
+
+        console.log("🗑️ Garment texture removed");
+    }
+
+    clearTexture(garment) {
+        this.removeTexture(garment);
+    }
+
+    setRoughness(garment, roughness) {
+        if (!garment) {
+            return;
+        }
+
+        const value = THREE.MathUtils.clamp(
+            Number(roughness),
+            0,
+            1
+        );
+
+        const materials = this.getMaterials(garment);
+
+        materials.forEach((material) => {
+            material.roughness = value;
+            material.needsUpdate = true;
+        });
+
+        console.log("🪡 Roughness updated:", value);
+    }
+
+    setMetalness(garment, metalness) {
+        if (!garment) {
+            return;
+        }
+
+        const value = THREE.MathUtils.clamp(
+            Number(metalness),
+            0,
+            1
+        );
+
+        const materials = this.getMaterials(garment);
+
+        materials.forEach((material) => {
+            material.metalness = value;
+            material.needsUpdate = true;
+        });
+
+        console.log("✨ Metalness updated:", value);
+    }
+
+    setMaterialProperties(garment, roughness, metalness) {
+        if (!garment) {
+            return;
+        }
+
+        const materials = this.getMaterials(garment);
+
+        materials.forEach((material) => {
+            if (roughness !== undefined) {
+                material.roughness = roughness;
+            }
+
+            if (metalness !== undefined) {
+                material.metalness = metalness;
+            }
+
+            material.needsUpdate = true;
+        });
+    }
+
+    async loadTexture(texturePath) {
+        if (this.textureCache.has(texturePath)) {
+            return this.textureCache.get(texturePath);
+        }
+
+        const texture = await new Promise((resolve, reject) => {
+            this.textureLoader.load(
+                texturePath,
+                resolve,
+                undefined,
+                reject
+            );
+        });
+
+        this.textureCache.set(texturePath, texture);
+        return texture;
+    }
+
+    disposeTexture(texture) {
+        if (!texture) {
+            return;
+        }
+
+        let isCached = false;
+
+        for (const cachedTexture of this.textureCache.values()) {
+            if (cachedTexture === texture) {
+                isCached = true;
+                break;
+            }
+        }
+
+        if (!isCached) {
+            texture.dispose();
+        }
+    }
+
+    disposeGarmentMaterials(garment) {
+        if (!garment) {
+            return;
+        }
+
+        const materials = this.getMaterials(garment);
+
+        materials.forEach((material) => {
+            if (material.map) {
+                this.disposeTexture(material.map);
+                material.map = null;
+            }
+
+            material.dispose();
+        });
+
+        console.log("🗑️ Garment materials disposed");
+    }
+}
+
+
+// =====================================================
+// GLOBAL COMPATIBILITY HELPERS
+// Existing HTML buttons can continue using these.
+// Primary material control remains MaterialEngine.
+// =====================================================
+
+function getSelectedGarment(target) {
+    const manager = window.garmentManager;
+
+    if (!manager) {
+        console.error("❌ Garment manager is not available");
+        return null;
+    }
 
     if (target === "shirt") {
-
-        return (
-            manager.shirt ||
-            manager.currentShirt ||
-            manager.shirtGarment ||
-            null
-        );
+        return manager.getShirt
+            ? manager.getShirt()
+            : manager.shirt || null;
     }
-
 
     if (target === "pant") {
-
-        return (
-            manager.pant ||
-            manager.currentPant ||
-            manager.pantGarment ||
-            null
-        );
+        return manager.getPant
+            ? manager.getPant()
+            : manager.pant || null;
     }
 
-
-    console.error(
-        "❌ Invalid target:",
-        target
-    );
-
+    console.error("❌ Invalid garment target:", target);
     return null;
-    console.log(window.garmentManager);
-console.log(window.garmentManager.shirt);
 }
 
-// // =====================================================
-// APPLY COLOR
-// =====================================================
+function getMaterialEngine() {
+    const manager = window.garmentManager;
 
-function applyGarmentColor(target,color){
-    console.log("Color Target:", target);
-    console.log("Color garment:", garment);
-
-    const garment = getSelectedGarment(target);
-    console.log("Selected Garment:", garment);
-    if(!garment){
-        console.warn(`${target} is not loaded`);
-        return;
+    if (!manager) {
+        console.error("❌ Garment manager is not available");
+        return null;
     }
-    garment.traverse((child)=>{
-        if(child.isMesh && child.material){
-            child.material.color.set(color);
-            child.material.needsUpdate= true;
-        }
-    });
 
-    console.log(`${target} color updated`,color);
+    if (!manager.materialEngine) {
+        console.error("❌ Material engine is not available");
+        return null;
+    }
+
+    return manager.materialEngine;
 }
 
 
 // =====================================================
-// APPLY FABRIC TEXTURE
+// GLOBAL COLOR FUNCTION
 // =====================================================
 
-function applyGarmentFabric(
-    target,
-    texturePath
-) {
-
-    const garment =
-        getSelectedGarment(
-            target
-        );
+function applyGarmentColor(target, color) {
+    const garment = getSelectedGarment(target);
 
     if (!garment) {
-
-        console.warn(
-            `${target} is not loaded`
-        );
-
+        console.warn(`⚠️ ${target} is not loaded`);
         return;
     }
 
-    const loader =
-        new THREE.TextureLoader();
+    const materialEngine = getMaterialEngine();
 
-    loader.load(
+    if (!materialEngine) {
+        return;
+    }
 
-        texturePath,
-
-        function(texture) {
-
-            texture.wrapS =
-                THREE.RepeatWrapping;
-
-            texture.wrapT =
-                THREE.RepeatWrapping;
-
-            texture.repeat.set(
-                4,
-                4
-            );
-
-            garment.traverse(
-                function(child) {
-
-                    if (
-                        child.isMesh &&
-                        child.material
-                    ) {
-
-                        child.material.map =
-                            texture;
-
-                        child.material.color.set(
-                            0xffffff
-                        );
-
-                        child.material.needsUpdate =
-                            true;
-                    }
-                }
-            );
-
-            console.log(
-                "Fabric applied:",
-                texturePath
-            );
-        },
-
-        undefined,
-
-        function(error) {
-
-            console.error(
-                "Fabric loading failed:",
-                texturePath,
-                error
-            );
-        }
-    );
+    materialEngine.applyColor(garment, color);
 }
 
 
-
 // =====================================================
-// APPLY PATTERN
+// GLOBAL FABRIC FUNCTION
 // =====================================================
-function applyGarmentPattern(
-    target,
-    texturePath
-) {
 
-    const garment =
-        getSelectedGarment(
-            target
-        );
+async function applyGarmentFabric(target, texturePath) {
+    const garment = getSelectedGarment(target);
 
     if (!garment) {
+        console.warn(`⚠️ ${target} is not loaded`);
+        return;
+    }
 
-        console.warn(
-            `${target} is not loaded`
+    const materialEngine = getMaterialEngine();
+
+    if (!materialEngine) {
+        return;
+    }
+
+    try {
+        await materialEngine.applyFabric(
+            garment,
+            "cotton",
+            texturePath
         );
-
-        return;
+    } catch (error) {
+        console.error(
+            "❌ Fabric application failed:",
+            error
+        );
     }
-
-    const loader =
-        new THREE.TextureLoader();
-
-    loader.load(
-
-        texturePath,
-
-        function(texture) {
-
-            texture.wrapS =
-                THREE.RepeatWrapping;
-
-            texture.wrapT =
-                THREE.RepeatWrapping;
-
-            texture.repeat.set(
-                5,
-                5
-            );
-
-            garment.traverse(
-                function(child) {
-
-                    if (
-                        child.isMesh &&
-                        child.material
-                    ) {
-
-                        child.material.map =
-                            texture;
-
-                        child.material.color.set(
-                            0xffffff
-                        );
-
-                        child.material.needsUpdate =
-                            true;
-                    }
-                }
-            );
-
-            console.log(
-                "Pattern applied:",
-                texturePath
-            );
-        },
-
-        undefined,
-
-        function(error) {
-
-            console.error(
-                "Pattern loading failed:",
-                texturePath,
-                error
-            );
-        }
-    );
 }
 
+
 // =====================================================
-// REMOVE TEXTURE / PATTERN
+// GLOBAL PATTERN FUNCTION
 // =====================================================
 
-function clearGarmentTexture(target){
+async function applyGarmentPattern(target, texturePath) {
     const garment = getSelectedGarment(target);
-    if(!garment){
+
+    if (!garment) {
+        console.warn(`⚠️ ${target} is not loaded`);
         return;
     }
 
-    garment.traverse((child)=>{
-        if(child.isMesh && child.material){
-            child.material.map = null;
-            child.material.needsUpdate =true;
-        }
-    });
+    const materialEngine = getMaterialEngine();
 
-    console.log(`${target} texture cleared`)
+    if (!materialEngine) {
+        return;
+    }
+
+    try {
+        await materialEngine.applyPattern(
+            garment,
+            texturePath,
+            5,
+            5
+        );
+    } catch (error) {
+        console.error(
+            "❌ Pattern application failed:",
+            error
+        );
+    }
 }
 
 
-// apply globle avaialabel 
-window.applyGarmentFabric =
-    applyGarmentFabric;
+// =====================================================
+// GLOBAL CLEAR TEXTURE FUNCTION
+// =====================================================
 
-window.applyGarmentPattern =
-    applyGarmentPattern;
+function clearGarmentTexture(target) {
+    const garment = getSelectedGarment(target);
 
-window.clearGarmentTexture =
-    clearGarmentTexture;
+    if (!garment) {
+        console.warn(`⚠️ ${target} is not loaded`);
+        return;
+    }
 
-window.applyGarmentColor =
-    applyGarmentColor;
+    const materialEngine = getMaterialEngine();
+
+    if (!materialEngine) {
+        return;
+    }
+
+    materialEngine.removeTexture(garment);
+}
+
+
+// =====================================================
+// EXISTING BUTTON COMPATIBILITY
+// =====================================================
+
+window.applyGarmentColor = applyGarmentColor;
+window.applyGarmentFabric = applyGarmentFabric;
+window.applyGarmentPattern = applyGarmentPattern;
+window.clearGarmentTexture = clearGarmentTexture;
